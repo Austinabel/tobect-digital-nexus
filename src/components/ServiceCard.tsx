@@ -8,17 +8,18 @@ interface ServiceCardProps {
   service: ServiceCategory;
 }
 
-type IconName = keyof typeof Icons;
-
 const ServiceCard = ({ service }: ServiceCardProps) => {
-  // Find icon by name or use a default
-  const IconComponent = Icons[service.icon as IconName] || Icons.FileText;
-
+  // Use a safer way to handle the icon component
+  const IconComponent = service.icon && typeof service.icon === 'string' && 
+    service.icon in Icons ? 
+    (Icons as Record<string, React.ComponentType<any>>)[service.icon] : 
+    Icons.FileText;
+  
   return (
     <Card className="service-card p-6 h-full flex flex-col transition-all hover:shadow-lg hover:border-tobecatBlue-400 overflow-hidden relative">
       <div className="flex justify-between items-start mb-4">
         <div className="p-3 bg-tobecatBlue-100 rounded-lg text-tobecatBlue-600">
-          <IconComponent size={24} />
+          {IconComponent && <IconComponent size={24} />}
         </div>
       </div>
       <h3 className="text-xl font-semibold text-tobecatGray-800 mb-2">{service.title}</h3>
