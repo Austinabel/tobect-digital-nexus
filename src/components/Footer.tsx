@@ -1,5 +1,6 @@
 
-import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, Briefcase, Book, Users, Star, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -43,11 +44,36 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-lg mb-6">Quick Links</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-tobecatGray-300 hover:text-white transition-colors">About Us</a></li>
-              <li><a href="#" className="text-tobecatGray-300 hover:text-white transition-colors">Portfolio</a></li>
-              <li><a href="#" className="text-tobecatGray-300 hover:text-white transition-colors">Testimonials</a></li>
-              <li><a href="#" className="text-tobecatGray-300 hover:text-white transition-colors">Blog</a></li>
-              <li><a href="#" className="text-tobecatGray-300 hover:text-white transition-colors">Careers</a></li>
+              <li>
+                <Link to="/about" className="text-tobecatGray-300 hover:text-white transition-colors flex items-center">
+                  <Info className="h-4 w-4 mr-2" />
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/portfolio" className="text-tobecatGray-300 hover:text-white transition-colors flex items-center">
+                  <Briefcase className="h-4 w-4 mr-2" />
+                  Portfolio
+                </Link>
+              </li>
+              <li>
+                <Link to="/testimonials" className="text-tobecatGray-300 hover:text-white transition-colors flex items-center">
+                  <Star className="h-4 w-4 mr-2" />
+                  Testimonials
+                </Link>
+              </li>
+              <li>
+                <Link to="/blog" className="text-tobecatGray-300 hover:text-white transition-colors flex items-center">
+                  <Book className="h-4 w-4 mr-2" />
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link to="/careers" className="text-tobecatGray-300 hover:text-white transition-colors flex items-center">
+                  <Users className="h-4 w-4 mr-2" />
+                  Careers
+                </Link>
+              </li>
             </ul>
           </div>
           
