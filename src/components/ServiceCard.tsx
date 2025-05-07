@@ -9,11 +9,10 @@ interface ServiceCardProps {
 }
 
 const ServiceCard = ({ service }: ServiceCardProps) => {
-  // Use a safer way to handle the icon component
-  const IconComponent = service.icon && typeof service.icon === 'string' && 
-    service.icon in Icons ? 
-    (Icons as Record<string, React.ComponentType<any>>)[service.icon] : 
-    Icons.FileText;
+  // Get the icon component more safely with type casting
+  const IconComponent = service.icon && typeof service.icon === 'string' 
+    ? (Icons as any)[service.icon] || Icons.FileText
+    : Icons.FileText;
   
   return (
     <Card className="service-card p-6 h-full flex flex-col transition-all hover:shadow-lg hover:border-tobecatBlue-400 overflow-hidden relative">
