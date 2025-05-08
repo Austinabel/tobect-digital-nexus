@@ -38,6 +38,9 @@ const Navbar = () => {
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
+          <Link to="/services" className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105">
+            Services
+          </Link>
           <Link to="/portfolio" className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105">
             Portfolio
           </Link>
@@ -73,6 +76,13 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-sky-700 shadow-lg absolute w-full animate-fade-in">
           <div className="flex flex-col py-4 px-4 space-y-4">
+            <Link
+              to="/services"
+              className="font-medium text-white hover:text-orange-300 transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Services
+            </Link>
             <Link
               to="/portfolio"
               className="font-medium text-white hover:text-orange-300 transition-colors py-2"
