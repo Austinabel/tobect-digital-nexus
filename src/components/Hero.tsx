@@ -9,10 +9,12 @@ const Hero = () => {
   const [isTypingComplete, setIsTypingComplete] = useState(false);
 
   useEffect(() => {
+    setTypedText('');
     let currentIndex = 0;
+    
     const typingInterval = setInterval(() => {
       if (currentIndex < fullText.length) {
-        setTypedText(prev => prev + fullText[currentIndex]);
+        setTypedText(fullText.substring(0, currentIndex + 1));
         currentIndex++;
       } else {
         clearInterval(typingInterval);
