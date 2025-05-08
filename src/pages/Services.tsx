@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { services } from '@/data/services';
@@ -9,6 +9,19 @@ import * as Icons from 'lucide-react';
 
 const Services = () => {
   const [activeTab, setActiveTab] = useState(services[0].id.toString());
+
+  // Handle hash in URL for direct linking
+  useEffect(() => {
+    // Get hash from URL (remove the # character)
+    const hash = window.location.hash.substring(1);
+    if (hash) {
+      // If there's a service with this ID, activate its tab
+      const service = services.find(s => s.id.toString() === hash);
+      if (service) {
+        setActiveTab(service.id.toString());
+      }
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -24,7 +37,7 @@ const Services = () => {
             </p>
           </div>
 
-          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="mb-8 overflow-x-auto">
               <TabsList className="w-full justify-start md:justify-center flex-wrap border-b bg-transparent p-0">
                 {services.map((service) => {
@@ -35,6 +48,7 @@ const Services = () => {
                   return (
                     <TabsTrigger 
                       key={service.id} 
+                      id={`tab-${service.id}`}
                       value={service.id.toString()}
                       className="flex items-center gap-2 py-3 px-4 data-[state=active]:border-b-2 data-[state=active]:border-tobecatBlue-600 rounded-none bg-transparent data-[state=active]:bg-sky-50 data-[state=active]:text-tobecatBlue-600"
                     >
@@ -52,7 +66,12 @@ const Services = () => {
                 : Icons.FileText;
               
               return (
-                <TabsContent key={service.id} value={service.id.toString()} className="animate-fade-in">
+                <TabsContent 
+                  key={service.id} 
+                  value={service.id.toString()} 
+                  id={service.id.toString()} 
+                  className="animate-fade-in"
+                >
                   <Card className="p-6 md:p-8 shadow-md">
                     <div className="flex flex-col md:flex-row md:items-start gap-6">
                       <div className="flex-shrink-0">

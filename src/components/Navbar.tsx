@@ -1,8 +1,15 @@
 
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { services } from '@/data/services';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -38,9 +45,30 @@ const Navbar = () => {
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link to="/services" className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105">
-            Services
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105 flex items-center">
+              Services <ChevronDown size={16} className="ml-1" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-white">
+              {services.map((service) => (
+                <DropdownMenuItem key={service.id} className="hover:bg-sky-50">
+                  <Link 
+                    to={`/services#${service.id}`} 
+                    className="w-full py-1"
+                    onClick={() => {
+                      // Ensure the tab is activated when clicked
+                      const element = document.getElementById(`tab-${service.id}`);
+                      if (element) {
+                        setTimeout(() => element.click(), 100);
+                      }
+                    }}
+                  >
+                    {service.title}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Link to="/portfolio" className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105">
             Portfolio
           </Link>
@@ -76,13 +104,41 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-sky-700 shadow-lg absolute w-full animate-fade-in">
           <div className="flex flex-col py-4 px-4 space-y-4">
-            <Link
-              to="/services"
-              className="font-medium text-white hover:text-orange-300 transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Services
-            </Link>
+            <div className="relative">
+              <button
+                className="font-medium text-white hover:text-orange-300 transition-colors py-2 flex items-center w-full"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const subMenu = document.getElementById('mobileServicesMenu');
+                  if (subMenu) {
+                    subMenu.classList.toggle('hidden');
+                  }
+                }}
+              >
+                Services <ChevronDown size={16} className="ml-1" />
+              </button>
+              <div id="mobileServicesMenu" className="hidden pl-4 mt-2 space-y-2">
+                {services.map((service) => (
+                  <Link
+                    key={service.id}
+                    to={`/services#${service.id}`}
+                    className="block text-white hover:text-orange-300 py-1"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      // Ensure the tab is activated when clicked
+                      setTimeout(() => {
+                        const element = document.getElementById(`tab-${service.id}`);
+                        if (element) {
+                          element.click();
+                        }
+                      }, 100);
+                    }}
+                  >
+                    {service.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
             <Link
               to="/portfolio"
               className="font-medium text-white hover:text-orange-300 transition-colors py-2"
