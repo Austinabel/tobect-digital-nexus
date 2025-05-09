@@ -69,6 +69,9 @@ const Navbar = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          <Link to="/products" className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105">
+            Products
+          </Link>
           <Link to="/portfolio" className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105">
             Portfolio
           </Link>
@@ -138,6 +141,13 @@ const Navbar = () => {
                 ))}
               </div>
             </div>
+            <Link
+              to="/products"
+              className="font-medium text-white hover:text-orange-300 transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Products
+            </Link>
             <Link
               to="/portfolio"
               className="font-medium text-white hover:text-orange-300 transition-colors py-2"

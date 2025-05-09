@@ -10,6 +10,7 @@ import AboutUs from "./pages/AboutUs";
 import Portfolio from "./pages/Portfolio";
 import Blog from "./pages/Blog";
 import Services from "./pages/Services";
+import Products from "./pages/Products";
 import Testimonials from "./pages/Testimonials";
 import GetQuote from "./pages/GetQuote";
 import AdminPanel from "./pages/AdminPanel";
@@ -37,6 +38,7 @@ const App = () => {
               <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/services" element={<Services />} />
+              <Route path="/products" element={<Products />} />
               <Route path="/testimonials" element={<Testimonials />} />
               <Route path="/get-quote" element={<GetQuote />} />
               <Route path="/admin" element={<AdminPanel />} />
