@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Plus, Pencil, Trash } from 'lucide-react';
+import { Plus, Pencil, Trash, Upload, Image } from 'lucide-react';
 
 // Mock blog posts data (in a real app, this would come from a database)
 const initialBlogPosts = [
@@ -15,7 +15,8 @@ const initialBlogPosts = [
     excerpt: "Exploring the latest trends and technologies in web development.",
     content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     author: "John Doe",
-    date: "2025-04-15"
+    date: "2025-04-15",
+    imageUrl: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
   },
   {
     id: 2,
@@ -23,7 +24,8 @@ const initialBlogPosts = [
     excerpt: "Essential UX design principles every designer should know.",
     content: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     author: "Jane Smith",
-    date: "2025-04-10"
+    date: "2025-04-10",
+    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
   }
 ];
 
@@ -34,6 +36,7 @@ interface BlogPost {
   content: string;
   author: string;
   date: string;
+  imageUrl?: string;
 }
 
 const BlogPostManager = () => {
@@ -46,8 +49,10 @@ const BlogPostManager = () => {
     excerpt: '',
     content: '',
     author: '',
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    imageUrl: ''
   });
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const resetForm = () => {
     setFormData({
@@ -55,8 +60,10 @@ const BlogPostManager = () => {
       excerpt: '',
       content: '',
       author: '',
-      date: new Date().toISOString().split('T')[0]
+      date: new Date().toISOString().split('T')[0],
+      imageUrl: ''
     });
+    setPreviewImage(null);
   };
 
   const handleAddPost = () => {
@@ -117,8 +124,10 @@ const BlogPostManager = () => {
       excerpt: post.excerpt,
       content: post.content,
       author: post.author,
-      date: post.date
+      date: post.date,
+      imageUrl: post.imageUrl || ''
     });
+    setPreviewImage(post.imageUrl || null);
   };
 
   const handleDeletePost = (id: number) => {
@@ -136,20 +145,39 @@ const BlogPostManager = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // In a real app, you'd upload this to a server and get a URL back
+      // For this demo, we'll just create a local object URL
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewImage(objectUrl);
+      setFormData(prev => ({ ...prev, imageUrl: objectUrl }));
+      
+      toast({
+        title: "Image selected",
+        description: "Image ready to be uploaded with post",
+      });
+    }
+  };
   
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Manage Blog Posts</h2>
         {!isAddingPost && !isEditingPost && (
-          <Button onClick={() => setIsAddingPost(true)}>
+          <Button 
+            onClick={() => setIsAddingPost(true)}
+            className="bg-tobecatBlue-600 hover:bg-tobecatBlue-700 transition-all transform hover:scale-105"
+          >
             <Plus size={16} className="mr-1" /> Add New Post
           </Button>
         )}
       </div>
       
       {(isAddingPost || isEditingPost !== null) && (
-        <Card className="mb-8 p-6">
+        <Card className="mb-8 p-6 border-l-4 border-l-tobecatBlue-500 animate-fade-in bg-gradient-to-r from-white to-tobecatBlue-50">
           <h3 className="text-xl font-bold mb-4">
             {isEditingPost !== null ? "Edit Post" : "Add New Post"}
           </h3>
@@ -166,6 +194,7 @@ const BlogPostManager = () => {
                 onChange={handleInputChange}
                 placeholder="Post title"
                 required
+                className="focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300"
               />
             </div>
             
@@ -180,6 +209,7 @@ const BlogPostManager = () => {
                 onChange={handleInputChange}
                 placeholder="Brief excerpt (displayed in listings)"
                 required
+                className="focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300"
               />
             </div>
             
@@ -193,9 +223,50 @@ const BlogPostManager = () => {
                 value={formData.content}
                 onChange={handleInputChange}
                 placeholder="Post content"
-                className="min-h-[200px]"
+                className="min-h-[200px] focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300"
                 required
               />
+            </div>
+
+            <div className="border-2 border-dashed border-tobecatBlue-300 rounded-lg p-6 bg-tobecatBlue-50 transition-all hover:bg-tobecatBlue-100">
+              <div className="flex flex-col items-center">
+                <Image className="h-12 w-12 text-tobecatBlue-500 mb-2" />
+                <p className="mb-2 text-sm text-tobecatGray-600">Upload a featured image for your blog post</p>
+                
+                <label htmlFor="image-upload" className="cursor-pointer bg-tobecatBlue-600 hover:bg-tobecatBlue-700 text-white py-2 px-4 rounded flex items-center transition-transform hover:scale-105">
+                  <Upload size={16} className="mr-2" />
+                  Choose Image
+                  <input 
+                    id="image-upload" 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleImageChange} 
+                    className="hidden" 
+                  />
+                </label>
+                
+                {previewImage && (
+                  <div className="mt-4 w-full">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Preview</label>
+                    <div className="relative mt-2 rounded-lg overflow-hidden border border-tobecatBlue-300 animate-fade-in">
+                      <img 
+                        src={previewImage} 
+                        alt="Preview" 
+                        className="w-full h-48 object-cover transition-transform hover:scale-105 duration-300" 
+                      />
+                      <button 
+                        onClick={() => {
+                          setPreviewImage(null);
+                          setFormData(prev => ({ ...prev, imageUrl: '' }));
+                        }} 
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                      >
+                        <Trash size={16} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -210,6 +281,7 @@ const BlogPostManager = () => {
                   onChange={handleInputChange}
                   placeholder="Author name"
                   required
+                  className="focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300"
                 />
               </div>
               
@@ -224,6 +296,7 @@ const BlogPostManager = () => {
                   value={formData.date}
                   onChange={handleInputChange}
                   required
+                  className="focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300"
                 />
               </div>
             </div>
@@ -236,12 +309,13 @@ const BlogPostManager = () => {
                   setIsEditingPost(null);
                   resetForm();
                 }}
+                className="border-tobecatBlue-300 hover:bg-tobecatBlue-50"
               >
                 Cancel
               </Button>
               <Button 
                 onClick={isEditingPost !== null ? handleEditPost : handleAddPost}
-                className="bg-tobecatBlue-600 hover:bg-tobecatBlue-700 text-white"
+                className="bg-tobecatBlue-600 hover:bg-tobecatBlue-700 text-white transition-transform hover:scale-105"
               >
                 {isEditingPost !== null ? "Update Post" : "Add Post"}
               </Button>
@@ -251,41 +325,58 @@ const BlogPostManager = () => {
       )}
       
       <div className="space-y-4">
-        <h3 className="text-xl font-semibold mb-2">Existing Posts</h3>
+        <h3 className="text-xl font-semibold mb-4">Existing Posts</h3>
         
         {blogPosts.length === 0 ? (
           <p className="text-gray-500 italic">No blog posts available.</p>
         ) : (
-          blogPosts.map(post => (
-            <Card key={post.id} className="p-4 border-l-4 border-l-tobecatBlue-500">
-              <div className="flex justify-between">
-                <div>
-                  <h4 className="text-lg font-medium">{post.title}</h4>
-                  <p className="text-sm text-gray-500">
-                    By {post.author} on {new Date(post.date).toLocaleDateString()}
-                  </p>
-                  <p className="mt-2 text-gray-600">{post.excerpt}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {blogPosts.map(post => (
+              <Card 
+                key={post.id} 
+                className="overflow-hidden border-l-4 border-l-tobecatBlue-500 transition-all hover:shadow-lg hover:scale-[1.02]"
+              >
+                {post.imageUrl && (
+                  <div className="h-48 overflow-hidden">
+                    <img 
+                      src={post.imageUrl} 
+                      alt={post.title} 
+                      className="w-full h-full object-cover transition-transform hover:scale-110 duration-500" 
+                    />
+                  </div>
+                )}
+                <div className="p-4">
+                  <div className="flex justify-between">
+                    <div>
+                      <h4 className="text-lg font-medium text-tobecatBlue-800">{post.title}</h4>
+                      <p className="text-sm text-gray-500">
+                        By {post.author} on {new Date(post.date).toLocaleDateString()}
+                      </p>
+                      <p className="mt-2 text-gray-600">{post.excerpt}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => startEditing(post)}
+                        className="text-tobecatBlue-600 hover:text-tobecatBlue-800 hover:bg-tobecatBlue-50"
+                      >
+                        <Pencil size={16} />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => handleDeletePost(post.id)}
+                      >
+                        <Trash size={16} />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => startEditing(post)}
-                  >
-                    <Pencil size={16} />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-red-500 hover:text-red-700"
-                    onClick={() => handleDeletePost(post.id)}
-                  >
-                    <Trash size={16} />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))
+              </Card>
+            ))}
+          </div>
         )}
       </div>
     </div>

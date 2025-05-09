@@ -30,7 +30,7 @@ const Navbar = () => {
   
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-sky-600 shadow-md py-2' : 'bg-sky-500 py-4'
+      isScrolled ? 'bg-sky-600 shadow-md py-2' : 'bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 py-4'
     }`}>
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
         <div className="flex items-center">
@@ -38,7 +38,7 @@ const Navbar = () => {
             <img 
               src="/lovable-uploads/b5ad5ccd-b578-4996-a407-ff523198c679.png" 
               alt="Tobecat Logo" 
-              className="h-12 md:h-14"
+              className="h-12 md:h-14 transition-transform hover:scale-105 duration-300"
             />
           </Link>
         </div>
@@ -49,7 +49,7 @@ const Navbar = () => {
             <DropdownMenuTrigger className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105 flex items-center">
               Services <ChevronDown size={16} className="ml-1" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white">
+            <DropdownMenuContent className="bg-white animate-fade-in">
               {services.map((service) => (
                 <DropdownMenuItem key={service.id} className="hover:bg-sky-50">
                   <Link 
@@ -78,14 +78,11 @@ const Navbar = () => {
           <Link to="/blog" className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105">
             Blog
           </Link>
-          <Link to="/careers" className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105">
-            Careers
-          </Link>
           <Link to="/testimonials" className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105">
             Testimonials
           </Link>
           <Link to="/get-quote">
-            <Button className="bg-orange-500 text-white hover:bg-orange-600 transition-transform hover:scale-105">
+            <Button className="bg-orange-500 text-white hover:bg-orange-600 transition-transform hover:scale-105 shadow-lg">
               Get a Quote
             </Button>
           </Link>
@@ -161,13 +158,6 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Blog
-            </Link>
-            <Link
-              to="/careers"
-              className="font-medium text-white hover:text-orange-300 transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Careers
             </Link>
             <Link
               to="/testimonials"

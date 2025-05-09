@@ -36,7 +36,7 @@ const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   phone: z.string().min(10, { message: "Valid phone number is required" }),
   company: z.string().optional(),
-  budget: z.enum(["<5000", "5000-10000", "10000-25000", "25000-50000", "50000+"]),
+  budget: z.enum(["<500000", "500000-2000000", "2000000-5000000", "5000000-10000000", "10000000+"]),
   primaryService: z.string().min(1, { message: "Please select a primary service" }),
   additionalServices: z.array(z.string()).optional(),
   timeframe: z.enum(["asap", "1-3months", "3-6months", "6months+"]),
@@ -55,7 +55,7 @@ const GetQuote = () => {
       email: "",
       phone: "",
       company: "",
-      budget: "<5000",
+      budget: "<500000",
       primaryService: "",
       additionalServices: [],
       timeframe: "1-3months",
@@ -82,22 +82,25 @@ const GetQuote = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="pt-24 md:pt-28 pb-16 flex-grow">
+      <div className="pt-24 md:pt-28 pb-16 flex-grow bg-gradient-to-b from-tobecatBlue-50 to-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
-            <h1 className="text-3xl md:text-5xl font-bold text-tobecatGray-900 mb-4">
+            <h1 className="text-3xl md:text-5xl font-bold text-tobecatGray-900 mb-4 animate-fade-in">
               Get a <span className="text-tobecatBlue-600">Quote</span>
             </h1>
-            <p className="text-lg text-tobecatGray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-tobecatGray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Tell us about your project and we'll provide you with a customized quote 
               tailored to your specific business needs.
             </p>
           </div>
           
-          <div className="max-w-3xl mx-auto">
-            <div className="bg-white shadow-md rounded-lg p-6 md:p-8">
+          <div className="max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 border border-tobecatBlue-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-tobecatBlue-100 rounded-full filter blur-3xl opacity-30"></div>
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-tobecatAccent-purple rounded-full filter blur-3xl opacity-20"></div>
+              
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 relative z-10">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
@@ -106,7 +109,11 @@ const GetQuote = () => {
                         <FormItem>
                           <FormLabel>Full Name*</FormLabel>
                           <FormControl>
-                            <Input placeholder="John Smith" {...field} />
+                            <Input 
+                              placeholder="John Smith" 
+                              {...field} 
+                              className="border-tobecatBlue-200 focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300 transition-all"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -119,7 +126,11 @@ const GetQuote = () => {
                         <FormItem>
                           <FormLabel>Email*</FormLabel>
                           <FormControl>
-                            <Input placeholder="john@example.com" {...field} />
+                            <Input 
+                              placeholder="john@example.com" 
+                              {...field} 
+                              className="border-tobecatBlue-200 focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300 transition-all"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -135,7 +146,11 @@ const GetQuote = () => {
                         <FormItem>
                           <FormLabel>Phone Number*</FormLabel>
                           <FormControl>
-                            <Input placeholder="+1 (123) 456-7890" {...field} />
+                            <Input 
+                              placeholder="+234 123 456 7890" 
+                              {...field} 
+                              className="border-tobecatBlue-200 focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300 transition-all"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -148,7 +163,11 @@ const GetQuote = () => {
                         <FormItem>
                           <FormLabel>Company Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Company Inc." {...field} />
+                            <Input 
+                              placeholder="Company Inc." 
+                              {...field} 
+                              className="border-tobecatBlue-200 focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300 transition-all"
+                            />
                           </FormControl>
                           <FormDescription>Optional</FormDescription>
                         </FormItem>
@@ -161,7 +180,7 @@ const GetQuote = () => {
                     name="budget"
                     render={({ field }) => (
                       <FormItem className="space-y-3">
-                        <FormLabel>Budget Range*</FormLabel>
+                        <FormLabel>Budget Range* (in Naira ₦)</FormLabel>
                         <FormControl>
                           <RadioGroup
                             onValueChange={field.onChange}
@@ -171,42 +190,42 @@ const GetQuote = () => {
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                               <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                  <RadioGroupItem value="<5000" />
+                                  <RadioGroupItem value="<500000" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
-                                  Less than $5,000
+                                  Less than ₦500,000
                                 </FormLabel>
                               </FormItem>
                               <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                  <RadioGroupItem value="5000-10000" />
+                                  <RadioGroupItem value="500000-2000000" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
-                                  $5,000 - $10,000
+                                  ₦500,000 - ₦2,000,000
                                 </FormLabel>
                               </FormItem>
                               <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                  <RadioGroupItem value="10000-25000" />
+                                  <RadioGroupItem value="2000000-5000000" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
-                                  $10,000 - $25,000
+                                  ₦2,000,000 - ₦5,000,000
                                 </FormLabel>
                               </FormItem>
                               <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                  <RadioGroupItem value="25000-50000" />
+                                  <RadioGroupItem value="5000000-10000000" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
-                                  $25,000 - $50,000
+                                  ₦5,000,000 - ₦10,000,000
                                 </FormLabel>
                               </FormItem>
                               <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                  <RadioGroupItem value="50000+" />
+                                  <RadioGroupItem value="10000000+" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
-                                  $50,000+
+                                  Above ₦10,000,000
                                 </FormLabel>
                               </FormItem>
                             </div>
@@ -225,11 +244,11 @@ const GetQuote = () => {
                         <FormLabel>Primary Service*</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="border-tobecatBlue-200 focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300">
                               <SelectValue placeholder="Select a service" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
+                          <SelectContent className="animate-fade-in">
                             {services.map((service) => (
                               <SelectItem key={service.id} value={service.id.toString()}>
                                 {service.title}
@@ -277,6 +296,7 @@ const GetQuote = () => {
                                                 )
                                               )
                                         }}
+                                        className="border-tobecatBlue-300 text-tobecatBlue-600 focus:ring-tobecatBlue-300"
                                       />
                                     </FormControl>
                                     <FormLabel className="font-normal">
@@ -307,7 +327,7 @@ const GetQuote = () => {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                               <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                  <RadioGroupItem value="asap" />
+                                  <RadioGroupItem value="asap" className="border-tobecatBlue-300 text-tobecatBlue-600" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
                                   As soon as possible
@@ -315,7 +335,7 @@ const GetQuote = () => {
                               </FormItem>
                               <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                  <RadioGroupItem value="1-3months" />
+                                  <RadioGroupItem value="1-3months" className="border-tobecatBlue-300 text-tobecatBlue-600" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
                                   1-3 months
@@ -323,7 +343,7 @@ const GetQuote = () => {
                               </FormItem>
                               <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                  <RadioGroupItem value="3-6months" />
+                                  <RadioGroupItem value="3-6months" className="border-tobecatBlue-300 text-tobecatBlue-600" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
                                   3-6 months
@@ -331,7 +351,7 @@ const GetQuote = () => {
                               </FormItem>
                               <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                  <RadioGroupItem value="6months+" />
+                                  <RadioGroupItem value="6months+" className="border-tobecatBlue-300 text-tobecatBlue-600" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
                                   6+ months
@@ -354,7 +374,7 @@ const GetQuote = () => {
                         <FormControl>
                           <Textarea
                             placeholder="Please describe your project and any specific requirements..."
-                            className="min-h-[120px]"
+                            className="min-h-[120px] border-tobecatBlue-200 focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300 transition-all"
                             {...field}
                           />
                         </FormControl>
@@ -365,7 +385,7 @@ const GetQuote = () => {
 
                   <Button 
                     type="submit" 
-                    className="w-full bg-tobecatBlue-600 hover:bg-tobecatBlue-700 text-white py-6 text-lg"
+                    className="w-full bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white py-6 text-lg transition-transform hover:scale-[1.01] shadow-lg"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? "Submitting..." : "Submit Quote Request"}
