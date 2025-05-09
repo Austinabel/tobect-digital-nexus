@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -113,6 +112,50 @@ const salesFormSchema = z.object({
   installation: z.boolean().optional(),
   additionalInfo: z.string().optional(),
 });
+
+// Product types for quote form
+const productTypes = [
+  {
+    id: 'solar-panels',
+    name: 'Solar Panels',
+    icon: <Sun className="h-5 w-5" />,
+    items: [
+      { id: 1, name: 'Premium 500W Monocrystalline Panel', price: 250000 },
+      { id: 2, name: 'Commercial 1KW Solar Array', price: 520000 },
+      { id: 3, name: 'Residential Complete 3KW System', price: 980000 }
+    ]
+  },
+  {
+    id: 'batteries',
+    name: 'Battery Storage',
+    icon: <Battery className="h-5 w-5" />,
+    items: [
+      { id: 1, name: '5kWh Lithium Battery Bank', price: 350000 },
+      { id: 2, name: '10kWh Home Storage Solution', price: 620000 },
+      { id: 3, name: '20kWh Commercial Storage System', price: 1200000 }
+    ]
+  },
+  {
+    id: 'inverters',
+    name: 'Inverters',
+    icon: <Zap className="h-5 w-5" />,
+    items: [
+      { id: 1, name: '3kW Hybrid Inverter', price: 180000 },
+      { id: 2, name: '5kW Grid-Tie Inverter', price: 250000 },
+      { id: 3, name: '10kW Commercial Inverter', price: 420000 }
+    ]
+  },
+  {
+    id: 'cctv',
+    name: 'Security Cameras',
+    icon: <Cctv className="h-5 w-5" />,
+    items: [
+      { id: 1, name: 'HD Outdoor Camera (4 Pack)', price: 45000 },
+      { id: 2, name: '4K Smart Security System', price: 85000 },
+      { id: 3, name: 'Complete Business Security Suite', price: 150000 }
+    ]
+  }
+];
 
 const GetQuote = () => {
   const { toast } = useToast();

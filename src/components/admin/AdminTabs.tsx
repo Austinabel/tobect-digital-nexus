@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BlogPostManager from "./BlogPostManager";
 import PortfolioManager from "./PortfolioManager";
+import ProductsManager from "./ProductsManager";
 
 const AdminTabs = () => {
   const [activeTab, setActiveTab] = useState("blog");
@@ -27,7 +28,7 @@ const AdminTabs = () => {
         }}
         className="relative z-10"
       >
-        <TabsList className="grid grid-cols-2 w-full max-w-md mb-8 bg-tobecatBlue-100 p-1 rounded-lg">
+        <TabsList className="grid grid-cols-3 w-full max-w-2xl mb-8 bg-tobecatBlue-100 p-1 rounded-lg">
           <TabsTrigger 
             value="blog"
             className={`
@@ -50,6 +51,17 @@ const AdminTabs = () => {
           >
             Portfolio Items
           </TabsTrigger>
+          <TabsTrigger 
+            value="products"
+            className={`
+              transition-all duration-300
+              data-[state=active]:bg-tobecatBlue-600 data-[state=active]:text-white 
+              data-[state=active]:shadow-md data-[state=active]:scale-105
+              hover:bg-tobecatBlue-200
+            `}
+          >
+            Products
+          </TabsTrigger>
         </TabsList>
         
         <div className={`transition-all duration-300 ${animate ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}>
@@ -59,6 +71,10 @@ const AdminTabs = () => {
           
           <TabsContent value="portfolio" className="space-y-4 animate-fade-in">
             <PortfolioManager />
+          </TabsContent>
+          
+          <TabsContent value="products" className="space-y-4 animate-fade-in">
+            <ProductsManager />
           </TabsContent>
         </div>
       </Tabs>
