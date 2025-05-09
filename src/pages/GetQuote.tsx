@@ -7,7 +7,7 @@ import { services } from '@/data/services';
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Check, ArrowRight, Zap, Battery, SolarPanel, Cctv, CircleDollarSign } from 'lucide-react';
+import { Check, ArrowRight, Zap, Battery, Sun, Cctv, CircleDollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,7 +37,7 @@ const productCategories = [
   {
     id: 'solar-panels',
     name: 'Solar Panels',
-    icon: <SolarPanel className="h-5 w-5" />,
+    icon: <Sun className="h-5 w-5" />,
     items: [
       { id: 1, name: 'Premium 500W Monocrystalline Panel', price: 250000 },
       { id: 2, name: 'Commercial 1KW Solar Array', price: 520000 },

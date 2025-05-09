@@ -2,7 +2,7 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, SolarPanel, Battery, Zap, Cctv } from 'lucide-react';
+import { ArrowRight, Battery, Zap, Cctv, Sun } from 'lucide-react';
 import { motion, useInView } from "framer-motion";
 
 const featuredProducts = [
@@ -10,7 +10,7 @@ const featuredProducts = [
     id: 1,
     name: "Premium Solar Panels",
     description: "High-efficiency monocrystalline solar panels for residential and commercial use.",
-    icon: <SolarPanel size={24} className="text-blue-500" />,
+    icon: <Sun size={24} className="text-blue-500" />,
     image: "/lovable-uploads/solar-panel.jpg",
     link: "/products?category=solar-panels",
     color: "bg-blue-50"
