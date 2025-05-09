@@ -1,4 +1,3 @@
-
 import { Facebook, Twitter, Instagram, Linkedin, Briefcase, Book, Users, Star, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -11,11 +10,9 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="mb-6">
-              <img 
-                src="/lovable-uploads/b5ad5ccd-b578-4996-a407-ff523198c679.png" 
-                alt="Tobecat Logo" 
-                className="h-12"
-              />
+              <h1 className="font-display text-4xl font-bold tracking-wider text-white">
+                TOBECAT
+              </h1>
             </div>
             <p className="text-gray-300 mb-6">
               Your one-stop IT solutions partner for business growth and digital transformation.
