@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Hero = () => {
   const [typedText, setTypedText] = useState('');
@@ -43,13 +44,17 @@ const Hero = () => {
               from stunning design to cutting-edge development and strategic marketing.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: '1.5s' }}>
-              <Button className="bg-tobecatBlue-600 hover:bg-tobecatBlue-700 text-white px-8 py-6 text-lg hover:scale-105 transition-transform">
-                Explore Services
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button variant="outline" className="border-tobecatBlue-600 text-tobecatBlue-600 hover:bg-tobecatBlue-50 px-8 py-6 text-lg hover:scale-105 transition-transform">
-                Contact Us
-              </Button>
+              <Link to="/services">
+                <Button className="bg-tobecatBlue-600 hover:bg-tobecatBlue-700 text-white px-8 py-6 text-lg hover:scale-105 transition-transform">
+                  Explore Services
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/get-quote">
+                <Button variant="outline" className="border-tobecatBlue-600 text-tobecatBlue-600 hover:bg-tobecatBlue-50 px-8 py-6 text-lg hover:scale-105 transition-transform">
+                  Contact Us
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="lg:w-1/2 lg:pl-12 animate-fade-in" style={{ animationDelay: '0.5s' }}>

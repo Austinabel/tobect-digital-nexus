@@ -11,6 +11,8 @@ import Blog from "./pages/Blog";
 import Careers from "./pages/Careers";
 import Services from "./pages/Services";
 import Testimonials from "./pages/Testimonials";
+import GetQuote from "./pages/GetQuote";
+import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/careers" element={<Careers />} />
           <Route path="/services" element={<Services />} />
           <Route path="/testimonials" element={<Testimonials />} />
+          <Route path="/get-quote" element={<GetQuote />} />
+          <Route path="/admin" element={<AdminPanel />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

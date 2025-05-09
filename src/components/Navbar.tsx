@@ -84,9 +84,11 @@ const Navbar = () => {
           <Link to="/testimonials" className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105">
             Testimonials
           </Link>
-          <Button className="bg-orange-500 text-white hover:bg-orange-600 transition-transform hover:scale-105">
-            Get a Quote
-          </Button>
+          <Link to="/get-quote">
+            <Button className="bg-orange-500 text-white hover:bg-orange-600 transition-transform hover:scale-105">
+              Get a Quote
+            </Button>
+          </Link>
         </div>
         
         {/* Mobile menu button */}
@@ -174,12 +176,16 @@ const Navbar = () => {
             >
               Testimonials
             </Link>
-            <Button 
-              className="bg-orange-500 text-white hover:bg-orange-600 w-full"
+            <Link
+              to="/get-quote"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Get a Quote
-            </Button>
+              <Button 
+                className="bg-orange-500 text-white hover:bg-orange-600 w-full"
+              >
+                Get a Quote
+              </Button>
+            </Link>
           </div>
         </div>
       )}
