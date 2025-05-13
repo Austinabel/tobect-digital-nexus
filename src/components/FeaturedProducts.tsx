@@ -13,7 +13,10 @@ const FeaturedProducts = () => {
   
   // Get featured products (first product from each category)
   const featuredProducts = productCategories.slice(0, 4).map(category => {
-    const product = category.items[0] || {}; // Get first product or empty object
+    // Get first product or define default values to avoid type errors
+    const product = category.items[0] || { 
+      description: `High-quality ${category.name.toLowerCase()} for residential and commercial applications.`
+    };
     
     const icons = {
       'solar-panels': <Sun size={24} className="text-blue-500" />,
