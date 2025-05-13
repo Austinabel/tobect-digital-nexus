@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import * as z from "zod";
-import { package as PackageIcon, ShoppingCart, Ticket, Receipt, FileText } from "lucide-react";
+import { Package, ShoppingCart, Ticket, Receipt, FileText } from "lucide-react";
 
 // Form schema for adding new products
 const productSchema = z.object({
@@ -209,7 +208,7 @@ const ProductsManager = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="w-full border-b pb-0 mb-6">
           <TabsTrigger value="products" className="flex items-center gap-2 data-[state=active]:bg-blue-50">
-            <PackageIcon size={18} />
+            <Package size={18} />
             Products
           </TabsTrigger>
           <TabsTrigger value="orders" className="flex items-center gap-2 data-[state=active]:bg-blue-50">
