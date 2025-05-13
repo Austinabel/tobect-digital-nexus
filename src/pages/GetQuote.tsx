@@ -106,9 +106,7 @@ const salesFormSchema = z.object({
   address: z.string().min(5, { message: "Delivery address is required" }),
   productCategory: z.string().min(1, { message: "Please select a product category" }),
   productId: z.string().min(1, { message: "Please select a product" }),
-  quantity: z.string().transform(val => Number(val)).refine(val => val >= 1, {
-    message: "Quantity must be at least 1"
-  }),
+  quantity: z.coerce.number().min(1, { message: "Quantity must be at least 1" }),
   installation: z.boolean().optional(),
   additionalInfo: z.string().optional(),
 });
@@ -209,7 +207,7 @@ const GetQuote = () => {
       address: "",
       productCategory: "",
       productId: "",
-      quantity: "1",
+      quantity: 1,  // Changed from "1" to 1
       installation: true,
       additionalInfo: "",
     },
