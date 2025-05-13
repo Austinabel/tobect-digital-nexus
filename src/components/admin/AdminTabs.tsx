@@ -14,6 +14,10 @@ const AdminTabs = () => {
           <Package className="w-4 h-4" />
           <span>Products</span>
         </TabsTrigger>
+        <TabsTrigger value="quotes" className="flex items-center gap-2">
+          <MessageSquare className="w-4 h-4" />
+          <span>Quotes</span>
+        </TabsTrigger>
         <TabsTrigger value="portfolio" className="flex items-center gap-2">
           <Image className="w-4 h-4" />
           <span>Portfolio</span>
@@ -22,23 +26,19 @@ const AdminTabs = () => {
           <FileText className="w-4 h-4" />
           <span>Blog</span>
         </TabsTrigger>
-        <TabsTrigger value="quotes" className="flex items-center gap-2">
-          <MessageSquare className="w-4 h-4" />
-          <span>Quotes</span>
-        </TabsTrigger>
       </TabsList>
       <div className="p-4 border rounded-lg mt-4">
         <TabsContent value="products">
           <ProductsManager />
+        </TabsContent>
+        <TabsContent value="quotes">
+          <QuotesManager />
         </TabsContent>
         <TabsContent value="portfolio">
           <PortfolioManager />
         </TabsContent>
         <TabsContent value="blog">
           <BlogPostManager />
-        </TabsContent>
-        <TabsContent value="quotes">
-          <QuotesManager />
         </TabsContent>
       </div>
     </Tabs>

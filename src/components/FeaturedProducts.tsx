@@ -4,49 +4,50 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Battery, Zap, Cctv, Sun } from 'lucide-react';
 import { motion, useInView } from "framer-motion";
-
-const featuredProducts = [
-  {
-    id: 1,
-    name: "Premium Solar Panels",
-    description: "High-efficiency monocrystalline solar panels for residential and commercial use.",
-    icon: <Sun size={24} className="text-blue-500" />,
-    image: "/lovable-uploads/solar-panel.jpg",
-    link: "/products?category=solar-panels",
-    color: "bg-blue-50"
-  },
-  {
-    id: 2,
-    name: "Lithium Battery Banks",
-    description: "State-of-the-art lithium battery storage solutions for reliable power supply.",
-    icon: <Battery size={24} className="text-green-500" />,
-    image: "/lovable-uploads/battery.jpg",
-    link: "/products?category=batteries",
-    color: "bg-green-50"
-  },
-  {
-    id: 3,
-    name: "Hybrid Inverters",
-    description: "Smart hybrid inverters compatible with both on-grid and off-grid systems.",
-    icon: <Zap size={24} className="text-orange-500" />,
-    image: "/lovable-uploads/inverter.jpg",
-    link: "/products?category=inverters",
-    color: "bg-orange-50"
-  },
-  {
-    id: 4,
-    name: "Security Cameras",
-    description: "Advanced CCTV security solutions for home and business protection.",
-    icon: <Cctv size={24} className="text-purple-500" />,
-    image: "/lovable-uploads/cctv.jpg",
-    link: "/products?category=cctv",
-    color: "bg-purple-50"
-  }
-];
+import { useProducts } from '@/context/ProductContext';
 
 const FeaturedProducts = () => {
+  const { productCategories } = useProducts();
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+  
+  // Get featured products (first product from each category)
+  const featuredProducts = productCategories.slice(0, 4).map(category => {
+    const product = category.items[0] || {}; // Get first product or empty object
+    
+    const icons = {
+      'solar-panels': <Sun size={24} className="text-blue-500" />,
+      'batteries': <Battery size={24} className="text-green-500" />,
+      'inverters': <Zap size={24} className="text-orange-500" />,
+      'cctv': <Cctv size={24} className="text-purple-500" />
+    };
+    
+    const colors = {
+      'solar-panels': "bg-blue-50",
+      'batteries': "bg-green-50",
+      'inverters': "bg-orange-50",
+      'cctv': "bg-purple-50",
+      'generators': "bg-red-50"
+    };
+    
+    const emojis = {
+      'solar-panels': "☀️",
+      'batteries': "🔋",
+      'inverters': "⚡",
+      'cctv': "🎥",
+      'generators': "🔌"
+    };
+    
+    return {
+      id: category.id,
+      name: category.name,
+      description: product.description || `High-quality ${category.name.toLowerCase()} for residential and commercial applications.`,
+      icon: icons[category.id as keyof typeof icons] || <Sun size={24} className="text-blue-500" />,
+      emoji: emojis[category.id as keyof typeof emojis] || "⚙️",
+      link: `/products?category=${category.id}`,
+      color: colors[category.id as keyof typeof colors] || "bg-gray-50"
+    };
+  });
   
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -95,10 +96,7 @@ const FeaturedProducts = () => {
             >
               <div className={`h-48 ${product.color} flex items-center justify-center p-4`}>
                 <div className="text-6xl">
-                  {product.id === 1 && "☀️"}
-                  {product.id === 2 && "🔋"}
-                  {product.id === 3 && "⚡"}
-                  {product.id === 4 && "🎥"}
+                  {product.emoji}
                 </div>
               </div>
               <div className="p-6 flex-grow flex flex-col">

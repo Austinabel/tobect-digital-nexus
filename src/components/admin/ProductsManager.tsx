@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
+import { useProducts } from "@/context/ProductContext";
 import * as z from "zod";
 import { Package, ShoppingCart, Ticket, Receipt, FileText } from "lucide-react";
 
@@ -23,14 +25,6 @@ const productSchema = z.object({
   }),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
 });
-
-// Mock data for products
-const mockProducts = [
-  { id: 1, name: "Premium Solar Panel", category: "Solar Panels", price: 250000, stock: 15, description: "High-efficiency monocrystalline solar panel for residential use" },
-  { id: 2, name: "Lithium Battery Bank", category: "Batteries", price: 350000, stock: 8, description: "10kWh lithium battery storage for solar systems" },
-  { id: 3, name: "Hybrid Inverter", category: "Inverters", price: 180000, stock: 12, description: "5kW hybrid inverter with battery support" },
-  { id: 4, name: "HD Security Camera", category: "CCTV", price: 45000, stock: 25, description: "1080p weatherproof security camera with night vision" },
-];
 
 // Mock data for orders
 const mockOrders = [
@@ -59,7 +53,8 @@ const mockTransactions = [
 const ProductsManager = () => {
   const [activeTab, setActiveTab] = useState("products");
   const { toast } = useToast();
-  const [products, setProducts] = useState(mockProducts);
+  const { getAllProducts, addProduct, deleteProduct } = useProducts();
+  const products = getAllProducts();
 
   // Form for adding new products
   const form = useForm<z.infer<typeof productSchema>>({
@@ -75,7 +70,6 @@ const ProductsManager = () => {
 
   const onSubmit = (data: z.infer<typeof productSchema>) => {
     const newProduct = {
-      id: products.length + 1,
       name: data.name,
       category: data.category,
       price: Number(data.price),
@@ -83,7 +77,7 @@ const ProductsManager = () => {
       description: data.description
     };
     
-    setProducts([...products, newProduct]);
+    addProduct(newProduct);
     
     toast({
       title: "Product Added",
@@ -93,12 +87,17 @@ const ProductsManager = () => {
     form.reset();
   };
 
-  const deleteProduct = (id: number) => {
-    setProducts(products.filter(product => product.id !== id));
+  const handleDeleteProduct = (id: number) => {
+    deleteProduct(id);
     toast({
       title: "Product Deleted",
       description: "The product has been removed from your catalog.",
     });
+  };
+
+  // Format currency in Naira
+  const formatNaira = (amount: number) => {
+    return `₦${amount.toLocaleString()}`;
   };
 
   return (
@@ -155,7 +154,7 @@ const ProductsManager = () => {
                     name="price"
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>Price (KES)</FormLabel>
+                        <FormLabel>Price (₦)</FormLabel>
                         <FormControl>
                           <Input placeholder="250000" {...field} />
                         </FormControl>
@@ -248,7 +247,7 @@ const ProductsManager = () => {
                     <TableCell className="font-medium">{product.id}</TableCell>
                     <TableCell>{product.name}</TableCell>
                     <TableCell>{product.category}</TableCell>
-                    <TableCell>KES {product.price.toLocaleString()}</TableCell>
+                    <TableCell>{formatNaira(product.price)}</TableCell>
                     <TableCell>{product.stock}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
@@ -256,7 +255,7 @@ const ProductsManager = () => {
                         <Button 
                           variant="destructive" 
                           size="sm"
-                          onClick={() => deleteProduct(product.id)}
+                          onClick={() => handleDeleteProduct(product.id)}
                         >
                           Delete
                         </Button>
@@ -290,7 +289,7 @@ const ProductsManager = () => {
                     <TableCell>{order.date}</TableCell>
                     <TableCell>{order.customer}</TableCell>
                     <TableCell>{order.items}</TableCell>
-                    <TableCell>KES {order.total.toLocaleString()}</TableCell>
+                    <TableCell>{formatNaira(order.total)}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         order.status === 'Delivered' ? 'bg-green-100 text-green-800' :
@@ -369,7 +368,7 @@ const ProductsManager = () => {
                     <TableCell className="font-medium">{transaction.id}</TableCell>
                     <TableCell>{transaction.date}</TableCell>
                     <TableCell>{transaction.type}</TableCell>
-                    <TableCell>KES {transaction.amount.toLocaleString()}</TableCell>
+                    <TableCell>{formatNaira(transaction.amount)}</TableCell>
                     <TableCell>{transaction.method}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs ${
