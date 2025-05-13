@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // Define product categories and items
 const productCategories = [
@@ -161,6 +162,9 @@ const GetQuote = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("digital");
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [submittedData, setSubmittedData] = useState<any>(null);
+  const [quoteType, setQuoteType] = useState<"digital" | "product">("digital");
 
   // Parse URL parameters
   useEffect(() => {
@@ -221,11 +225,9 @@ const GetQuote = () => {
     setTimeout(() => {
       console.log("Digital form values:", values);
       setIsSubmitting(false);
-      toast({
-        title: "Digital Service Quote Request Submitted",
-        description: "We'll get back to you within 24-48 hours.",
-      });
-      digitalForm.reset();
+      setSubmittedData(values);
+      setQuoteType("digital");
+      setSuccessDialogOpen(true);
     }, 1500);
   };
   
@@ -237,14 +239,21 @@ const GetQuote = () => {
     setTimeout(() => {
       console.log("Sales form values:", values);
       setIsSubmitting(false);
-      toast({
-        title: "Product Order Request Submitted",
-        description: "We'll contact you shortly to confirm your order.",
-      });
-      salesForm.reset();
+      setSubmittedData(values);
+      setQuoteType("product");
+      setSuccessDialogOpen(true);
     }, 1500);
   };
   
+  // Find selected product details
+  const getSelectedProduct = (categoryId: string, productId: string) => {
+    const category = productCategories.find(cat => cat.id === categoryId);
+    if (!category) return null;
+    
+    const product = category.items.find(item => item.id.toString() === productId);
+    return product || null;
+  };
+
   // Format price in Naira
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-NG', {
@@ -253,6 +262,18 @@ const GetQuote = () => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(price);
+  };
+
+  // Success Dialog
+  const handleCloseSuccessDialog = () => {
+    setSuccessDialogOpen(false);
+    // Reset the form after closing the dialog
+    if (quoteType === "digital") {
+      digitalForm.reset();
+    } else {
+      salesForm.reset();
+      setSelectedCategory(null);
+    }
   };
 
   return (
@@ -815,6 +836,58 @@ const GetQuote = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold text-tobecatBlue-600">
+              Request Submitted Successfully!
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Your {quoteType === "digital" ? "digital service quote" : "product order"} request has been received.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="bg-tobecatBlue-50 p-4 rounded-lg border border-tobecatBlue-100">
+            <div className="flex items-center justify-center mb-4">
+              <div className="bg-green-100 rounded-full p-2">
+                <Check className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+            
+            {quoteType === "digital" ? (
+              <div className="text-center">
+                <p className="font-medium">Thank you, {submittedData?.fullName}!</p>
+                <p className="text-sm text-tobecatGray-600 mt-2">
+                  We've received your digital service request. Our team will review your requirements and contact you within 24-48 hours at {submittedData?.email} or {submittedData?.phone} to discuss your project further.
+                </p>
+              </div>
+            ) : (
+              <div className="text-center">
+                <p className="font-medium">Thank you, {submittedData?.fullName}!</p>
+                <p className="text-sm text-tobecatGray-600 mt-2">
+                  We've received your product order request for {submittedData?.quantity}x {
+                    submittedData?.productId && submittedData?.productCategory ? 
+                    getSelectedProduct(submittedData.productCategory, submittedData.productId)?.name : 
+                    "selected product"
+                  }. Our team will contact you shortly at {submittedData?.email} or {submittedData?.phone} to confirm your order details.
+                </p>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter className="sm:justify-center">
+            <Button
+              onClick={handleCloseSuccessDialog}
+              className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white"
+            >
+              Close <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Footer />
     </div>
   );
