@@ -30,10 +30,10 @@ const ScrollToTop = () => {
   return (
     <button
       onClick={scrollToTop}
-      className={`scroll-up-btn ${isVisible ? 'visible' : ''}`}
+      className={`fixed bottom-6 right-6 bg-tobecatBlue-600 text-white p-3 rounded-full shadow-lg z-50 transition-all duration-300 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
       aria-label="Scroll to top"
     >
-      <ArrowUp size={24} />
+      <ArrowUp size={24} className="transition-transform duration-300 group-hover:-translate-y-1" />
     </button>
   );
 };
