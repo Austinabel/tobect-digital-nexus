@@ -30,7 +30,7 @@ const Navbar = () => {
   
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-sky-600 shadow-md py-2' : 'bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 py-4'
+      isScrolled ? 'bg-blackOlive shadow-md py-2' : 'bg-blackOlive py-4'
     }`}>
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
         <div className="flex items-center">
@@ -104,7 +104,7 @@ const Navbar = () => {
       
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-sky-700 shadow-lg absolute w-full animate-fade-in">
+        <div className="md:hidden bg-blackOlive shadow-lg absolute w-full animate-fade-in">
           <div className="flex flex-col py-4 px-4 space-y-4">
             <div className="relative">
               <button
