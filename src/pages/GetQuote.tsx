@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DigitalServiceQuoteForm from '@/components/quotes/DigitalServiceQuoteForm';
 import ProductQuoteForm from '@/components/quotes/ProductQuoteForm';
 import SuccessDialog from '@/components/quotes/SuccessDialog';
+import ScrollToTop from '@/components/ScrollToTop';
 
 const GetQuote = () => {
   const location = useLocation();
@@ -91,6 +92,7 @@ const GetQuote = () => {
       />
 
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

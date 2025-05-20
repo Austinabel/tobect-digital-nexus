@@ -1,171 +1,72 @@
-
-import { useState } from 'react';
+import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { Lock, ArrowLeft } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import ScrollToTop from '@/components/ScrollToTop';
 
 const Signup = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      setError("Passwords don't match");
-      return;
-    }
-    
-    setIsLoading(true);
-    setError('');
-    
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            role: 'admin'
-          }
-        }
-      });
-      
-      if (error) {
-        setError(error.message);
-        toast({
-          title: "Registration Failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else if (data.user) {
-        toast({
-          title: "Success",
-          description: "Account created successfully! You can now login.",
-        });
-        navigate('/admin');
-      }
-    } catch (err) {
-      setError('An unexpected error occurred');
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen">
       <Navbar />
-      <div className="pt-24 md:pt-28 pb-16 flex-grow bg-gradient-to-b from-tobecatBlue-50 to-white">
+      <div className="pt-20 pb-16">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-md mx-auto">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/admin')}
-              className="mb-4"
-            >
-              <ArrowLeft size={16} className="mr-2" /> Back to Login
-            </Button>
-            
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-tobecatGray-900">
-                Admin Signup
-              </h1>
-              <p className="text-tobecatGray-600 mt-2">
-                Create an admin account
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-lg p-6 border border-tobecatBlue-100 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-tobecatBlue-100 rounded-full filter blur-3xl opacity-30"></div>
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-tobecatAccent-purple rounded-full filter blur-3xl opacity-20"></div>
-              
-              <div className="relative z-10">
-                {error && (
-                  <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded animate-fade-in">
-                    {error}
-                  </div>
-                )}
-                
-                <form onSubmit={handleSignup} className="space-y-4">
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-tobecatGray-700 mb-1">
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full p-2 border border-tobecatBlue-200 rounded focus:border-tobecatBlue-400 focus:ring-2 focus:ring-tobecatBlue-200 focus:outline-none transition-all"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-tobecatGray-700 mb-1">
-                      Password
-                    </label>
-                    <input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full p-2 border border-tobecatBlue-200 rounded focus:border-tobecatBlue-400 focus:ring-2 focus:ring-tobecatBlue-200 focus:outline-none transition-all"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-tobecatGray-700 mb-1">
-                      Confirm Password
-                    </label>
-                    <input
-                      id="confirmPassword"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full p-2 border border-tobecatBlue-200 rounded focus:border-tobecatBlue-400 focus:ring-2 focus:ring-tobecatBlue-200 focus:outline-none transition-all"
-                      required
-                    />
-                  </div>
-                  
-                  <Button 
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white transition-transform hover:scale-[1.02]"
-                    disabled={isLoading}
-                  >
-                    <Lock size={16} className="mr-2" /> {isLoading ? 'Creating Account...' : 'Create Account'}
-                  </Button>
-                </form>
-                
-                <div className="mt-4 text-sm text-gray-600 text-center">
-                  <p>Already have an account?</p>
-                  <button 
-                    onClick={() => navigate('/admin')} 
-                    className="text-tobecatBlue-600 hover:underline mt-1"
-                  >
-                    Login Here
-                  </button>
-                </div>
+          <div className="max-w-3xl mx-auto mb-12 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-tobecatGray-900">Sign Up</h1>
+            <p className="text-xl text-tobecatGray-600">Create an account to get started</p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <form>
+              <div className="mb-4">
+                <label htmlFor="name" className="block text-tobecatGray-700 text-sm font-bold mb-2">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-tobecatGray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  placeholder="Your Name"
+                />
               </div>
-            </div>
+              <div className="mb-4">
+                <label htmlFor="email" className="block text-tobecatGray-700 text-sm font-bold mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-tobecatGray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  placeholder="Your Email"
+                />
+              </div>
+              <div className="mb-6">
+                <label htmlFor="password" className="block text-tobecatGray-700 text-sm font-bold mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-tobecatGray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                  placeholder="Your Password"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <button
+                  className="bg-tobecatBlue-600 hover:bg-tobecatBlue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  type="button"
+                >
+                  Sign Up
+                </button>
+                <a className="inline-block align-baseline font-bold text-sm text-tobecatBlue-600 hover:text-tobecatBlue-800" href="#">
+                  Forgot Password?
+                </a>
+              </div>
+            </form>
           </div>
         </div>
       </div>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

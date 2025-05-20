@@ -1,8 +1,8 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Star } from 'lucide-react';
+import ScrollToTop from '@/components/ScrollToTop';
 
 const Testimonials = () => {
   const testimonials = [
@@ -77,6 +77,7 @@ const Testimonials = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
+      <ScrollToTop />
       <div className="pt-20 pb-16">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto mb-12 text-center">

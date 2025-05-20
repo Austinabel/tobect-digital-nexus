@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const NotFound = () => {
   const location = useLocation();
@@ -45,6 +46,7 @@ const NotFound = () => {
         </div>
       </div>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

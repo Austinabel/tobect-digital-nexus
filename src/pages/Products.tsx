@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { formatPrice, useProductCategories } from '@/components/quotes/ProductCategoriesData';
+import ScrollToTop from '@/components/ScrollToTop';
 
 const Products = () => {
   const location = useLocation();
@@ -130,6 +130,7 @@ const Products = () => {
           )}
         </div>
       </div>
+      <ScrollToTop />
       <Footer />
     </div>
   );

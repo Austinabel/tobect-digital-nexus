@@ -6,6 +6,7 @@ import { services } from '@/data/services';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import * as Icons from 'lucide-react';
+import ScrollToTop from '@/components/ScrollToTop';
 
 const Services = () => {
   const [activeTab, setActiveTab] = useState(services[0].id.toString());
@@ -107,6 +108,7 @@ const Services = () => {
         </div>
       </div>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };
