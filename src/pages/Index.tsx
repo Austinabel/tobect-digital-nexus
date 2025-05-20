@@ -5,6 +5,7 @@ import ServicesSection from '@/components/ServicesSection';
 import FeaturedProducts from '@/components/FeaturedProducts';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
+import ScrollToTop from '@/components/ScrollToTop';
 import { useEffect, useState } from 'react';
 
 const Index = () => {
@@ -32,6 +33,7 @@ const Index = () => {
           <Footer />
         </div>
       </div>
+      <ScrollToTop />
     </div>
   );
 };

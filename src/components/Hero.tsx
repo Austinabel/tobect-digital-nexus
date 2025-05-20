@@ -58,7 +58,7 @@ const Hero = () => {
             </div>
           </div>
           <div className="lg:w-1/2 lg:pl-12 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            <div className="relative transform transition-all hover:scale-[1.02] duration-300">
+            <div className="relative transform hover-scale-image hover-gradient-overlay transition-all hover:scale-[1.02] duration-300">
               <div className="bg-white rounded-lg shadow-xl overflow-hidden">
                 <img 
                   src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80" 
@@ -66,11 +66,11 @@ const Hero = () => {
                   className="w-full h-auto"
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-tobecatAccent-purple text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105 hover:-translate-y-1">
+              <div className="absolute -bottom-6 -right-6 bg-tobecatAccent-purple text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:-translate-y-1">
                 <p className="font-bold text-xl">10+ Services</p>
                 <p className="text-sm">For Your Business</p>
               </div>
-              <div className="absolute -top-6 -left-6 bg-tobecatAccent-orange text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105 hover:translate-y-1">
+              <div className="absolute -top-6 -left-6 bg-tobecatAccent-orange text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:translate-y-1">
                 <p className="font-bold text-xl">100%</p>
                 <p className="text-sm">Client Satisfaction</p>
               </div>

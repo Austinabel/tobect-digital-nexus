@@ -1,3 +1,4 @@
+
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -67,7 +68,11 @@ const FeaturedProducts = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.5 }
+      transition: { 
+        duration: 0.5,
+        type: "spring",
+        stiffness: 100
+      }
     }
   };
 
@@ -93,11 +98,11 @@ const FeaturedProducts = () => {
           {featuredProducts.map((product) => (
             <motion.div 
               key={product.id} 
-              className="flex flex-col h-full bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 border border-blue-100"
+              className="flex flex-col h-full bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-blue-100 feature-card"
               variants={itemVariants}
             >
-              <div className={`h-48 ${product.color} flex items-center justify-center p-4`}>
-                <div className="text-6xl">
+              <div className={`h-48 ${product.color} hover-scale-image overflow-hidden flex items-center justify-center p-4`}>
+                <div className="text-6xl transform transition-all duration-500 hover:scale-125 hover:rotate-12">
                   {product.emoji}
                 </div>
               </div>
@@ -113,7 +118,7 @@ const FeaturedProducts = () => {
                     className="w-full border-blue-300 text-blue-600 hover:bg-blue-50 transition-all group"
                   >
                     View Products 
-                    <ArrowRight size={16} className="ml-2 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight size={16} className="ml-2 transition-transform group-hover:translate-x-2" />
                   </Button>
                 </Link>
               </div>
@@ -123,7 +128,7 @@ const FeaturedProducts = () => {
         
         <div className="mt-12 text-center">
           <Link to="/products">
-            <Button className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white px-8 py-6 rounded-md text-lg transition-transform hover:scale-[1.01] shadow-lg">
+            <Button className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white px-8 py-6 rounded-md text-lg transition-all hover:scale-105 hover:shadow-lg shadow-md">
               Explore All Products
             </Button>
           </Link>
