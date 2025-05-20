@@ -36,7 +36,7 @@ const Navbar = () => {
         <div className="flex items-center">
           <Link to="/" className="flex items-center text-white animate-fade-in hover:opacity-90 transition-opacity">
             <img 
-              src="/lovable-uploads/4d9351ea-4dfe-404d-b627-7e5cbacc8530.png" 
+              src="/lovable-uploads/a46707c1-2f96-483a-922d-aa6761ce4ef1.png" 
               alt="Tobecat Technologies Logo" 
               className="h-12 md:h-14 transition-transform hover:scale-105 duration-300"
             />
