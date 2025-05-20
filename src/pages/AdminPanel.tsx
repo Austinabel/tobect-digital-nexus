@@ -24,9 +24,16 @@ const AdminPanel = () => {
     
     // Check if user is already logged in
     const checkAuthStatus = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        setIsAuthenticated(true);
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (data.session) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (err) {
+        console.error('Error checking auth status:', err);
+        setIsAuthenticated(false);
       }
     };
     

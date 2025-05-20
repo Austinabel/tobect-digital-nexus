@@ -56,7 +56,11 @@ const statusColors: Record<string, string> = {
   "Lost": "bg-red-100 text-red-800"
 };
 
-const QuotesManager = () => {
+interface QuotesManagerProps {
+  quoteType?: "digital" | "product";
+}
+
+const QuotesManager = ({ quoteType }: QuotesManagerProps) => {
   const { toast } = useToast();
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -69,10 +73,16 @@ const QuotesManager = () => {
     const fetchQuotes = async () => {
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from('quotes')
           .select('*')
-          .order('created_at', { ascending: false });
+          
+        // Filter by quote type if specified
+        if (quoteType) {
+          query = query.eq('type', quoteType);
+        }
+        
+        const { data, error } = await query.order('created_at', { ascending: false });
 
         if (error) throw error;
         
@@ -129,7 +139,7 @@ const QuotesManager = () => {
     };
 
     fetchQuotes();
-  }, [toast]);
+  }, [toast, quoteType]);
 
   const viewQuoteDetails = (quote: Quote) => {
     setSelectedQuote(quote);
@@ -233,7 +243,13 @@ const QuotesManager = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-tobecatGray-900">Quote Requests</h2>
+        <h2 className="text-2xl font-bold text-tobecatGray-900">
+          {quoteType === "digital" 
+            ? "Service Quote Requests" 
+            : quoteType === "product" 
+              ? "Product Quote Requests" 
+              : "All Quote Requests"}
+        </h2>
         <Button className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white">
           <FileText size={16} className="mr-2" /> Export Quotes
         </Button>
@@ -256,7 +272,7 @@ const QuotesManager = () => {
                 <TableHead>ID</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Client</TableHead>
-                <TableHead>Type</TableHead>
+                {!quoteType && <TableHead>Type</TableHead>}
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -267,9 +283,11 @@ const QuotesManager = () => {
                   <TableCell className="font-medium">{quote.quote_id}</TableCell>
                   <TableCell>{quote.date}</TableCell>
                   <TableCell>{quote.full_name}</TableCell>
-                  <TableCell>
-                    {quote.type === "digital" ? "Digital Service" : "Product Purchase"}
-                  </TableCell>
+                  {!quoteType && (
+                    <TableCell>
+                      {quote.type === "digital" ? "Digital Service" : "Product Purchase"}
+                    </TableCell>
+                  )}
                   <TableCell>
                     <Badge variant="outline" className={statusColors[quote.status] || "bg-gray-100 text-gray-800"}>
                       {quote.status}
