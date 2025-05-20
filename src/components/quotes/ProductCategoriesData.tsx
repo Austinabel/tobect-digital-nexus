@@ -11,6 +11,11 @@ interface ProductItem {
   description?: string;
 }
 
+// Define database product type that includes category
+interface DatabaseProduct extends ProductItem {
+  category: string;
+}
+
 // Define product category type
 interface ProductCategory {
   id: string;
@@ -92,7 +97,7 @@ const fetchProductsFromSupabase = async () => {
     // Group products by category
     const productsByCategory: Record<string, ProductItem[]> = {};
     
-    data.forEach(product => {
+    data.forEach((product: DatabaseProduct) => {
       const categoryName = product.category;
       const categoryId = categoryName.toLowerCase().replace(/\s+/g, '-');
       
@@ -120,15 +125,25 @@ const fetchProductsFromSupabase = async () => {
     // Add any new categories from database
     Object.keys(productsByCategory).forEach(categoryId => {
       if (!updatedCategories.find(cat => cat.id === categoryId)) {
-        const firstProduct = productsByCategory[categoryId][0];
-        const categoryName = firstProduct ? firstProduct.category : categoryId.replace(/-/g, ' ');
-        
-        updatedCategories.push({
-          id: categoryId,
-          name: categoryName,
-          icon: <CircleDollarSign className="h-5 w-5" />, // Default icon for new categories
-          items: productsByCategory[categoryId]
-        });
+        // We need to get the category name from any product in this category
+        const productsInCategory = productsByCategory[categoryId];
+        if (productsInCategory.length > 0) {
+          // Get the category name from the database directly
+          const { data } = await supabase
+            .from('products')
+            .select('category')
+            .eq('id', productsInCategory[0].id)
+            .single();
+            
+          const categoryName = data ? data.category : categoryId.replace(/-/g, ' ');
+          
+          updatedCategories.push({
+            id: categoryId,
+            name: categoryName,
+            icon: <CircleDollarSign className="h-5 w-5" />, // Default icon for new categories
+            items: productsInCategory
+          });
+        }
       }
     });
     
