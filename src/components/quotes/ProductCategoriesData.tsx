@@ -1,9 +1,26 @@
 
 import { Battery, Cctv, CircleDollarSign, Sun, Zap } from 'lucide-react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
-// Define product categories and items
-export const productCategories = [
+// Define product type
+interface ProductItem {
+  id: number | string;
+  name: string;
+  price: number;
+  description?: string;
+}
+
+// Define product category type
+interface ProductCategory {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+  items: ProductItem[];
+}
+
+// Default product categories and items
+const defaultProductCategories: ProductCategory[] = [
   {
     id: 'solar-panels',
     name: 'Solar Panels',
@@ -56,6 +73,80 @@ export const productCategories = [
   }
 ];
 
+// Fetch products from Supabase and merge with default categories
+const fetchProductsFromSupabase = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*');
+    
+    if (error) {
+      console.error("Error fetching products:", error);
+      return defaultProductCategories;
+    }
+    
+    if (!data || data.length === 0) {
+      return defaultProductCategories;
+    }
+    
+    // Group products by category
+    const productsByCategory: Record<string, ProductItem[]> = {};
+    
+    data.forEach(product => {
+      const categoryName = product.category;
+      const categoryId = categoryName.toLowerCase().replace(/\s+/g, '-');
+      
+      if (!productsByCategory[categoryId]) {
+        productsByCategory[categoryId] = [];
+      }
+      
+      productsByCategory[categoryId].push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        description: product.description
+      });
+    });
+    
+    // Create updated categories array
+    const updatedCategories = defaultProductCategories.map(category => {
+      const updatedItems = productsByCategory[category.id] || [];
+      return {
+        ...category,
+        items: updatedItems.length > 0 ? updatedItems : category.items
+      };
+    });
+    
+    // Add any new categories from database
+    Object.keys(productsByCategory).forEach(categoryId => {
+      if (!updatedCategories.find(cat => cat.id === categoryId)) {
+        const firstProduct = productsByCategory[categoryId][0];
+        const categoryName = firstProduct ? firstProduct.category : categoryId.replace(/-/g, ' ');
+        
+        updatedCategories.push({
+          id: categoryId,
+          name: categoryName,
+          icon: <CircleDollarSign className="h-5 w-5" />, // Default icon for new categories
+          items: productsByCategory[categoryId]
+        });
+      }
+    });
+    
+    return updatedCategories;
+  } catch (error) {
+    console.error("Error processing products:", error);
+    return defaultProductCategories;
+  }
+};
+
+// Initialize productCategories with default data
+export let productCategories: ProductCategory[] = [...defaultProductCategories];
+
+// Update productCategories from database
+(async () => {
+  productCategories = await fetchProductsFromSupabase();
+})();
+
 // Format price in Naira
 export const formatPrice = (price: number) => {
   return new Intl.NumberFormat('en-NG', {
@@ -73,4 +164,36 @@ export const getSelectedProduct = (categoryId: string, productId: string) => {
   
   const product = category.items.find(item => item.id.toString() === productId);
   return product || null;
+};
+
+// Hook to get product categories from Supabase
+export const useProductCategories = () => {
+  const [categories, setCategories] = useState<ProductCategory[]>(productCategories);
+  
+  useEffect(() => {
+    const fetchAndSetCategories = async () => {
+      const updatedCategories = await fetchProductsFromSupabase();
+      setCategories(updatedCategories);
+      productCategories = updatedCategories; // Update the exported variable
+    };
+    
+    fetchAndSetCategories();
+    
+    // Subscribe to product changes
+    const channel = supabase
+      .channel('public:products')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'products' }, 
+        () => {
+          fetchAndSetCategories();
+        }
+      )
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+  
+  return categories;
 };

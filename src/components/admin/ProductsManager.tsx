@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -11,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import * as z from "zod";
 import { Package, ShoppingCart, Ticket, Receipt, FileText } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Form schema for adding new products
 const productSchema = z.object({
@@ -67,6 +69,15 @@ const ProductsManager = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>([
+    'Solar Panels',
+    'Batteries',
+    'Inverters',
+    'CCTV Cameras',
+    'Solar Generators'
+  ]);
 
   // Form for adding new products
   const form = useForm<z.infer<typeof productSchema>>({
@@ -110,9 +121,23 @@ const ProductsManager = () => {
     fetchProducts();
   }, []);
 
+  const handleEditProduct = (product: Product) => {
+    form.reset({
+      name: product.name,
+      category: product.category,
+      price: product.price.toString(),
+      stock: product.stock.toString(),
+      description: product.description,
+      image_url: product.image_url || "",
+    });
+    setEditingProductId(product.id);
+    setIsEditing(true);
+    setIsSheetOpen(true);
+  };
+
   const onSubmit = async (data: z.infer<typeof productSchema>) => {
     try {
-      const newProduct = {
+      const productData = {
         name: data.name,
         category: data.category,
         price: parseInt(data.price),
@@ -121,27 +146,45 @@ const ProductsManager = () => {
         image_url: data.image_url || null,
       };
       
-      const { error } = await supabase
-        .from('products')
-        .insert([newProduct]);
+      let result;
       
-      if (error) {
-        throw error;
+      if (isEditing && editingProductId) {
+        // Update existing product
+        result = await supabase
+          .from('products')
+          .update(productData)
+          .eq('id', editingProductId);
+          
+        if (result.error) throw result.error;
+        
+        toast({
+          title: "Product Updated",
+          description: `${data.name} has been updated.`,
+        });
+      } else {
+        // Add new product
+        result = await supabase
+          .from('products')
+          .insert([productData]);
+          
+        if (result.error) throw result.error;
+        
+        toast({
+          title: "Product Added",
+          description: `${data.name} has been added to your product catalog.`,
+        });
       }
-      
-      toast({
-        title: "Product Added",
-        description: `${data.name} has been added to your product catalog.`,
-      });
       
       form.reset();
       setIsSheetOpen(false);
+      setIsEditing(false);
+      setEditingProductId(null);
       fetchProducts(); // Refresh the product list
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error("Error saving product:", error);
       toast({
         title: "Error",
-        description: "Failed to add product",
+        description: `Failed to ${isEditing ? 'update' : 'add'} product`,
         variant: "destructive",
       });
     }
@@ -177,6 +220,24 @@ const ProductsManager = () => {
       });
     }
   };
+  
+  const resetForm = () => {
+    form.reset({
+      name: "",
+      category: "",
+      price: "",
+      stock: "",
+      description: "",
+      image_url: "",
+    });
+    setIsEditing(false);
+    setEditingProductId(null);
+  };
+
+  const handleOpenSheet = () => {
+    resetForm();
+    setIsSheetOpen(true);
+  };
 
   // Format currency in Naira
   const formatNaira = (amount: number) => {
@@ -187,17 +248,25 @@ const ProductsManager = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-tobecatGray-900">Products Management</h2>
-        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <Sheet open={isSheetOpen} onOpenChange={(open) => {
+          setIsSheetOpen(open);
+          if (!open) resetForm();
+        }}>
           <SheetTrigger asChild>
-            <Button className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white">
+            <Button 
+              onClick={handleOpenSheet}
+              className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white"
+            >
               Add New Product
             </Button>
           </SheetTrigger>
           <SheetContent className="overflow-y-auto">
             <SheetHeader>
-              <SheetTitle>Add New Product</SheetTitle>
+              <SheetTitle>{isEditing ? "Edit Product" : "Add New Product"}</SheetTitle>
               <SheetDescription>
-                Fill in the details to add a new product to your inventory.
+                {isEditing 
+                  ? "Update the details of your existing product." 
+                  : "Fill in the details to add a new product to your inventory."}
               </SheetDescription>
             </SheetHeader>
             
@@ -223,9 +292,24 @@ const ProductsManager = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Solar Panels" {...field} />
-                      </FormControl>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value} 
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categories.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -293,7 +377,7 @@ const ProductsManager = () => {
                   type="submit" 
                   className="w-full mt-4 bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white"
                 >
-                  Add Product
+                  {isEditing ? "Update Product" : "Add Product"}
                 </Button>
               </form>
             </Form>
@@ -357,7 +441,13 @@ const ProductsManager = () => {
                       <TableCell>{product.stock}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm">Edit</Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleEditProduct(product)}
+                          >
+                            Edit
+                          </Button>
                           <Button 
                             variant="destructive" 
                             size="sm"

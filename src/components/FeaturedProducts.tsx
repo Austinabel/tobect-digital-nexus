@@ -1,13 +1,12 @@
-
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Battery, Zap, Cctv, Sun } from 'lucide-react';
 import { motion, useInView } from "framer-motion";
-import { useProducts } from '@/context/ProductContext';
+import { useProductCategories } from '@/components/quotes/ProductCategoriesData';
 
 const FeaturedProducts = () => {
-  const { productCategories } = useProducts();
+  const productCategories = useProductCategories();
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
   
