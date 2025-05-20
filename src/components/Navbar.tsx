@@ -40,6 +40,7 @@ const Navbar = () => {
               alt="Tobecat Technologies Logo" 
               className="h-12 md:h-14 transition-transform hover:scale-105 duration-300"
             />
+            <span className="ml-2 text-xl font-bold hidden sm:block">TOBECAT</span>
           </Link>
         </div>
         
