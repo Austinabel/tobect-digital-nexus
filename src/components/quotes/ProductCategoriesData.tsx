@@ -123,31 +123,34 @@ const fetchProductsFromSupabase = async () => {
     });
     
     // Add any new categories from database
-    Object.keys(productsByCategory).forEach(categoryId => {
-      if (!updatedCategories.find(cat => cat.id === categoryId)) {
-        // We need to get the category name from any product in this category
-        const productsInCategory = productsByCategory[categoryId];
-        if (productsInCategory.length > 0) {
-          // Get the category name from the database directly
-          const { data } = await supabase
-            .from('products')
-            .select('category')
-            .eq('id', productsInCategory[0].id)
-            .single();
+    const addNewCategories = async () => {
+      for (const categoryId of Object.keys(productsByCategory)) {
+        if (!updatedCategories.find(cat => cat.id === categoryId)) {
+          // We need to get the category name from any product in this category
+          const productsInCategory = productsByCategory[categoryId];
+          if (productsInCategory.length > 0) {
+            // Get the category name from the database directly
+            const { data } = await supabase
+              .from('products')
+              .select('category')
+              .eq('id', productsInCategory[0].id.toString())
+              .single();
+              
+            const categoryName = data ? data.category : categoryId.replace(/-/g, ' ');
             
-          const categoryName = data ? data.category : categoryId.replace(/-/g, ' ');
-          
-          updatedCategories.push({
-            id: categoryId,
-            name: categoryName,
-            icon: <CircleDollarSign className="h-5 w-5" />, // Default icon for new categories
-            items: productsInCategory
-          });
+            updatedCategories.push({
+              id: categoryId,
+              name: categoryName,
+              icon: <CircleDollarSign className="h-5 w-5" />, // Default icon for new categories
+              items: productsInCategory
+            });
+          }
         }
       }
-    });
+      return updatedCategories;
+    };
     
-    return updatedCategories;
+    return addNewCategories();
   } catch (error) {
     console.error("Error processing products:", error);
     return defaultProductCategories;
