@@ -6,6 +6,8 @@ import AdminTabs from '@/components/admin/AdminTabs';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Unlock } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const AdminPanel = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,22 +15,78 @@ const AdminPanel = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsLoaded(true);
+    
+    // Check if user is already logged in
+    const checkAuthStatus = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        setIsAuthenticated(true);
+      }
+    };
+    
+    checkAuthStatus();
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  // Mock admin authentication (in a real app, use proper auth system)
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple hard-coded check (replace with real auth)
-    if (email === 'admin@example.com' && password === 'admin123') {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('Invalid email or password');
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        setError(error.message);
+        toast({
+          title: "Login Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else if (data.user) {
+        toast({
+          title: "Success",
+          description: "Logged in successfully",
+        });
+      }
+    } catch (err) {
+      setError('An unexpected error occurred');
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsAuthenticated(false);
+    toast({
+      title: "Logged out",
+      description: "You have been logged out successfully",
+    });
   };
 
   return (
@@ -90,15 +148,21 @@ const AdminPanel = () => {
                     <Button 
                       type="submit"
                       className="w-full bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white transition-transform hover:scale-[1.02]"
+                      disabled={isLoading}
                     >
-                      <Lock size={16} className="mr-2" /> Login
+                      <Lock size={16} className="mr-2" /> {isLoading ? 'Logging in...' : 'Login'}
                     </Button>
                   </form>
                   
                   <div className="mt-4 text-sm text-gray-600 text-center">
-                    <p>Demo credentials:</p>
-                    <p>Email: admin@example.com</p>
-                    <p>Password: admin123</p>
+                    <p>Don't have an account? Contact your administrator.</p>
+                    <p className="mt-2">For testing, you can register at:</p>
+                    <button 
+                      onClick={() => navigate('/signup')} 
+                      className="text-tobecatBlue-600 hover:underline mt-1"
+                    >
+                      Signup Page
+                    </button>
                   </div>
                 </div>
               </div>
@@ -111,7 +175,7 @@ const AdminPanel = () => {
                 </h1>
                 <Button 
                   variant="outline" 
-                  onClick={() => setIsAuthenticated(false)}
+                  onClick={handleLogout}
                   className="border-tobecatBlue-300 text-tobecatBlue-600 hover:bg-tobecatBlue-50 transition-transform hover:scale-105"
                 >
                   <Unlock size={16} className="mr-2" /> Logout

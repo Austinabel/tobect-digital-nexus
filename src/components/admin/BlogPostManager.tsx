@@ -1,58 +1,68 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Plus, Pencil, Trash, Upload, Image } from 'lucide-react';
-
-// Mock blog posts data (in a real app, this would come from a database)
-const initialBlogPosts = [
-  {
-    id: 1,
-    title: "The Future of Web Development",
-    excerpt: "Exploring the latest trends and technologies in web development.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    author: "John Doe",
-    date: "2025-04-15",
-    imageUrl: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-  },
-  {
-    id: 2,
-    title: "UX Design Principles for 2025",
-    excerpt: "Essential UX design principles every designer should know.",
-    content: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    author: "Jane Smith",
-    date: "2025-04-10",
-    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-  }
-];
+import { supabase } from '@/integrations/supabase/client';
 
 interface BlogPost {
-  id: number;
+  id: string;
   title: string;
   excerpt: string;
   content: string;
   author: string;
   date: string;
-  imageUrl?: string;
+  image_url?: string;
 }
 
 const BlogPostManager = () => {
   const { toast } = useToast();
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(initialBlogPosts);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [isAddingPost, setIsAddingPost] = useState(false);
-  const [isEditingPost, setIsEditingPost] = useState<number | null>(null);
+  const [isEditingPost, setIsEditingPost] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<Omit<BlogPost, 'id'>>({
     title: '',
     excerpt: '',
     content: '',
     author: '',
     date: new Date().toISOString().split('T')[0],
-    imageUrl: ''
+    image_url: ''
   });
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  // Fetch blog posts from Supabase
+  const fetchBlogPosts = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .order('date', { ascending: false });
+      
+      if (error) {
+        throw error;
+      }
+      
+      setBlogPosts(data || []);
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch blog posts",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBlogPosts();
+  }, []);
 
   const resetForm = () => {
     setFormData({
@@ -61,12 +71,12 @@ const BlogPostManager = () => {
       content: '',
       author: '',
       date: new Date().toISOString().split('T')[0],
-      imageUrl: ''
+      image_url: ''
     });
     setPreviewImage(null);
   };
 
-  const handleAddPost = () => {
+  const handleAddPost = async () => {
     if (!formData.title || !formData.content) {
       toast({
         title: "Error",
@@ -76,22 +86,34 @@ const BlogPostManager = () => {
       return;
     }
 
-    const newPost = {
-      id: blogPosts.length > 0 ? Math.max(...blogPosts.map(post => post.id)) + 1 : 1,
-      ...formData
-    };
-
-    setBlogPosts([...blogPosts, newPost]);
-    setIsAddingPost(false);
-    resetForm();
-    
-    toast({
-      title: "Success",
-      description: "Blog post added successfully",
-    });
+    try {
+      const { error } = await supabase
+        .from('blog_posts')
+        .insert([formData]);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Success",
+        description: "Blog post added successfully",
+      });
+      
+      setIsAddingPost(false);
+      resetForm();
+      fetchBlogPosts();
+    } catch (error) {
+      console.error("Error adding blog post:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add blog post",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleEditPost = () => {
+  const handleEditPost = async () => {
     if (!isEditingPost) return;
     
     if (!formData.title || !formData.content) {
@@ -103,18 +125,32 @@ const BlogPostManager = () => {
       return;
     }
 
-    const updatedPosts = blogPosts.map(post => 
-      post.id === isEditingPost ? { ...post, ...formData } : post
-    );
-
-    setBlogPosts(updatedPosts);
-    setIsEditingPost(null);
-    resetForm();
-    
-    toast({
-      title: "Success",
-      description: "Blog post updated successfully",
-    });
+    try {
+      const { error } = await supabase
+        .from('blog_posts')
+        .update(formData)
+        .eq('id', isEditingPost);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Success",
+        description: "Blog post updated successfully",
+      });
+      
+      setIsEditingPost(null);
+      resetForm();
+      fetchBlogPosts();
+    } catch (error) {
+      console.error("Error updating blog post:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update blog post",
+        variant: "destructive",
+      });
+    }
   };
 
   const startEditing = (post: BlogPost) => {
@@ -124,19 +160,39 @@ const BlogPostManager = () => {
       excerpt: post.excerpt,
       content: post.content,
       author: post.author,
-      date: post.date,
-      imageUrl: post.imageUrl || ''
+      date: post.date.split('T')[0],
+      image_url: post.image_url || ''
     });
-    setPreviewImage(post.imageUrl || null);
+    setPreviewImage(post.image_url || null);
   };
 
-  const handleDeletePost = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      setBlogPosts(blogPosts.filter(post => post.id !== id));
+  const handleDeletePost = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this post?")) {
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('blog_posts')
+        .delete()
+        .eq('id', id);
+      
+      if (error) {
+        throw error;
+      }
       
       toast({
         title: "Success",
         description: "Blog post deleted successfully",
+      });
+      
+      fetchBlogPosts();
+    } catch (error) {
+      console.error("Error deleting blog post:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete blog post",
+        variant: "destructive",
       });
     }
   };
@@ -153,7 +209,7 @@ const BlogPostManager = () => {
       // For this demo, we'll just create a local object URL
       const objectUrl = URL.createObjectURL(file);
       setPreviewImage(objectUrl);
-      setFormData(prev => ({ ...prev, imageUrl: objectUrl }));
+      setFormData(prev => ({ ...prev, image_url: objectUrl }));
       
       toast({
         title: "Image selected",
@@ -257,7 +313,7 @@ const BlogPostManager = () => {
                       <button 
                         onClick={() => {
                           setPreviewImage(null);
-                          setFormData(prev => ({ ...prev, imageUrl: '' }));
+                          setFormData(prev => ({ ...prev, image_url: '' }));
                         }} 
                         className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                       >
@@ -266,6 +322,21 @@ const BlogPostManager = () => {
                     </div>
                   </div>
                 )}
+
+                <div className="mt-4 w-full">
+                  <label htmlFor="image_url" className="block text-sm font-medium text-gray-700 mb-1">
+                    Or paste image URL directly:
+                  </label>
+                  <Input
+                    id="image_url"
+                    name="image_url"
+                    type="text"
+                    value={formData.image_url}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/image.jpg"
+                    className="focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300"
+                  />
+                </div>
               </div>
             </div>
             
@@ -327,7 +398,9 @@ const BlogPostManager = () => {
       <div className="space-y-4">
         <h3 className="text-xl font-semibold mb-4">Existing Posts</h3>
         
-        {blogPosts.length === 0 ? (
+        {isLoading ? (
+          <p className="text-gray-500 italic">Loading blog posts...</p>
+        ) : blogPosts.length === 0 ? (
           <p className="text-gray-500 italic">No blog posts available.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -336,10 +409,10 @@ const BlogPostManager = () => {
                 key={post.id} 
                 className="overflow-hidden border-l-4 border-l-tobecatBlue-500 transition-all hover:shadow-lg hover:scale-[1.02]"
               >
-                {post.imageUrl && (
+                {post.image_url && (
                   <div className="h-48 overflow-hidden">
                     <img 
-                      src={post.imageUrl} 
+                      src={post.image_url} 
                       alt={post.title} 
                       className="w-full h-full object-cover transition-transform hover:scale-110 duration-500" 
                     />

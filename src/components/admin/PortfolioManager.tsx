@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,43 +13,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Pencil, Trash } from 'lucide-react';
-
-// Mock portfolio items data
-const initialPortfolioItems = [
-  {
-    id: 1,
-    title: "E-commerce Website Redesign",
-    category: "web-design",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80",
-    client: "Fashion Retailer Inc.",
-    description: "Complete redesign of an e-commerce platform for a fashion retailer, improving conversion rates by 35%.",
-    link: "https://example.com",
-    date: "2025-03-15",
-    featured: true
-  },
-  {
-    id: 2,
-    title: "Mobile Banking App",
-    category: "mobile-app",
-    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80",
-    client: "Regional Bank",
-    description: "Developed a secure, user-friendly mobile banking application with advanced features.",
-    link: "https://example.com",
-    date: "2025-02-20",
-    featured: false
-  }
-];
+import { supabase } from '@/integrations/supabase/client';
 
 interface PortfolioItem {
-  id: number;
+  id: string;
   title: string;
   category: string;
   image: string;
-  client: string;
+  client: string | null;
   description: string;
-  link: string;
+  link: string | null;
   date: string;
-  featured: boolean;
+  featured: boolean | null;
 }
 
 const categories = [
@@ -64,9 +39,10 @@ const categories = [
 
 const PortfolioManager = () => {
   const { toast } = useToast();
-  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(initialPortfolioItems);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [isAddingItem, setIsAddingItem] = useState(false);
-  const [isEditingItem, setIsEditingItem] = useState<number | null>(null);
+  const [isEditingItem, setIsEditingItem] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<Omit<PortfolioItem, 'id'>>({
     title: '',
     category: '',
@@ -77,6 +53,35 @@ const PortfolioManager = () => {
     date: new Date().toISOString().split('T')[0],
     featured: false
   });
+
+  // Fetch portfolio items from Supabase
+  const fetchPortfolioItems = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('portfolio_items')
+        .select('*');
+      
+      if (error) {
+        throw error;
+      }
+      
+      setPortfolioItems(data || []);
+    } catch (error) {
+      console.error("Error fetching portfolio items:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch portfolio items",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPortfolioItems();
+  }, []);
 
   const resetForm = () => {
     setFormData({
@@ -91,7 +96,7 @@ const PortfolioManager = () => {
     });
   };
 
-  const handleAddItem = () => {
+  const handleAddItem = async () => {
     if (!formData.title || !formData.category || !formData.description) {
       toast({
         title: "Error",
@@ -101,22 +106,34 @@ const PortfolioManager = () => {
       return;
     }
 
-    const newItem = {
-      id: portfolioItems.length > 0 ? Math.max(...portfolioItems.map(item => item.id)) + 1 : 1,
-      ...formData
-    };
-
-    setPortfolioItems([...portfolioItems, newItem]);
-    setIsAddingItem(false);
-    resetForm();
-    
-    toast({
-      title: "Success",
-      description: "Portfolio item added successfully",
-    });
+    try {
+      const { error } = await supabase
+        .from('portfolio_items')
+        .insert([formData]);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Success",
+        description: "Portfolio item added successfully",
+      });
+      
+      setIsAddingItem(false);
+      resetForm();
+      fetchPortfolioItems();
+    } catch (error) {
+      console.error("Error adding portfolio item:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add portfolio item",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleEditItem = () => {
+  const handleEditItem = async () => {
     if (!isEditingItem) return;
     
     if (!formData.title || !formData.category || !formData.description) {
@@ -128,18 +145,32 @@ const PortfolioManager = () => {
       return;
     }
 
-    const updatedItems = portfolioItems.map(item => 
-      item.id === isEditingItem ? { ...item, ...formData } : item
-    );
-
-    setPortfolioItems(updatedItems);
-    setIsEditingItem(null);
-    resetForm();
-    
-    toast({
-      title: "Success",
-      description: "Portfolio item updated successfully",
-    });
+    try {
+      const { error } = await supabase
+        .from('portfolio_items')
+        .update(formData)
+        .eq('id', isEditingItem);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Success",
+        description: "Portfolio item updated successfully",
+      });
+      
+      setIsEditingItem(null);
+      resetForm();
+      fetchPortfolioItems();
+    } catch (error) {
+      console.error("Error updating portfolio item:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update portfolio item",
+        variant: "destructive",
+      });
+    }
   };
 
   const startEditing = (item: PortfolioItem) => {
@@ -156,13 +187,33 @@ const PortfolioManager = () => {
     });
   };
 
-  const handleDeleteItem = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this item?")) {
-      setPortfolioItems(portfolioItems.filter(item => item.id !== id));
+  const handleDeleteItem = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this item?")) {
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('portfolio_items')
+        .delete()
+        .eq('id', id);
+      
+      if (error) {
+        throw error;
+      }
       
       toast({
         title: "Success",
         description: "Portfolio item deleted successfully",
+      });
+      
+      fetchPortfolioItems();
+    } catch (error) {
+      console.error("Error deleting portfolio item:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete portfolio item",
+        variant: "destructive",
       });
     }
   };
@@ -254,7 +305,7 @@ const PortfolioManager = () => {
               <Input
                 id="client"
                 name="client"
-                value={formData.client}
+                value={formData.client || ''}
                 onChange={handleInputChange}
                 placeholder="Client name"
               />
@@ -283,7 +334,7 @@ const PortfolioManager = () => {
                 <Input
                   id="link"
                   name="link"
-                  value={formData.link}
+                  value={formData.link || ''}
                   onChange={handleInputChange}
                   placeholder="https://example.com"
                 />
@@ -309,7 +360,7 @@ const PortfolioManager = () => {
                 id="featured"
                 name="featured"
                 type="checkbox"
-                checked={formData.featured}
+                checked={formData.featured || false}
                 onChange={(e) => handleCheckboxChange('featured', e.target.checked)}
                 className="h-4 w-4 text-tobecatBlue-600 rounded border-gray-300"
               />
@@ -343,7 +394,9 @@ const PortfolioManager = () => {
       <div className="space-y-4">
         <h3 className="text-xl font-semibold mb-2">Existing Projects</h3>
         
-        {portfolioItems.length === 0 ? (
+        {isLoading ? (
+          <p className="text-gray-500 italic">Loading portfolio items...</p>
+        ) : portfolioItems.length === 0 ? (
           <p className="text-gray-500 italic">No portfolio items available.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

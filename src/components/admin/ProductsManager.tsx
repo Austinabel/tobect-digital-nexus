@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
-import { useProducts } from "@/context/ProductContext";
+import { supabase } from "@/integrations/supabase/client";
 import * as z from "zod";
 import { Package, ShoppingCart, Ticket, Receipt, FileText } from "lucide-react";
 
@@ -24,9 +23,21 @@ const productSchema = z.object({
     message: "Stock must be a number",
   }),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
+  image_url: z.string().optional(),
 });
 
-// Mock data for orders
+// Type for product data
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  description: string;
+  image_url?: string;
+}
+
+// Mock data for orders, tickets, and transactions (we'll replace these with real data later)
 const mockOrders = [
   { id: "ORD-2023-001", date: "2023-05-15", customer: "John Smith", items: 2, total: 430000, status: "Delivered" },
   { id: "ORD-2023-002", date: "2023-05-18", customer: "Emily Johnson", items: 3, total: 625000, status: "Processing" },
@@ -53,8 +64,9 @@ const mockTransactions = [
 const ProductsManager = () => {
   const [activeTab, setActiveTab] = useState("products");
   const { toast } = useToast();
-  const { getAllProducts, addProduct, deleteProduct } = useProducts();
-  const products = getAllProducts();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   // Form for adding new products
   const form = useForm<z.infer<typeof productSchema>>({
@@ -65,34 +77,105 @@ const ProductsManager = () => {
       price: "",
       stock: "",
       description: "",
+      image_url: "",
     },
   });
 
-  const onSubmit = (data: z.infer<typeof productSchema>) => {
-    const newProduct = {
-      name: data.name,
-      category: data.category,
-      price: Number(data.price),
-      stock: Number(data.stock),
-      description: data.description
-    };
-    
-    addProduct(newProduct);
-    
-    toast({
-      title: "Product Added",
-      description: `${data.name} has been added to your product catalog.`,
-    });
-    
-    form.reset();
+  // Fetch products from Supabase
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*');
+      
+      if (error) {
+        throw error;
+      }
+      
+      setProducts(data || []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch products",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDeleteProduct = (id: number) => {
-    deleteProduct(id);
-    toast({
-      title: "Product Deleted",
-      description: "The product has been removed from your catalog.",
-    });
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const onSubmit = async (data: z.infer<typeof productSchema>) => {
+    try {
+      const newProduct = {
+        name: data.name,
+        category: data.category,
+        price: parseInt(data.price),
+        stock: parseInt(data.stock),
+        description: data.description,
+        image_url: data.image_url || null,
+      };
+      
+      const { error } = await supabase
+        .from('products')
+        .insert([newProduct]);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Product Added",
+        description: `${data.name} has been added to your product catalog.`,
+      });
+      
+      form.reset();
+      setIsSheetOpen(false);
+      fetchProducts(); // Refresh the product list
+    } catch (error) {
+      console.error("Error adding product:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add product",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this product?")) {
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Product Deleted",
+        description: "The product has been removed from your catalog.",
+      });
+      
+      fetchProducts(); // Refresh the product list
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete product",
+        variant: "destructive",
+      });
+    }
   };
 
   // Format currency in Naira
@@ -104,7 +187,7 @@ const ProductsManager = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-tobecatGray-900">Products Management</h2>
-        <Sheet>
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
             <Button className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white">
               Add New Product
@@ -192,6 +275,20 @@ const ProductsManager = () => {
                   )}
                 />
                 
+                <FormField
+                  control={form.control}
+                  name="image_url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Image URL (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://example.com/image.jpg" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
                 <Button 
                   type="submit" 
                   className="w-full mt-4 bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white"
@@ -230,41 +327,51 @@ const ProductsManager = () => {
         
         <TabsContent value="products" className="space-y-4 pt-2">
           <div className="bg-white rounded-lg shadow overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Product Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell className="font-medium">{product.id}</TableCell>
-                    <TableCell>{product.name}</TableCell>
-                    <TableCell>{product.category}</TableCell>
-                    <TableCell>{formatNaira(product.price)}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">Edit</Button>
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          onClick={() => handleDeleteProduct(product.id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </TableCell>
+            {isLoading ? (
+              <div className="p-8 text-center">
+                <p className="text-gray-500">Loading products...</p>
+              </div>
+            ) : products.length === 0 ? (
+              <div className="p-8 text-center">
+                <p className="text-gray-500">No products found. Add your first product!</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Product Name</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Stock</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {products.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell className="font-medium">{product.id.substring(0, 8)}...</TableCell>
+                      <TableCell>{product.name}</TableCell>
+                      <TableCell>{product.category}</TableCell>
+                      <TableCell>{formatNaira(product.price)}</TableCell>
+                      <TableCell>{product.stock}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">Edit</Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => handleDeleteProduct(product.id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </div>
         </TabsContent>
         
