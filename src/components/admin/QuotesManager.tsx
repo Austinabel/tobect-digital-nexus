@@ -1,110 +1,50 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { FileText, Trash } from "lucide-react";
+import { FileText, Trash, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 // Types for quotes
 interface DigitalServiceQuote {
   id: string;
   type: "digital";
   date: string;
-  fullName: string;
+  full_name: string;
   email: string;
   phone: string;
   company?: string;
   budget: string;
-  primaryService: string;
-  additionalServices?: string[];
+  primary_service: string;
+  additional_services?: string[];
   timeframe: string;
-  projectDetails: string;
+  project_details: string;
   status: string;
+  quote_id: string;
 }
 
 interface ProductQuote {
   id: string;
   type: "product";
   date: string;
-  fullName: string;
+  full_name: string;
   email: string;
   phone: string;
   address: string;
-  productCategory: string;
+  product_category: string;
   product: string;
   quantity: number;
   installation?: boolean;
-  additionalInfo?: string;
+  additional_info?: string;
   status: string;
+  quote_id: string;
 }
 
 type Quote = DigitalServiceQuote | ProductQuote;
-
-// Mock data for client quotes
-const mockQuotes: Quote[] = [
-  {
-    id: "QT-2023-001",
-    type: "product",
-    date: "2023-06-10",
-    fullName: "John Smith",
-    email: "john.smith@example.com",
-    phone: "+234 712 345 678",
-    address: "123 Solar Street, Lagos",
-    productCategory: "Solar Panels",
-    product: "Premium Solar Panel",
-    quantity: 5,
-    installation: true,
-    additionalInfo: "Need installation on a flat roof",
-    status: "New"
-  },
-  {
-    id: "QT-2023-002",
-    type: "product",
-    date: "2023-06-12",
-    fullName: "Emily Johnson",
-    email: "emily.johnson@example.com",
-    phone: "+234 723 456 789",
-    address: "456 Battery Road, Abuja",
-    productCategory: "Batteries",
-    product: "Lithium Battery Bank",
-    quantity: 2,
-    installation: true,
-    additionalInfo: "Replacing existing lead-acid batteries",
-    status: "Contacted"
-  },
-  {
-    id: "QT-2023-003",
-    type: "digital",
-    date: "2023-06-15",
-    fullName: "Michael Brown",
-    email: "michael.brown@example.com",
-    phone: "+234 734 567 890",
-    company: "TechSolutions Inc",
-    budget: "2000000-5000000",
-    primaryService: "1",
-    additionalServices: ["2", "4"],
-    timeframe: "1-3months",
-    projectDetails: "We need a comprehensive website redesign with e-commerce functionality",
-    status: "Quote Sent"
-  },
-  {
-    id: "QT-2023-004",
-    type: "digital",
-    date: "2023-06-18",
-    fullName: "Sarah Davis",
-    email: "sarah.davis@example.com",
-    phone: "+234 745 678 901",
-    company: "Davis Security Inc.",
-    budget: "500000-2000000",
-    primaryService: "3",
-    timeframe: "asap",
-    projectDetails: "Need a mobile app for our security business to monitor CCTV cameras",
-    status: "Pending"
-  },
-];
 
 // Status badge colors
 const statusColors: Record<string, string> = {
@@ -121,7 +61,75 @@ const QuotesManager = () => {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [quotes, setQuotes] = useState(mockQuotes);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch quotes from Supabase
+  useEffect(() => {
+    const fetchQuotes = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('quotes')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        
+        if (data) {
+          // Convert Supabase data to Quote type
+          const formattedQuotes: Quote[] = data.map(quote => {
+            const baseQuote = {
+              id: quote.id,
+              date: new Date(quote.date).toISOString().split('T')[0],
+              full_name: quote.full_name,
+              email: quote.email,
+              phone: quote.phone,
+              status: quote.status,
+              quote_id: quote.quote_id,
+            };
+            
+            if (quote.type === 'digital') {
+              return {
+                ...baseQuote,
+                type: 'digital' as const,
+                company: quote.company,
+                budget: quote.budget || '',
+                primary_service: quote.primary_service || '',
+                additional_services: quote.additional_services as string[],
+                timeframe: quote.timeframe || '',
+                project_details: quote.project_details || '',
+              };
+            } else {
+              return {
+                ...baseQuote,
+                type: 'product' as const,
+                address: quote.address || '',
+                product_category: quote.product_category || '',
+                product: quote.product || '',
+                quantity: quote.quantity || 1,
+                installation: quote.installation || false,
+                additional_info: quote.additional_info,
+              };
+            }
+          });
+          
+          setQuotes(formattedQuotes);
+        }
+      } catch (error: any) {
+        console.error("Error fetching quotes:", error);
+        toast({
+          title: "Error fetching quotes",
+          description: error.message,
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchQuotes();
+  }, [toast]);
 
   const viewQuoteDetails = (quote: Quote) => {
     setSelectedQuote(quote);
@@ -133,26 +141,60 @@ const QuotesManager = () => {
     setDeleteDialogOpen(true);
   };
 
-  const deleteQuote = () => {
-    if (selectedQuote) {
+  const deleteQuote = async () => {
+    if (!selectedQuote) return;
+    
+    try {
+      const { error } = await supabase
+        .from('quotes')
+        .delete()
+        .eq('id', selectedQuote.id);
+      
+      if (error) throw error;
+      
       setQuotes(quotes.filter(quote => quote.id !== selectedQuote.id));
       setDeleteDialogOpen(false);
+      
       toast({
         title: "Quote deleted",
-        description: `Quote ${selectedQuote.id} has been deleted.`,
+        description: `Quote ${selectedQuote.quote_id} has been deleted.`,
+      });
+    } catch (error: any) {
+      console.error("Error deleting quote:", error);
+      toast({
+        title: "Error deleting quote",
+        description: error.message,
+        variant: "destructive",
       });
     }
   };
 
-  const updateQuoteStatus = (id: string, status: string) => {
-    setQuotes(quotes.map(quote => 
-      quote.id === id ? { ...quote, status } : quote
-    ));
-    setDetailsOpen(false);
-    toast({
-      title: "Status updated",
-      description: `Quote status has been updated to ${status}.`,
-    });
+  const updateQuoteStatus = async (id: string, status: string) => {
+    try {
+      const { error } = await supabase
+        .from('quotes')
+        .update({ status })
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setQuotes(quotes.map(quote => 
+        quote.id === id ? { ...quote, status } : quote
+      ));
+      
+      setDetailsOpen(false);
+      toast({
+        title: "Status updated",
+        description: `Quote status has been updated to ${status}.`,
+      });
+    } catch (error: any) {
+      console.error("Error updating quote status:", error);
+      toast({
+        title: "Error updating status",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const formatBudget = (budget: string) => {
@@ -198,60 +240,71 @@ const QuotesManager = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {quotes.map((quote) => (
-              <TableRow key={quote.id}>
-                <TableCell className="font-medium">{quote.id}</TableCell>
-                <TableCell>{quote.date}</TableCell>
-                <TableCell>{quote.fullName}</TableCell>
-                <TableCell>
-                  {quote.type === "digital" ? "Digital Service" : "Product Purchase"}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={statusColors[quote.status] || "bg-gray-100 text-gray-800"}>
-                    {quote.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => viewQuoteDetails(quote)}
-                    >
-                      Details
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => confirmDeleteQuote(quote)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </TableCell>
+        {isLoading ? (
+          <div className="flex justify-center items-center p-8">
+            <Loader2 className="h-8 w-8 animate-spin text-tobecatBlue-500" />
+            <span className="ml-2">Loading quotes...</span>
+          </div>
+        ) : quotes.length === 0 ? (
+          <div className="text-center p-8 text-gray-500">
+            <p>No quote requests found.</p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {quotes.map((quote) => (
+                <TableRow key={quote.id}>
+                  <TableCell className="font-medium">{quote.quote_id}</TableCell>
+                  <TableCell>{quote.date}</TableCell>
+                  <TableCell>{quote.full_name}</TableCell>
+                  <TableCell>
+                    {quote.type === "digital" ? "Digital Service" : "Product Purchase"}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={statusColors[quote.status] || "bg-gray-100 text-gray-800"}>
+                      {quote.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => viewQuoteDetails(quote)}
+                      >
+                        Details
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => confirmDeleteQuote(quote)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       {/* Quote Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Quote Request Details - {selectedQuote?.id}</DialogTitle>
+            <DialogTitle>Quote Request Details - {selectedQuote?.quote_id}</DialogTitle>
             <DialogDescription>
               {selectedQuote?.type === "digital" 
                 ? "Digital Service Quote Request" 
@@ -267,7 +320,7 @@ const QuotesManager = () => {
                 
                 <div>
                   <p className="text-sm font-medium text-gray-500">Name</p>
-                  <p>{selectedQuote.fullName}</p>
+                  <p>{selectedQuote.full_name}</p>
                 </div>
                 
                 <div>
@@ -314,14 +367,14 @@ const QuotesManager = () => {
                     
                     <div>
                       <p className="text-sm font-medium text-gray-500">Primary Service</p>
-                      <p>{getServiceName(selectedQuote.primaryService)}</p>
+                      <p>{getServiceName(selectedQuote.primary_service)}</p>
                     </div>
                     
-                    {selectedQuote.additionalServices && selectedQuote.additionalServices.length > 0 && (
+                    {selectedQuote.additional_services && selectedQuote.additional_services.length > 0 && (
                       <div>
                         <p className="text-sm font-medium text-gray-500">Additional Services</p>
                         <ul className="list-disc list-inside">
-                          {selectedQuote.additionalServices.map(serviceId => (
+                          {selectedQuote.additional_services.map(serviceId => (
                             <li key={serviceId}>{getServiceName(serviceId)}</li>
                           ))}
                         </ul>
@@ -335,7 +388,7 @@ const QuotesManager = () => {
                     
                     <div>
                       <p className="text-sm font-medium text-gray-500">Project Details</p>
-                      <p className="whitespace-pre-wrap">{selectedQuote.projectDetails}</p>
+                      <p className="whitespace-pre-wrap">{selectedQuote.project_details}</p>
                     </div>
                   </>
                 ) : (
@@ -344,7 +397,7 @@ const QuotesManager = () => {
                     
                     <div>
                       <p className="text-sm font-medium text-gray-500">Category</p>
-                      <p>{selectedQuote.productCategory}</p>
+                      <p>{selectedQuote.product_category}</p>
                     </div>
                     
                     <div>
@@ -362,10 +415,10 @@ const QuotesManager = () => {
                       <p>{selectedQuote.installation ? "Yes" : "No"}</p>
                     </div>
                     
-                    {selectedQuote.additionalInfo && (
+                    {selectedQuote.additional_info && (
                       <div>
                         <p className="text-sm font-medium text-gray-500">Additional Information</p>
-                        <p className="whitespace-pre-wrap">{selectedQuote.additionalInfo}</p>
+                        <p className="whitespace-pre-wrap">{selectedQuote.additional_info}</p>
                       </div>
                     )}
                   </>

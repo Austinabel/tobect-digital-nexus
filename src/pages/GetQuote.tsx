@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -9,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { Check, ArrowRight, Zap, Battery, Sun, Cctv, CircleDollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Form,
   FormControl,
