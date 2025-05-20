@@ -32,6 +32,7 @@ function App() {
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/quote" element={<GetQuote />} />
+          <Route path="/get-quote" element={<GetQuote />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />

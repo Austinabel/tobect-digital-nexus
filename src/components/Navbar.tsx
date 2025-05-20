@@ -84,7 +84,7 @@ const Navbar = () => {
           <Link to="/testimonials" className="font-medium text-white hover:text-orange-300 transition-colors transform duration-200 hover:scale-105">
             Testimonials
           </Link>
-          <Link to="/get-quote">
+          <Link to="/quote">
             <Button className="bg-orange-500 text-white hover:bg-orange-600 transition-transform hover:scale-105 shadow-lg">
               Get a Quote
             </Button>
@@ -177,7 +177,7 @@ const Navbar = () => {
               Testimonials
             </Link>
             <Link
-              to="/get-quote"
+              to="/quote"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <Button 

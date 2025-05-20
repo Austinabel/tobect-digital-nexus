@@ -104,7 +104,7 @@ const Products = () => {
                         <p className="text-tobecatGray-600 mb-4 text-sm h-16">{product.description}</p>
                         <div className="flex justify-between items-center">
                           <span className="font-bold text-tobecatBlue-600 text-lg">{formatPrice(product.price)}</span>
-                          <Link to={`/get-quote?product=${product.id}&category=${category.id}&section=sales`}>
+                          <Link to={`/quote?product=${product.id}&category=${category.id}&section=sales`}>
                             <Button className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white transition-transform hover:scale-105">
                               Purchase
                             </Button>
