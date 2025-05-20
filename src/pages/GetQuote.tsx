@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -219,32 +218,125 @@ const GetQuote = () => {
     },
   });
 
+  // Generate a unique quote ID
+  const generateQuoteId = () => {
+    const prefix = quoteType === "digital" ? "DS" : "PQ";
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, "0");
+    return `${prefix}-${timestamp}-${random}`;
+  };
+
   // Digital services submit handler
-  const onDigitalSubmit = (values: z.infer<typeof digitalFormSchema>) => {
+  const onDigitalSubmit = async (values: z.infer<typeof digitalFormSchema>) => {
     setIsSubmitting(true);
     
-    // Simulate API submission
-    setTimeout(() => {
-      console.log("Digital form values:", values);
-      setIsSubmitting(false);
-      setSubmittedData(values);
+    try {
+      // Generate a unique quote ID
+      const quoteId = generateQuoteId();
+      
+      // Prepare data for Supabase
+      const quoteData = {
+        type: "digital",
+        quote_id: quoteId,
+        full_name: values.fullName,
+        email: values.email,
+        phone: values.phone,
+        company: values.company || null,
+        budget: values.budget,
+        primary_service: values.primaryService,
+        additional_services: values.additionalServices || [],
+        timeframe: values.timeframe,
+        project_details: values.projectDetails,
+        status: "New",
+        date: new Date().toISOString()
+      };
+      
+      // Insert data into Supabase
+      const { error } = await supabase.from('quotes').insert(quoteData);
+      
+      if (error) {
+        console.error("Error submitting quote:", error);
+        toast({
+          title: "Error",
+          description: "There was a problem submitting your request. Please try again.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      
+      console.log("Digital quote submitted:", quoteData);
+      setSubmittedData(quoteData);
       setQuoteType("digital");
       setSuccessDialogOpen(true);
-    }, 1500);
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   // Product sales submit handler
-  const onSalesSubmit = (values: z.infer<typeof salesFormSchema>) => {
+  const onSalesSubmit = async (values: z.infer<typeof salesFormSchema>) => {
     setIsSubmitting(true);
     
-    // Simulate API submission
-    setTimeout(() => {
-      console.log("Sales form values:", values);
-      setIsSubmitting(false);
-      setSubmittedData(values);
+    try {
+      // Generate a unique quote ID
+      const quoteId = generateQuoteId();
+      
+      // Find product details
+      const selectedProduct = getSelectedProduct(values.productCategory, values.productId);
+      
+      // Prepare data for Supabase
+      const quoteData = {
+        type: "product",
+        quote_id: quoteId,
+        full_name: values.fullName,
+        email: values.email,
+        phone: values.phone,
+        address: values.address,
+        product_category: values.productCategory,
+        product: selectedProduct ? selectedProduct.name : values.productId,
+        quantity: values.quantity,
+        installation: values.installation || false,
+        additional_info: values.additionalInfo || null,
+        status: "New",
+        date: new Date().toISOString()
+      };
+      
+      // Insert data into Supabase
+      const { error } = await supabase.from('quotes').insert(quoteData);
+      
+      if (error) {
+        console.error("Error submitting quote:", error);
+        toast({
+          title: "Error",
+          description: "There was a problem submitting your request. Please try again.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      
+      console.log("Product quote submitted:", quoteData);
+      setSubmittedData(quoteData);
       setQuoteType("product");
       setSuccessDialogOpen(true);
-    }, 1500);
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   // Find selected product details
