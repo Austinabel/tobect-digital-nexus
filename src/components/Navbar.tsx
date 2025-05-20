@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -40,7 +39,6 @@ const Navbar = () => {
               alt="Tobecat Technologies Logo" 
               className="h-12 md:h-14 transition-transform hover:scale-105 duration-300"
             />
-            <span className="ml-2 text-xl font-bold hidden sm:block">TOBECAT</span>
           </Link>
         </div>
         
