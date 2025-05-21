@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, TrendingUp, Briefcase, Users, BarChart3 } from 'lucide-react';
-import JobApplicationForm from '../JobApplicationForm';
+import JobApplicationForm from '@/components/job-application/JobApplicationForm';
 import { Dialog, DialogContent, DialogTitle, DialogHeader } from '@/components/ui/dialog';
 
 const marketingJobs = [
