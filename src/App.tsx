@@ -17,6 +17,7 @@ import Terms from './pages/Terms';
 import Cookies from './pages/Cookies';
 import { Toaster } from './components/ui/toaster';
 import { ProductProvider } from './context/ProductContext';
+import WhatsAppButton from './components/WhatsAppButton';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           <Route path="/cookies" element={<Cookies />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <WhatsAppButton />
         <Toaster />
       </Router>
     </ProductProvider>
