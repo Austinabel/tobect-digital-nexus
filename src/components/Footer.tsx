@@ -1,3 +1,4 @@
+
 import { Facebook, Twitter, Instagram, Linkedin, Briefcase, Book, Users, Star, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -36,11 +37,31 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-lg mb-6">Services</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-orange-300 transition-colors">Graphics & Design</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-orange-300 transition-colors">Web & App Development</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-orange-300 transition-colors">CAC & Business Registration</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-orange-300 transition-colors">Marketing & Advertising</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-orange-300 transition-colors">Social Media Management</a></li>
+              <li>
+                <Link to="/services#design" className="text-gray-300 hover:text-orange-300 transition-colors">
+                  Graphics & Design
+                </Link>
+              </li>
+              <li>
+                <Link to="/services#development" className="text-gray-300 hover:text-orange-300 transition-colors">
+                  Web & App Development
+                </Link>
+              </li>
+              <li>
+                <Link to="/services#business" className="text-gray-300 hover:text-orange-300 transition-colors">
+                  CAC & Business Registration
+                </Link>
+              </li>
+              <li>
+                <Link to="/services#marketing" className="text-gray-300 hover:text-orange-300 transition-colors">
+                  Marketing & Advertising
+                </Link>
+              </li>
+              <li>
+                <Link to="/services#social" className="text-gray-300 hover:text-orange-300 transition-colors">
+                  Social Media Management
+                </Link>
+              </li>
             </ul>
           </div>
           
