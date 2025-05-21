@@ -16,20 +16,20 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full">
       <Navbar />
-      <div className={`transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`w-full transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
         <Hero />
-        <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+        <div className="animate-fade-in w-full" style={{ animationDelay: '0.3s' }}>
           <ServicesSection />
         </div>
-        <div className="animate-fade-in" style={{ animationDelay: '0.5s' }}>
+        <div className="animate-fade-in w-full" style={{ animationDelay: '0.5s' }}>
           <FeaturedProducts />
         </div>
-        <div className="animate-fade-in" style={{ animationDelay: '0.7s' }}>
+        <div className="animate-fade-in w-full" style={{ animationDelay: '0.7s' }}>
           <ContactSection />
         </div>
-        <div className="animate-fade-in" style={{ animationDelay: '0.9s' }}>
+        <div className="animate-fade-in w-full" style={{ animationDelay: '0.9s' }}>
           <Footer />
         </div>
       </div>
