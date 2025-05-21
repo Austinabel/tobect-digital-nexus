@@ -156,7 +156,8 @@ const Hero = () => {
         </div>
       </div>
       
-      <div className="absolute top-10 left-10 z-20 hidden lg:block">
+      {/* Client satisfaction box - adjusted position to be below the navbar */}
+      <div className="absolute top-24 left-10 z-20 hidden lg:block">
         <div className="bg-tobecatAccent-orange text-white p-4 rounded-lg shadow-lg transform hover:scale-110 transition-transform border border-white/20">
           <p className="font-bold text-xl">100%</p>
           <p className="text-sm">Client Satisfaction</p>
