@@ -1,4 +1,5 @@
 
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
@@ -195,3 +196,35 @@
   opacity: 0;
   transition: opacity 300ms;
 }
+
+/* Carousel fade animation */
+.carousel-fade .embla__slide {
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.carousel-fade .embla__slide.is-selected {
+  opacity: 1;
+}
+
+/* Custom fade effect for carousel items */
+.carousel-fade-item {
+  transition: opacity 1s ease-in-out;
+  opacity: 0;
+}
+
+.carousel-fade-item.is-selected {
+  opacity: 1;
+}
+
+/* Add borders to all main sections */
+.container, 
+.section-container {
+  @apply border-x border-gray-200;
+}
+
+/* Make sure all content has borders */
+.content-section {
+  @apply border-t border-b border-gray-200;
+}
+

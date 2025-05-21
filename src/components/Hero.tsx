@@ -76,12 +76,12 @@ const Hero = () => {
         <Carousel 
           className="w-full h-full" 
           onSelect={handleCarouselSelect}
-          opts={{ loop: true }}
+          opts={{ loop: true, skipSnaps: false }}
           plugins={[autoplayPlugin.current]}
         >
-          <CarouselContent className="h-full">
+          <CarouselContent className="h-full carousel-fade">
             {carouselImages.map((image, index) => (
-              <CarouselItem key={index} className="h-full">
+              <CarouselItem key={index} className="h-full carousel-fade-item">
                 <div className="relative w-full h-full">
                   <img 
                     src={image.src} 
