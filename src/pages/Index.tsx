@@ -3,7 +3,7 @@ import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import ServicesSection from '@/components/ServicesSection';
 import FeaturedProducts from '@/components/FeaturedProducts';
-import ContactSection from '@/components/ContactSection';
+import ContactSection from '@/components/contact/ContactSection';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import { useEffect, useState } from 'react';
