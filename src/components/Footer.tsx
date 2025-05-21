@@ -1,4 +1,5 @@
-import { Facebook, Instagram, Info } from 'lucide-react';
+
+import { Facebook, Instagram, Info, Briefcase, Star, Book, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Custom X (Twitter) logo SVG component
