@@ -3,6 +3,13 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const Hero = () => {
   const [typedText, setTypedText] = useState('');
@@ -25,6 +32,22 @@ const Hero = () => {
 
     return () => clearInterval(typingInterval);
   }, []);
+
+  // Carousel images
+  const carouselImages = [
+    {
+      src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80",
+      alt: "IT Professional workspace"
+    },
+    {
+      src: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80",
+      alt: "Business team collaborating"
+    },
+    {
+      src: "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80",
+      alt: "Modern tech office"
+    }
+  ];
 
   return (
     <section className="relative pt-24 md:pt-32 pb-20 md:pb-32 bg-gradient-to-br from-tobecatBlue-50 to-white overflow-hidden">
@@ -58,23 +81,59 @@ const Hero = () => {
             </div>
           </div>
           <div className="lg:w-1/2 lg:pl-12 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            <div className="relative transform hover-scale-image hover-gradient-overlay transition-all hover:scale-[1.02] duration-300">
-              <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800&q=80" 
-                  alt="IT Professional workspace" 
-                  className="w-full h-auto"
-                />
+            <Carousel className="w-full relative">
+              <CarouselContent>
+                {carouselImages.map((image, index) => (
+                  <CarouselItem key={index}>
+                    <div className="relative transform hover-scale-image hover-gradient-overlay transition-all hover:scale-[1.02] duration-300">
+                      <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+                        <img 
+                          src={image.src} 
+                          alt={image.alt} 
+                          className="w-full h-auto"
+                        />
+                      </div>
+                      {index === 0 && (
+                        <>
+                          <div className="absolute -bottom-6 -right-6 bg-tobecatAccent-purple text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:-translate-y-1">
+                            <p className="font-bold text-xl">10+ Services</p>
+                            <p className="text-sm">For Your Business</p>
+                          </div>
+                          <div className="absolute -top-6 -left-6 bg-tobecatAccent-orange text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:translate-y-1">
+                            <p className="font-bold text-xl">100%</p>
+                            <p className="text-sm">Client Satisfaction</p>
+                          </div>
+                        </>
+                      )}
+                      {index === 1 && (
+                        <div className="absolute -bottom-6 -right-6 bg-tobecatAccent-orange text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:-translate-y-1">
+                          <p className="font-bold text-xl">24/7</p>
+                          <p className="text-sm">Customer Support</p>
+                        </div>
+                      )}
+                      {index === 2 && (
+                        <div className="absolute -top-6 -right-6 bg-tobecatAccent-purple text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:translate-y-1">
+                          <p className="font-bold text-xl">15+ Years</p>
+                          <p className="text-sm">Industry Experience</p>
+                        </div>
+                      )}
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-2 lg:-left-4 bg-white/80 hover:bg-white" />
+              <CarouselNext className="right-2 lg:-right-4 bg-white/80 hover:bg-white" />
+              
+              {/* Carousel indicators */}
+              <div className="absolute -bottom-8 left-0 right-0 flex justify-center gap-2">
+                {carouselImages.map((_, index) => (
+                  <div 
+                    key={index} 
+                    className="w-2 h-2 rounded-full bg-tobecatBlue-300 transition-all duration-300"
+                  ></div>
+                ))}
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-tobecatAccent-purple text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:-translate-y-1">
-                <p className="font-bold text-xl">10+ Services</p>
-                <p className="text-sm">For Your Business</p>
-              </div>
-              <div className="absolute -top-6 -left-6 bg-tobecatAccent-orange text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:translate-y-1">
-                <p className="font-bold text-xl">100%</p>
-                <p className="text-sm">Client Satisfaction</p>
-              </div>
-            </div>
+            </Carousel>
           </div>
         </div>
       </div>
