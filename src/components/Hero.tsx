@@ -3,12 +3,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 
@@ -33,8 +27,7 @@ const Hero = () => {
     { 
       loop: true, 
       skipSnaps: false,
-      duration: 20, // Slower transition for better fade effect
-      draggable: false // Disable dragging to ensure smooth fades
+      duration: 20 // Slower transition for better fade effect
     },
     [autoplayPlugin.current]
   );
@@ -65,7 +58,11 @@ const Hero = () => {
     };
     
     emblaApi.on('select', onSelect);
-    return () => emblaApi.off('select', onSelect);
+    
+    // Return a cleanup function
+    return () => {
+      emblaApi.off('select', onSelect);
+    };
   }, [emblaApi]);
 
   // Carousel images

@@ -12,7 +12,6 @@ import AdminPanel from './pages/AdminPanel';
 import Signup from './pages/Signup';
 import GetQuote from './pages/GetQuote';
 import NotFound from './pages/NotFound';
-import './App.css';
 import { Toaster } from './components/ui/toaster';
 import { ProductProvider } from './context/ProductContext';
 

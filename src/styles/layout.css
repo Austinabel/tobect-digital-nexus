@@ -1,0 +1,25 @@
+
+/* Add borders to all main sections */
+.container, 
+.section-container {
+  @apply border-x border-gray-200 w-full max-w-full;
+}
+
+/* Make sure all content has borders */
+.content-section {
+  @apply border-t border-b border-gray-200;
+}
+
+/* Ensure fullwidth containers */
+.container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
