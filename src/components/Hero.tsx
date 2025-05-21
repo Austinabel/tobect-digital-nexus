@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
@@ -140,7 +139,7 @@ const Hero = () => {
               </Button>
             </Link>
             <Link to="/get-quote">
-              <Button variant="outline" className="border-white bg-transparent text-[#5c2a2] hover:bg-white/10 px-8 py-6 text-lg hover:scale-105 transition-transform">
+              <Button variant="outline" className="border-white bg-transparent text-[#5c2a2] hover:bg-[#5c2a2]/10 hover:text-[#5c2a2] hover:border-[#5c2a2] px-8 py-6 text-lg hover:scale-105 transition-transform">
                 Contact Us
               </Button>
             </Link>
