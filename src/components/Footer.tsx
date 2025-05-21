@@ -1,5 +1,5 @@
 
-import { Facebook, Twitter, Instagram, Linkedin, Briefcase, Book, Users, Star, Info } from 'lucide-react';
+import { Facebook, X, Instagram, Briefcase, Book, Users, Star, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -23,13 +23,10 @@ const Footer = () => {
                 <Facebook className="h-5 w-5" />
               </a>
               <a href="#" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
-                <Twitter className="h-5 w-5" />
+                <X className="h-5 w-5" />
               </a>
               <a href="#" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
                 <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
-                <Linkedin className="h-5 w-5" />
               </a>
             </div>
           </div>
@@ -129,15 +126,15 @@ const Footer = () => {
             &copy; {currentYear} Tobecat. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-gray-400 text-sm hover:text-orange-300 transition-colors">
+            <Link to="/privacy-policy" className="text-gray-400 text-sm hover:text-orange-300 transition-colors">
               Privacy Policy
-            </a>
-            <a href="#" className="text-gray-400 text-sm hover:text-orange-300 transition-colors">
+            </Link>
+            <Link to="/terms" className="text-gray-400 text-sm hover:text-orange-300 transition-colors">
               Terms of Service
-            </a>
-            <a href="#" className="text-gray-400 text-sm hover:text-orange-300 transition-colors">
+            </Link>
+            <Link to="/cookies" className="text-gray-400 text-sm hover:text-orange-300 transition-colors">
               Cookie Policy
-            </a>
+            </Link>
           </div>
         </div>
       </div>

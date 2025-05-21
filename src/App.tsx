@@ -12,6 +12,9 @@ import AdminPanel from './pages/AdminPanel';
 import Signup from './pages/Signup';
 import GetQuote from './pages/GetQuote';
 import NotFound from './pages/NotFound';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
+import Cookies from './pages/Cookies';
 import { Toaster } from './components/ui/toaster';
 import { ProductProvider } from './context/ProductContext';
 
@@ -32,6 +35,9 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/quote" element={<GetQuote />} />
           <Route path="/get-quote" element={<GetQuote />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/cookies" element={<Cookies />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
