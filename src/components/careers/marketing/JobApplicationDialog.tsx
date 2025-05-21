@@ -1,9 +1,10 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import JobApplicationForm from '@/components/job-application/JobApplicationForm';
+import { MarketingJob } from './marketingJobsData';
 
 interface JobApplicationDialogProps {
-  job: any;
+  job: MarketingJob | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }

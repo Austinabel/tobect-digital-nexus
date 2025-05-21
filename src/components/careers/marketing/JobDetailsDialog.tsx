@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Briefcase } from 'lucide-react';
+import { MarketingJob, getJobIcon } from './marketingJobsData';
 
 interface JobDetailsDialogProps {
-  job: any;
+  job: MarketingJob | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onApply: () => void;

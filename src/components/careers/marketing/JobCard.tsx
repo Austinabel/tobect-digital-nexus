@@ -10,20 +10,12 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Briefcase } from 'lucide-react';
+import { MarketingJob, getJobIcon } from './marketingJobsData';
 
 interface JobCardProps {
-  job: {
-    id: number;
-    title: string;
-    department: string;
-    location: string;
-    type: string;
-    experience: string;
-    description: string;
-    icon: React.ReactNode;
-  };
-  onViewDetails: (job: any) => void;
-  onApply: (job: any) => void;
+  job: MarketingJob;
+  onViewDetails: (job: MarketingJob) => void;
+  onApply: (job: MarketingJob) => void;
 }
 
 const JobCard = ({ job, onViewDetails, onApply }: JobCardProps) => {
@@ -31,7 +23,7 @@ const JobCard = ({ job, onViewDetails, onApply }: JobCardProps) => {
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader>
         <div className="mb-4">
-          {job.icon}
+          {getJobIcon(job.iconName, job.iconColor)}
         </div>
         <CardTitle className="text-xl font-bold">{job.title}</CardTitle>
         <div className="flex flex-wrap gap-2 mt-2">

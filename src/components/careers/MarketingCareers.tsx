@@ -3,19 +3,19 @@ import { useState } from 'react';
 import JobCard from './marketing/JobCard';
 import JobDetailsDialog from './marketing/JobDetailsDialog';
 import JobApplicationDialog from './marketing/JobApplicationDialog';
-import { marketingJobs } from './marketing/marketingJobsData';
+import { marketingJobs, MarketingJob } from './marketing/marketingJobsData';
 
 export default function MarketingCareers() {
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedJob, setSelectedJob] = useState<MarketingJob | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [applyFormOpen, setApplyFormOpen] = useState(false);
   
-  const handleViewDetails = (job) => {
+  const handleViewDetails = (job: MarketingJob) => {
     setSelectedJob(job);
     setDialogOpen(true);
   };
   
-  const handleApply = (job) => {
+  const handleApply = (job: MarketingJob) => {
     setSelectedJob(job);
     setDialogOpen(false);
     setApplyFormOpen(true);

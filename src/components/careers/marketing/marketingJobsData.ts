@@ -12,7 +12,22 @@ export interface MarketingJob {
   description: string;
   responsibilities: string[];
   requirements: string[];
-  icon: React.ReactNode;
+  iconName: string;
+  iconColor: string;
+}
+
+// Helper function to get the appropriate icon component in MarketingCareers.tsx
+export function getJobIcon(iconName: string, color: string): React.ReactNode {
+  switch (iconName) {
+    case 'TrendingUp':
+      return <TrendingUp className={`h-8 w-8 text-${color}`} />;
+    case 'Users':
+      return <Users className={`h-8 w-8 text-${color}`} />;
+    case 'BarChart3':
+      return <BarChart3 className={`h-8 w-8 text-${color}`} />;
+    default:
+      return <TrendingUp className={`h-8 w-8 text-${color}`} />;
+  }
 }
 
 export const marketingJobs: MarketingJob[] = [
@@ -38,7 +53,8 @@ export const marketingJobs: MarketingJob[] = [
       'Strong analytical skills with a data-driven approach',
       'Excellent communication and project management skills',
     ],
-    icon: <TrendingUp className="h-8 w-8 text-emerald-500" />,
+    iconName: 'TrendingUp',
+    iconColor: 'emerald-500',
   },
   {
     id: 2,
@@ -62,7 +78,8 @@ export const marketingJobs: MarketingJob[] = [
       'Experience with social media management tools',
       'Strong copywriting and visual communication skills',
     ],
-    icon: <Users className="h-8 w-8 text-blue-500" />,
+    iconName: 'Users',
+    iconColor: 'blue-500',
   },
   {
     id: 3,
@@ -86,6 +103,7 @@ export const marketingJobs: MarketingJob[] = [
       'Understanding of SEO principles and content optimization techniques',
       'Portfolio demonstrating content creation abilities',
     ],
-    icon: <BarChart3 className="h-8 w-8 text-purple-500" />,
+    iconName: 'BarChart3',
+    iconColor: 'purple-500',
   },
 ];
