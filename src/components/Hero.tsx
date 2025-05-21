@@ -10,11 +10,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const Hero = () => {
   const [typedText, setTypedText] = useState('');
   const fullText = "Digital Partner";
   const [isTypingComplete, setIsTypingComplete] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     setTypedText('');
@@ -81,19 +83,19 @@ const Hero = () => {
             </div>
           </div>
           <div className="lg:w-1/2 lg:pl-12 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            <Carousel className="w-full relative">
+            <Carousel className="w-full relative" onSelect={(index) => setActiveIndex(index)}>
               <CarouselContent>
                 {carouselImages.map((image, index) => (
                   <CarouselItem key={index}>
                     <div className="relative transform hover-scale-image hover-gradient-overlay transition-all hover:scale-[1.02] duration-300">
                       <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-                        <div className="relative aspect-[16/9] overflow-hidden">
+                        <AspectRatio ratio={16 / 9} className="w-full">
                           <img 
                             src={image.src} 
                             alt={image.alt} 
                             className="w-full h-full object-cover"
                           />
-                        </div>
+                        </AspectRatio>
                       </div>
                       
                       {index === 0 && (
@@ -132,7 +134,11 @@ const Hero = () => {
                 {carouselImages.map((_, index) => (
                   <div 
                     key={index} 
-                    className="w-2 h-2 rounded-full bg-tobecatBlue-300 transition-all duration-300"
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      activeIndex === index 
+                        ? "w-4 bg-tobecatBlue-600" 
+                        : "bg-tobecatBlue-300"
+                    }`}
                   ></div>
                 ))}
               </div>
