@@ -40,7 +40,9 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Send email using Resend
+    console.log("Sending email with data:", { name, email, subject });
+
+    // Send notification email to site owner
     const emailResponse = await resend.emails.send({
       from: "Tobecat Website <onboarding@resend.dev>",
       to: [RECIPIENT_EMAIL],
@@ -52,6 +54,23 @@ const handler = async (req: Request): Promise<Response> => {
         <p><strong>Subject:</strong> ${subject || 'N/A'}</p>
         <p><strong>Message:</strong></p>
         <p>${message.replace(/\n/g, '<br>')}</p>
+      `,
+    });
+
+    // Send confirmation email to the sender
+    await resend.emails.send({
+      from: "Tobecat Website <onboarding@resend.dev>",
+      to: [email],
+      subject: "Thank you for contacting Tobecat",
+      html: `
+        <h2>Thank You for Contacting Us</h2>
+        <p>Dear ${name},</p>
+        <p>Thank you for reaching out to Tobecat. We have received your message and will get back to you as soon as possible.</p>
+        <p>Here's a copy of your message:</p>
+        <p><strong>Subject:</strong> ${subject || 'N/A'}</p>
+        <p><strong>Message:</strong></p>
+        <p>${message.replace(/\n/g, '<br>')}</p>
+        <p>Best regards,<br>Tobecat Team</p>
       `,
     });
 
