@@ -1,6 +1,12 @@
-
-import { Facebook, X, Instagram, Briefcase, Book, Users, Star, Info } from 'lucide-react';
+import { Facebook, Instagram, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+// Custom X (Twitter) logo SVG component
+const XLogo = () => (
+  <svg width="20" height="20" viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z" />
+  </svg>
+);
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -23,7 +29,7 @@ const Footer = () => {
                 <Facebook className="h-5 w-5" />
               </a>
               <a href="#" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
-                <X className="h-5 w-5" />
+                <XLogo />
               </a>
               <a href="#" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
                 <Instagram className="h-5 w-5" />
