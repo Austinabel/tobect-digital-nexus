@@ -99,6 +99,18 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
   }
+  
+  /* Add better borders to sections */
+  section {
+    @apply border-b border-gray-200;
+  }
+  
+  /* Add better card borders */
+  .card, 
+  .hover-card, 
+  .feature-card {
+    @apply border border-gray-200 shadow-sm;
+  }
 }
 
 /* Service Cards Animation */
