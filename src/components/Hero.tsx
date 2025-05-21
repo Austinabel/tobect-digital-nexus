@@ -18,7 +18,7 @@ const Hero = () => {
   const [isTypingComplete, setIsTypingComplete] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   
-  // Create autoplay plugin with 5 second delay
+  // Create autoplay plugin with 5 second delay and no stopping on interaction
   const autoplayOptions = {
     delay: 5000,
     stopOnInteraction: false,
@@ -26,6 +26,17 @@ const Hero = () => {
   
   const autoplayPlugin = useRef(
     Autoplay(autoplayOptions)
+  );
+
+  // Create embla carousel ref with proper configuration for fade effect
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { 
+      loop: true, 
+      skipSnaps: false,
+      duration: 20, // Slower transition for better fade effect
+      draggable: false // Disable dragging to ensure smooth fades
+    },
+    [autoplayPlugin.current]
   );
 
   useEffect(() => {
@@ -45,6 +56,18 @@ const Hero = () => {
     return () => clearInterval(typingInterval);
   }, []);
 
+  // Handle slide change to update active index
+  useEffect(() => {
+    if (!emblaApi) return;
+    
+    const onSelect = () => {
+      setActiveIndex(emblaApi.selectedScrollSnap());
+    };
+    
+    emblaApi.on('select', onSelect);
+    return () => emblaApi.off('select', onSelect);
+  }, [emblaApi]);
+
   // Carousel images
   const carouselImages = [
     {
@@ -61,27 +84,18 @@ const Hero = () => {
     }
   ];
 
-  // Handle carousel selection - fixed to correctly handle the event
-  const handleCarouselSelect = (event: React.SyntheticEvent<HTMLDivElement>) => {
-    const emblaApi = (event.currentTarget as any)._emblaApi;
-    if (emblaApi) {
-      setActiveIndex(emblaApi.selectedScrollSnap());
-    }
-  };
-
   return (
     <section className="relative h-screen w-full overflow-hidden border-b border-gray-200">
       {/* Full-page background carousel */}
       <div className="absolute inset-0 w-full h-full z-0">
-        <Carousel 
-          className="w-full h-full" 
-          onSelect={handleCarouselSelect}
-          opts={{ loop: true, skipSnaps: false }}
-          plugins={[autoplayPlugin.current]}
-        >
-          <CarouselContent className="h-full carousel-fade">
+        <div className="w-full h-full overflow-hidden" ref={emblaRef}>
+          <div className="carousel-fade h-full flex">
             {carouselImages.map((image, index) => (
-              <CarouselItem key={index} className="h-full carousel-fade-item">
+              <div 
+                key={index} 
+                className={`carousel-fade-item min-w-0 w-full h-full flex-shrink-0 ${index === activeIndex ? 'is-selected' : ''}`}
+                style={{ flex: '0 0 100%' }}
+              >
                 <div className="relative w-full h-full">
                   <img 
                     src={image.src} 
@@ -90,10 +104,10 @@ const Hero = () => {
                   />
                   <div className="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
                 </div>
-              </CarouselItem>
+              </div>
             ))}
-          </CarouselContent>
-        </Carousel>
+          </div>
+        </div>
       </div>
       
       {/* Content overlay */}
