@@ -87,32 +87,35 @@ const Hero = () => {
                   <CarouselItem key={index}>
                     <div className="relative transform hover-scale-image hover-gradient-overlay transition-all hover:scale-[1.02] duration-300">
                       <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-                        <img 
-                          src={image.src} 
-                          alt={image.alt} 
-                          className="w-full h-auto"
-                        />
+                        <div className="relative aspect-[16/9] overflow-hidden">
+                          <img 
+                            src={image.src} 
+                            alt={image.alt} 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
                       </div>
+                      
                       {index === 0 && (
                         <>
-                          <div className="absolute -bottom-6 -right-6 bg-tobecatAccent-purple text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:-translate-y-1">
+                          <div className="absolute -bottom-6 -right-6 bg-tobecatAccent-purple text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:-translate-y-1 z-10">
                             <p className="font-bold text-xl">10+ Services</p>
                             <p className="text-sm">For Your Business</p>
                           </div>
-                          <div className="absolute -top-6 -left-6 bg-tobecatAccent-orange text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:translate-y-1">
+                          <div className="absolute -top-6 -left-6 bg-tobecatAccent-orange text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:translate-y-1 z-10">
                             <p className="font-bold text-xl">100%</p>
                             <p className="text-sm">Client Satisfaction</p>
                           </div>
                         </>
                       )}
                       {index === 1 && (
-                        <div className="absolute -bottom-6 -right-6 bg-tobecatAccent-orange text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:-translate-y-1">
+                        <div className="absolute -bottom-6 -right-6 bg-tobecatAccent-orange text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:-translate-y-1 z-10">
                           <p className="font-bold text-xl">24/7</p>
                           <p className="text-sm">Customer Support</p>
                         </div>
                       )}
                       {index === 2 && (
-                        <div className="absolute -top-6 -right-6 bg-tobecatAccent-purple text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:translate-y-1">
+                        <div className="absolute -top-6 -right-6 bg-tobecatAccent-purple text-white p-4 rounded-lg shadow-lg transform transition-transform hover:scale-110 hover:translate-y-1 z-10">
                           <p className="font-bold text-xl">15+ Years</p>
                           <p className="text-sm">Industry Experience</p>
                         </div>
@@ -121,8 +124,8 @@ const Hero = () => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="left-2 lg:-left-4 bg-white/80 hover:bg-white" />
-              <CarouselNext className="right-2 lg:-right-4 bg-white/80 hover:bg-white" />
+              <CarouselPrevious className="left-2 lg:-left-4 bg-white/80 hover:bg-white z-20" />
+              <CarouselNext className="right-2 lg:-right-4 bg-white/80 hover:bg-white z-20" />
               
               {/* Carousel indicators */}
               <div className="absolute -bottom-8 left-0 right-0 flex justify-center gap-2">
