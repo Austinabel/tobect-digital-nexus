@@ -59,6 +59,16 @@ const Hero = () => {
     
     emblaApi.on('select', onSelect);
     
+    // Preload all images to prevent flashing
+    const preloadImages = () => {
+      carouselImages.forEach(image => {
+        const img = new Image();
+        img.src = image.src;
+      });
+    };
+    
+    preloadImages();
+    
     // Return a cleanup function
     return () => {
       emblaApi.off('select', onSelect);
@@ -84,7 +94,7 @@ const Hero = () => {
   return (
     <section className="relative h-screen w-full overflow-hidden border-b border-gray-200">
       {/* Full-page background carousel */}
-      <div className="absolute inset-0 w-full h-full z-0">
+      <div className="absolute inset-0 w-full h-full z-0 embla-carousel bg-black">
         <div className="w-full h-full overflow-hidden" ref={emblaRef}>
           <div className="carousel-fade h-full flex">
             {carouselImages.map((image, index) => (

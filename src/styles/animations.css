@@ -93,6 +93,8 @@
   opacity: 0;
   transition: opacity 2s ease-in-out;
   visibility: hidden;
+  /* Ensure all slides are loaded but hidden to prevent flashes */
+  z-index: 0;
 }
 
 .carousel-fade-item.is-selected {
@@ -101,3 +103,10 @@
   position: relative;
   z-index: 1;
 }
+
+/* Prevent flashing between slides */
+.embla-carousel {
+  background-color: #000; /* Dark background to avoid white flashes */
+  overflow: hidden;
+}
+
