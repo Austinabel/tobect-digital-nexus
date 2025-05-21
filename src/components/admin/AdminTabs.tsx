@@ -4,7 +4,8 @@ import ProductsManager from "./ProductsManager";
 import BlogPostManager from "./BlogPostManager";
 import PortfolioManager from "./PortfolioManager";
 import QuotesManager from "./QuotesManager";
-import { Package, FileText, Image, MessageSquare, ShoppingCart, Settings } from "lucide-react";
+import TestimonialsManager from "./TestimonialsManager";
+import { Package, FileText, Image, MessageSquare, ShoppingCart, Settings, Star } from "lucide-react";
 
 const AdminTabs = () => {
   return (
@@ -30,6 +31,10 @@ const AdminTabs = () => {
           <FileText className="w-4 h-4" />
           <span>Blog</span>
         </TabsTrigger>
+        <TabsTrigger value="testimonials" className="flex items-center gap-2">
+          <Star className="w-4 h-4" />
+          <span>Testimonials</span>
+        </TabsTrigger>
       </TabsList>
       <div className="p-4 border rounded-lg mt-4">
         <TabsContent value="products">
@@ -46,6 +51,9 @@ const AdminTabs = () => {
         </TabsContent>
         <TabsContent value="blog">
           <BlogPostManager />
+        </TabsContent>
+        <TabsContent value="testimonials">
+          <TestimonialsManager />
         </TabsContent>
       </div>
     </Tabs>
