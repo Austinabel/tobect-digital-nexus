@@ -51,13 +51,21 @@ const Hero = () => {
     }
   ];
 
+  // Handle carousel selection - fixed to correctly handle the event
+  const handleCarouselSelect = (event: React.SyntheticEvent<HTMLDivElement>) => {
+    const emblaApi = (event.currentTarget as any)._emblaApi;
+    if (emblaApi) {
+      setActiveIndex(emblaApi.selectedScrollSnap());
+    }
+  };
+
   return (
     <section className="relative h-screen w-full overflow-hidden">
       {/* Full-page background carousel */}
       <div className="absolute inset-0 w-full h-full z-0">
         <Carousel 
           className="w-full h-full" 
-          onSelect={setActiveIndex}
+          onSelect={handleCarouselSelect}
         >
           <CarouselContent className="h-full">
             {carouselImages.map((image, index) => (
