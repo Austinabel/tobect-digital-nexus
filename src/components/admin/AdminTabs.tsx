@@ -11,7 +11,7 @@ import { Package, FileText, Image, MessageSquare, ShoppingCart, Settings, Star, 
 const AdminTabs = () => {
   return (
     <Tabs defaultValue="products" className="w-full">
-      <TabsList className="w-full">
+      <TabsList className="w-full flex flex-wrap">
         <TabsTrigger value="products" className="flex items-center gap-2">
           <Package className="w-4 h-4" />
           <span>Products</span>
