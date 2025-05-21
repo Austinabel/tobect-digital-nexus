@@ -230,15 +230,15 @@ const CareersPage = () => {
           </section>
 
           {/* Join Us CTA */}
-          <section className="bg-tobecatAccent-indigo py-16">
+          <section className="bg-tobecatAccent-purple py-16">
             <div className="container mx-auto px-4 md:px-6 text-center">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Join Our Team?</h2>
-              <p className="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
+              <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
                 Take the first step towards joining a company that values innovation, growth, and making a real impact.
               </p>
               <Button 
                 size="lg"
-                className="bg-white text-tobecatAccent-indigo hover:bg-gray-100"
+                className="bg-white text-tobecatAccent-purple hover:bg-gray-100"
                 onClick={() => {
                   const section = document.getElementById('marketing-careers');
                   section?.scrollIntoView({ behavior: 'smooth' });
