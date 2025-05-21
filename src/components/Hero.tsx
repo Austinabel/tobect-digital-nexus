@@ -83,7 +83,13 @@ const Hero = () => {
             </div>
           </div>
           <div className="lg:w-1/2 lg:pl-12 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            <Carousel className="w-full relative" onSelect={(index) => setActiveIndex(index)}>
+            <Carousel 
+              className="w-full relative" 
+              onSelect={(index) => {
+                // The Carousel from shadcn provides the selected index directly
+                setActiveIndex(index);
+              }}
+            >
               <CarouselContent>
                 {carouselImages.map((image, index) => (
                   <CarouselItem key={index}>
