@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Package, ShoppingCart, Ticket as TicketIcon, Receipt, FileText, MessageSquare } from 'lucide-react';
@@ -143,14 +143,16 @@ const ProductsManager = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-tobecatGray-900">Products Management</h2>
-        <SheetTrigger asChild>
-          <Button 
-            className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white"
-            onClick={() => setIsSheetOpen(true)}
-          >
-            Add New Product
-          </Button>
-        </SheetTrigger>
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <SheetTrigger asChild>
+            <Button 
+              className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white"
+              onClick={() => setIsSheetOpen(true)}
+            >
+              Add New Product
+            </Button>
+          </SheetTrigger>
+        </Sheet>
       </div>
       
       <ProductFormManager
