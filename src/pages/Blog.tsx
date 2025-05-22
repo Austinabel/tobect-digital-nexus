@@ -136,11 +136,11 @@ const Blog = () => {
                       </span>
                     </div>
                     <Link to={`/blog/${post.id}`}>
-                      <h3 className="text-xl font-bold mb-2 text-tobecatGray-900 hover:text-tobecatBlue-600 transition-colors">
+                      <h3 className="text-xl font-bold mb-2 text-tobecatGray-900 hover:text-tobecatBlue-600 transition-colors text-left">
                         {post.title}
                       </h3>
                     </Link>
-                    <p className="text-tobecatGray-600 mb-4">{post.excerpt}</p>
+                    <p className="text-tobecatGray-600 mb-4 text-left">{post.excerpt}</p>
                     <div className="flex items-center justify-between">
                       <Link 
                         to={`/blog/${post.id}`}
