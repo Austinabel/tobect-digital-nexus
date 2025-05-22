@@ -12,7 +12,7 @@ const ExpertiseSection = () => {
   const mainServiceCategories = services.slice(0, 4);
   
   return (
-    <div className="container mx-auto px-4 md:px-6 py-24">
+    <div className="container mx-auto px-4 md:px-6 py-28">
       <div className="text-center mb-16">
         <h2 className="text-3xl md:text-4xl font-bold text-tobecatGray-900 mb-6">
           Our Expertise
@@ -35,7 +35,7 @@ const ExpertiseSection = () => {
               </div>
               <h3 className="text-xl font-bold mb-4 text-tobecatGray-900">{service.title}</h3>
               <p className="text-tobecatGray-600 mb-5">{service.description}</p>
-              <ul className="space-y-3">
+              <ul className="space-y-3 text-left">
                 {service.subcategories.slice(0, 3).map((sub) => (
                   <li key={sub.id} className="flex items-start">
                     <CheckCircle size={18} className="text-green-500 mr-2 mt-1" />
@@ -48,7 +48,7 @@ const ExpertiseSection = () => {
         ))}
       </div>
       
-      <div className="text-center">
+      <div className="text-center mb-10">
         <Button asChild className="px-8 py-6 h-auto bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-md shadow-md text-lg">
           <Link to="/services">View All Services</Link>
         </Button>

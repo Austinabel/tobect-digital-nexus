@@ -22,7 +22,7 @@ const TechEquipmentSection = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div>
+            <div className="text-left">
               <h3 className="text-2xl font-bold mb-6 text-orange-400">Security Solutions</h3>
               <ul className="space-y-4">
                 <li className="flex items-center">
@@ -40,7 +40,7 @@ const TechEquipmentSection = () => {
               </ul>
             </div>
             
-            <div>
+            <div className="text-left">
               <h3 className="text-2xl font-bold mb-6 text-orange-400">Power Solutions</h3>
               <ul className="space-y-4">
                 <li className="flex items-center">

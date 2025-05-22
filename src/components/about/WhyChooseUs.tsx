@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 
 const WhyChooseUs = () => {
   return (
-    <div className="container mx-auto px-4 md:px-6 py-24">
+    <div className="container mx-auto px-4 md:px-6 py-28">
       <div className="text-center mb-16">
         <h2 className="text-3xl md:text-4xl font-bold text-tobecatGray-900 mb-6">
           Why Choose Tobecat Technologies?
@@ -16,7 +16,7 @@ const WhyChooseUs = () => {
         <Separator className="w-20 h-1 bg-orange-500 mx-auto" />
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mb-14">
         <Card className="bg-white p-6 rounded-lg shadow-md border-t-4 border-tobecatBlue-500 hover:shadow-lg transition-shadow">
           <CardContent className="p-0">
             <div className="h-12 w-12 rounded-full bg-tobecatBlue-100 flex items-center justify-center mb-6">

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 
 const CTASection = () => {
   return (
-    <div className="bg-tobecatBlue-600 py-24">
+    <div className="bg-tobecatBlue-600 pt-24 pb-16">
       <div className="container mx-auto px-4 md:px-6 text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
           Ready to Transform Your Business?
