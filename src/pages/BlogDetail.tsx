@@ -177,9 +177,9 @@ const BlogDetail = () => {
               </div>
             )}
             
-            <div className="prose prose-lg max-w-none">
+            <div className="prose prose-lg max-w-none text-left">
               {post.content.split('\n').map((paragraph: string, idx: number) => (
-                paragraph.trim() ? <p key={idx} className="mb-4 text-tobecatGray-700">{paragraph}</p> : <br key={idx} />
+                paragraph.trim() ? <p key={idx} className="mb-4 text-tobecatGray-700 text-left">{paragraph}</p> : <br key={idx} />
               ))}
             </div>
           </div>
