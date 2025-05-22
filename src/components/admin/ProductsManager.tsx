@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -14,7 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import * as z from "zod";
 import { Package, ShoppingCart, Ticket, Receipt, FileText, Image } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import ImageUploader, { ProductImage } from "../product/ImageUploader";
+import ImageUploader from "../product/ImageUploader";
+import { ProductImage } from "@/types/productImages";
 
 // Form schema for adding new products
 const productSchema = z.object({
@@ -127,17 +127,21 @@ const ProductsManager = () => {
 
   const fetchProductImages = async (productId: string) => {
     try {
+      // Need to use fetch directly as Supabase client doesn't know about the new table yet
       const { data, error } = await supabase
-        .from('product_images')
-        .select('*')
-        .eq('product_id', productId);
-        
+        .rpc('get_product_images', { p_product_id: productId })
+        .returns<ProductImage[]>();
+
       if (error) {
         throw error;
       }
       
-      setProductImages(data || []);
-      return data;
+      if (data) {
+        setProductImages(data);
+        return data;
+      }
+      
+      return [];
     } catch (error) {
       console.error("Error fetching product images:", error);
       toast({
@@ -162,7 +166,20 @@ const ProductsManager = () => {
     setIsEditing(true);
     
     // Fetch product images
-    await fetchProductImages(product.id);
+    try {
+      // Directly fetch images through REST API since Supabase client doesn't know about new table
+      const response = await fetch(`https://xyrdhogqwhlpbfftgokj.supabase.co/rest/v1/product_images?product_id=eq.${product.id}`, {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5cmRob2dxd2hscGJmZnRnb2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NzI2MTEsImV4cCI6MjA2MzM0ODYxMX0.aK2o3zBR9ioNmON5ae9yG-_MJuYBEYej9pf8151XOZA',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5cmRob2dxd2hscGJmZnRnb2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NzI2MTEsImV4cCI6MjA2MzM0ODYxMX0.aK2o3zBR9ioNmON5ae9yG-_MJuYBEYej9pf8151XOZA'
+        }
+      });
+      const images = await response.json() as ProductImage[];
+      setProductImages(images);
+    } catch (error) {
+      console.error("Error fetching product images:", error);
+      setProductImages([]);
+    }
     
     setIsSheetOpen(true);
   };
@@ -215,16 +232,25 @@ const ProductsManager = () => {
         });
       }
       
-      // If this is a new product and we have images, we need to update the product_id
-      if (!isEditing && productImages.length > 0 && newProductId) {
-        const updatePromises = productImages.map(image => 
-          supabase
-            .from('product_images')
-            .update({ product_id: newProductId })
-            .eq('id', image.id)
-        );
-        
-        await Promise.all(updatePromises);
+      // If we have images and a product ID, we need to update the product_id for each image
+      if (productImages.length > 0 && newProductId) {
+        try {
+          // Update product_id for each image through REST API
+          for (const image of productImages) {
+            await fetch(`https://xyrdhogqwhlpbfftgokj.supabase.co/rest/v1/product_images?id=eq.${image.id}`, {
+              method: 'PATCH',
+              headers: {
+                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5cmRob2dxd2hscGJmZnRnb2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NzI2MTEsImV4cCI6MjA2MzM0ODYxMX0.aK2o3zBR9ioNmON5ae9yG-_MJuYBEYej9pf8151XOZA',
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5cmRob2dxd2hscGJmZnRnb2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NzI2MTEsImV4cCI6MjA2MzM0ODYxMX0.aK2o3zBR9ioNmON5ae9yG-_MJuYBEYej9pf8151XOZA',
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+              },
+              body: JSON.stringify({ product_id: newProductId })
+            });
+          }
+        } catch (error) {
+          console.error("Error updating product_id for images:", error);
+        }
       }
       
       form.reset();
@@ -249,15 +275,15 @@ const ProductsManager = () => {
     }
     
     try {
-      // First delete all product images to avoid orphaned records
-      const { error: imagesError } = await supabase
-        .from('product_images')
-        .delete()
-        .eq('product_id', id);
-      
-      if (imagesError) {
-        throw imagesError;
-      }
+      // Delete associated images through REST API
+      await fetch(`https://xyrdhogqwhlpbfftgokj.supabase.co/rest/v1/product_images?product_id=eq.${id}`, {
+        method: 'DELETE',
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5cmRob2dxd2hscGJmZnRnb2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NzI2MTEsImV4cCI6MjA2MzM0ODYxMX0.aK2o3zBR9ioNmON5ae9yG-_MJuYBEYej9pf8151XOZA',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5cmRob2dxd2hscGJmZnRnb2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NzI2MTEsImV4cCI6MjA2MzM0ODYxMX0.aK2o3zBR9ioNmON5ae9yG-_MJuYBEYej9pf8151XOZA',
+          'Prefer': 'return=minimal'
+        }
+      });
       
       // Then delete the product
       const { error } = await supabase

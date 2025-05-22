@@ -4,18 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Image, UploadCloud, X, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { ProductImage } from '@/types/productImages';
 
 interface ImageUploaderProps {
   productId: string;
   onImagesChange: (images: ProductImage[]) => void;
   existingImages?: ProductImage[];
-}
-
-export interface ProductImage {
-  id: string;
-  url: string;
-  product_id: string;
-  is_primary: boolean;
 }
 
 const ImageUploader = ({ productId, onImagesChange, existingImages = [] }: ImageUploaderProps) => {
@@ -58,21 +52,31 @@ const ImageUploader = ({ productId, onImagesChange, existingImages = [] }: Image
           .getPublicUrl(filePath);
           
         // Insert record in product_images table
-        const { data: imageData, error: dbError } = await supabase
+        const { error: dbError } = await supabase
           .from('product_images')
           .insert({
             product_id: productId,
             url: urlData.publicUrl,
             is_primary: images.length === 0 && i === 0 // First image is primary if no other images exist
-          })
-          .select()
-          .single();
+          });
           
         if (dbError) {
           throw dbError;
         }
         
-        newImages.push(imageData as ProductImage);
+        // Fetch the newly created image to get its ID
+        const { data: newImageData, error: fetchError } = await supabase
+          .from('product_images')
+          .select('*')
+          .eq('url', urlData.publicUrl)
+          .eq('product_id', productId)
+          .single();
+          
+        if (fetchError) {
+          throw fetchError;
+        }
+        
+        newImages.push(newImageData as unknown as ProductImage);
         setUploadProgress(Math.round(((i + 1) / Math.min(files.length, 5)) * 100));
       }
       
