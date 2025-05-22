@@ -1,146 +1,243 @@
 
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { motion } from "framer-motion";
-import { formatPrice, useProductCategories } from '@/components/quotes/ProductCategoriesData';
+import { Input } from "@/components/ui/input";
+import { Search, Filter } from 'lucide-react';
+import { formatPrice } from '@/components/quotes/ProductCategoriesData';
 import ScrollToTop from '@/components/ScrollToTop';
-import { Image } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { motion } from "framer-motion";
+
+// Types
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  description: string;
+  stock: number;
+  image_url?: string;
+}
 
 const Products = () => {
-  const location = useLocation();
-  const productCategories = useProductCategories();
-  const [activeTab, setActiveTab] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeCategory = searchParams.get('category') || 'all';
   
+  // Fetch products from Supabase
   useEffect(() => {
-    // Set active tab based on URL query param
-    const params = new URLSearchParams(location.search);
-    const categoryParam = params.get('category');
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*');
+        
+        if (error) {
+          throw error;
+        }
+        
+        setProducts(data || []);
+        
+        // Extract unique categories
+        const uniqueCategories = Array.from(
+          new Set((data || []).map(product => product.category))
+        );
+        setCategories(uniqueCategories);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    if (categoryParam && productCategories.some(cat => cat.id === categoryParam)) {
-      setActiveTab(categoryParam);
-    } else if (productCategories.length > 0) {
-      setActiveTab(productCategories[0].id);
-    }
-  }, [location.search, productCategories]);
+    fetchProducts();
+  }, []);
+
+  // Filtered products based on search and selected category
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = 
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase());
+      
+    const matchesCategory = activeCategory === 'all' || product.category === activeCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
   
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+  const handleCategoryChange = (category: string) => {
+    if (category === 'all') {
+      searchParams.delete('category');
+    } else {
+      searchParams.set('category', category);
     }
-  };
-  
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5
-      }
-    }
+    setSearchParams(searchParams);
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="pt-24 md:pt-28 pb-16 flex-grow bg-gradient-to-b from-tobecatBlue-50/50 to-white">
+      <ScrollToTop />
+      
+      <div className="pt-20 md:pt-24 pb-16 flex-grow">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-12">
-            <h1 className="text-3xl md:text-5xl font-bold text-tobecatGray-900 mb-4 animate-fade-in">
-              Our <span className="text-tobecatBlue-600">Products</span>
-            </h1>
-            <p className="text-lg text-tobecatGray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              High-quality solar equipment and security solutions for residential and commercial applications.
-            </p>
-          </div>
-
-          {productCategories.length > 0 && (
-            <Tabs 
-              value={activeTab} 
-              onValueChange={setActiveTab}
-              className="w-full"
-            >
-              <div className="flex justify-center mb-8 overflow-x-auto pb-2">
-                <TabsList className="bg-blue-50 p-1 rounded-full">
-                  {productCategories.map((category) => (
+          <section className="mb-12">
+            <div className="text-center mb-10">
+              <motion.h1 
+                className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-tobecatBlue-700 to-tobecatBlue-500 inline-block text-transparent bg-clip-text"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                Our Products
+              </motion.h1>
+              <motion.p 
+                className="text-lg text-tobecatGray-600 max-w-3xl mx-auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                Explore our range of high-quality renewable energy products and security solutions designed to meet your needs.
+              </motion.p>
+            </div>
+            
+            {/* Search and filter */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Input 
+                  placeholder="Search products..." 
+                  className="pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter size={18} />
+                <span>Filters</span>
+              </Button>
+            </div>
+            
+            {/* Category tabs */}
+            <Tabs defaultValue={activeCategory} onValueChange={handleCategoryChange}>
+              <div className="overflow-x-auto">
+                <TabsList className="mb-8 w-full justify-start">
+                  <TabsTrigger value="all" className="px-4 py-2">
+                    All Products
+                  </TabsTrigger>
+                  
+                  {categories.map(category => (
                     <TabsTrigger 
-                      key={category.id}
-                      value={category.id}
-                      className="rounded-full data-[state=active]:bg-blue-600 data-[state=active]:text-white px-4 py-2 transition-all"
+                      key={category} 
+                      value={category} 
+                      className="px-4 py-2"
                     >
-                      {category.name}
+                      {category}
                     </TabsTrigger>
                   ))}
                 </TabsList>
               </div>
-
-              {productCategories.map((category) => (
-                <TabsContent key={category.id} value={category.id} className="mt-6">
-                  <motion.div 
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                  >
-                    {category.items.length > 0 ? (
-                      category.items.map((product) => (
-                        <motion.div 
-                          key={product.id}
-                          className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 border border-blue-100"
-                          variants={itemVariants}
-                        >
-                          <Link to={`/product/${product.id}`} className="block h-48 overflow-hidden bg-blue-50 flex items-center justify-center">
+              
+              {/* Products grid */}
+              <TabsContent value={activeCategory} className="mt-0">
+                {isLoading ? (
+                  <div className="flex justify-center py-12">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                ) : filteredProducts.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {filteredProducts.map((product) => (
+                      <motion.div
+                        key={product.id}
+                        className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all border border-gray-100 group"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <Link to={`/product/${product.id}`} className="block">
+                          <div className="aspect-square overflow-hidden bg-gray-100">
                             {product.image_url ? (
                               <img 
                                 src={product.image_url} 
-                                alt={product.name} 
-                                className="w-full h-full object-cover"
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
                             ) : (
-                              <div className="text-6xl text-blue-300 flex items-center justify-center h-full w-full">
-                                <Image size={64} className="text-blue-300" />
+                              <div className="w-full h-full flex items-center justify-center">
+                                <span className="text-gray-400">No image</span>
                               </div>
                             )}
-                          </Link>
-                          <div className="p-6">
-                            <Link to={`/product/${product.id}`} className="block">
-                              <h3 className="text-xl font-bold mb-2 text-tobecatGray-900 hover:text-tobecatBlue-600 transition-colors">
-                                {product.name}
-                              </h3>
-                              <p className="text-tobecatGray-600 mb-4 text-sm h-16">{product.description || `High-quality ${category.name.toLowerCase()}`}</p>
-                            </Link>
+                          </div>
+                          <div className="p-4">
+                            <span className="text-sm text-tobecatBlue-600 font-medium block mb-1">{product.category}</span>
+                            <h3 className="font-semibold text-lg mb-2 text-gray-800 line-clamp-2">{product.name}</h3>
+                            <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
                             <div className="flex justify-between items-center">
-                              <span className="font-bold text-tobecatBlue-600 text-lg">{formatPrice(product.price)}</span>
-                              <Link to={`/product/${product.id}`}>
-                                <Button className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white transition-transform hover:scale-105">
-                                  View Details
-                                </Button>
-                              </Link>
+                              <span className="font-bold text-tobecatBlue-700">{formatPrice(product.price)}</span>
+                              <span className={`text-xs px-2 py-1 rounded ${
+                                product.stock > 0 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                              </span>
                             </div>
                           </div>
-                        </motion.div>
-                      ))
-                    ) : (
-                      <div className="col-span-3 text-center py-12">
-                        <p className="text-gray-500">No products found in this category.</p>
-                      </div>
-                    )}
-                  </motion.div>
-                </TabsContent>
-              ))}
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500">No products found for the selected criteria.</p>
+                    <Button 
+                      variant="link" 
+                      onClick={() => {
+                        setSearchQuery('');
+                        handleCategoryChange('all');
+                      }}
+                      className="mt-2"
+                    >
+                      Clear filters
+                    </Button>
+                  </div>
+                )}
+              </TabsContent>
             </Tabs>
-          )}
+          </section>
+          
+          {/* CTA Section */}
+          <section className="mt-16 bg-gradient-to-br from-tobecatBlue-600 to-tobecatBlue-800 rounded-xl p-8 md:p-12 text-white">
+            <div className="text-center md:max-w-3xl mx-auto">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">Need Help Choosing the Right Product?</h2>
+              <p className="mb-6 text-tobecatBlue-50">
+                Our team of experts is ready to assist you in finding the perfect solution for your needs. 
+                Request a custom quote tailored to your specific requirements.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/quote">
+                  <Button size="lg" className="bg-white text-tobecatBlue-700 hover:bg-tobecatBlue-50">
+                    Get a Custom Quote
+                  </Button>
+                </Link>
+                <Link to="/contact">
+                  <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+                    Contact Our Sales Team
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
-      <ScrollToTop />
+      
       <Footer />
     </div>
   );
