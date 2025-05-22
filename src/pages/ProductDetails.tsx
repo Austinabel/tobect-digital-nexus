@@ -407,7 +407,7 @@ const ProductDetails = () => {
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
                   
                   
-                  <Link to="/quote" className="w-full sm:w-auto">
+                  <Link to="/quote?section=sales" className="w-full sm:w-auto">
                     <Button 
                       variant="outline"
                       className="border-tobecatBlue-300 text-tobecatBlue-600 hover:bg-tobecatBlue-50 w-full px-8 py-6 rounded-lg flex items-center justify-center gap-2 text-lg"
