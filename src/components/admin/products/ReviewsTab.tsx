@@ -6,25 +6,8 @@ import {
   TableRow, 
   TableHead, 
   TableBody, 
-  TableCell 
 } from "@/components/ui/table";
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Star, Trash2 } from 'lucide-react';
-import { format } from 'date-fns';
 import { useToast } from "@/hooks/use-toast";
 import { ProductReview } from '@/types/productReviews';
 import { 
@@ -32,6 +15,9 @@ import {
   updateReviewApproval, 
   deleteReview 
 } from './ProductReviewService';
+import ReviewsLoading from './reviews/ReviewsLoading';
+import ReviewsEmptyState from './reviews/ReviewsEmptyState';
+import ReviewItem from './reviews/ReviewItem';
 
 const ReviewsTab = () => {
   const [reviews, setReviews] = useState<ProductReview[]>([]);
@@ -102,38 +88,8 @@ const ReviewsTab = () => {
     }
   };
   
-  const renderRating = (rating: number) => {
-    return (
-      <div className="flex">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            size={16}
-            fill={rating >= star ? "currentColor" : "none"}
-            className={rating >= star ? "text-yellow-500" : "text-gray-300"}
-          />
-        ))}
-      </div>
-    );
-  };
-  
   if (isLoading) {
-    return (
-      <div>
-        <h3 className="text-lg font-medium mb-4">Product Reviews</h3>
-        <div className="space-y-2">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center space-x-4">
-              <Skeleton className="h-12 w-12 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    return <ReviewsLoading />;
   }
   
   return (
@@ -158,72 +114,15 @@ const ReviewsTab = () => {
           </TableHeader>
           <TableBody>
             {reviews.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                  No reviews found
-                </TableCell>
-              </TableRow>
+              <ReviewsEmptyState />
             ) : (
               reviews.map((review) => (
-                <TableRow key={review.id}>
-                  <TableCell className="max-w-[150px] truncate">
-                    {review.product_id}
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">{review.reviewer_name}</div>
-                    <div className="text-gray-500 text-sm">{review.reviewer_email}</div>
-                  </TableCell>
-                  <TableCell>{renderRating(review.rating)}</TableCell>
-                  <TableCell className="max-w-[200px]">
-                    <div className="line-clamp-2">{review.comment}</div>
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    {format(new Date(review.created_at), "MMM d, yyyy")}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Switch 
-                        checked={!!review.approved} 
-                        onCheckedChange={(checked) => 
-                          handleApprovalChange(review.id, checked)
-                        }
-                      />
-                      <span>
-                        {review.approved ? (
-                          <Badge variant="default" className="bg-green-500 hover:bg-green-600">Approved</Badge>
-                        ) : (
-                          <Badge variant="outline" className="bg-gray-100">Pending</Badge>
-                        )}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="outline" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50">
-                          <Trash2 size={16} />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Review</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the review.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction 
-                            onClick={() => handleDeleteReview(review.id)}
-                            className="bg-red-500 hover:bg-red-600 text-white"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </TableCell>
-                </TableRow>
+                <ReviewItem 
+                  key={review.id}
+                  review={review}
+                  onApprovalChange={handleApprovalChange}
+                  onDelete={handleDeleteReview}
+                />
               ))
             )}
           </TableBody>
