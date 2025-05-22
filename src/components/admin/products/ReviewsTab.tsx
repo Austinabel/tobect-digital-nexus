@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   Table, 
@@ -189,7 +190,7 @@ const ReviewsTab = () => {
                       />
                       <span>
                         {review.approved ? (
-                          <Badge variant="success" className="bg-green-500">Approved</Badge>
+                          <Badge variant="default" className="bg-green-500 hover:bg-green-600">Approved</Badge>
                         ) : (
                           <Badge variant="outline" className="bg-gray-100">Pending</Badge>
                         )}
