@@ -130,24 +130,22 @@ const Portfolio = () => {
           </div>
           
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-white rounded-lg overflow-hidden shadow-md">
-                  <Skeleton className="h-60 w-full" />
-                  <div className="p-6">
-                    <Skeleton className="h-4 w-24 mb-3" />
-                    <Skeleton className="h-6 w-48 mb-2" />
-                    <Skeleton className="h-4 w-full mb-4" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
+                <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
+                  <Skeleton className="h-40 w-full" />
+                  <div className="p-3">
+                    <Skeleton className="h-3 w-16 mb-2" />
                     <Skeleton className="h-4 w-32" />
                   </div>
                 </div>
               ))}
             </div>
           ) : filteredProjects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
               {filteredProjects.map((project) => (
-                <div key={project.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                  <div className="h-60 overflow-hidden">
+                <div key={project.id} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  <div className="h-40 overflow-hidden">
                     {project.image ? (
                       <img 
                         src={project.image} 
@@ -160,26 +158,21 @@ const Portfolio = () => {
                       </div>
                     )}
                   </div>
-                  <div className="p-6">
-                    <span className="inline-block px-3 py-1 text-sm rounded-full bg-tobecatBlue-50 text-tobecatBlue-700 mb-3">
+                  <div className="p-3">
+                    <span className="inline-block px-2 py-1 text-xs rounded-full bg-tobecatBlue-50 text-tobecatBlue-700 mb-2">
                       {getCategoryDisplayName(project.category)}
                     </span>
-                    <h3 className="text-xl font-bold mb-2 text-tobecatGray-900">{project.title}</h3>
-                    <p className="text-tobecatGray-600 mb-4">{project.description}</p>
+                    <h3 className="text-sm font-semibold text-tobecatGray-900">{project.title}</h3>
                     {project.link ? (
                       <a 
                         href={project.link} 
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block text-tobecatBlue-600 hover:text-tobecatBlue-800 font-medium transition-colors"
+                        className="inline-block text-xs text-tobecatBlue-600 hover:text-tobecatBlue-800 font-medium transition-colors mt-1"
                       >
-                        View Case Study →
+                        View →
                       </a>
-                    ) : (
-                      <span className="inline-block text-tobecatGray-400">
-                        Case Study Coming Soon
-                      </span>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               ))}
@@ -191,7 +184,7 @@ const Portfolio = () => {
             </div>
           )}
           
-          {filteredProjects.length > 0 && filteredProjects.length % 3 === 0 && (
+          {filteredProjects.length > 0 && filteredProjects.length % 12 === 0 && (
             <div className="mt-12 text-center">
               <button className="px-8 py-3 bg-tobecatBlue-600 hover:bg-tobecatBlue-700 text-white rounded-md transition-colors shadow-md">
                 Load More Projects
