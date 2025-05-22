@@ -73,7 +73,7 @@ const ProductForm = ({
     }
   }, [editingProductId]);
 
-  const fetchProductImages = async (productId: string) => {
+  const fetchProductImages = async (productId: string): Promise<ProductImage[]> => {
     try {
       // Need to use rpc directly as Supabase client doesn't know about the new table yet
       const { data, error } = await supabase
