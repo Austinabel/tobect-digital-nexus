@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -7,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { formatPrice, useProductCategories } from '@/components/quotes/ProductCategoriesData';
 import ScrollToTop from '@/components/ScrollToTop';
+import { Image } from 'lucide-react';
 
 const Products = () => {
   const location = useLocation();
@@ -95,23 +97,31 @@ const Products = () => {
                           className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 border border-blue-100"
                           variants={itemVariants}
                         >
-                          <div className="h-48 overflow-hidden bg-blue-50 flex items-center justify-center">
-                            <div className="text-6xl text-blue-300">
-                              {category.id === 'solar-panels' && "☀️"}
-                              {category.id === 'batteries' && "🔋"}
-                              {category.id === 'inverters' && "⚡"}
-                              {category.id === 'cctv' && "🎥"}
-                              {category.id === 'generators' && "🔌"}
-                            </div>
-                          </div>
+                          <Link to={`/product/${product.id}`} className="block h-48 overflow-hidden bg-blue-50 flex items-center justify-center">
+                            {product.image_url ? (
+                              <img 
+                                src={product.image_url} 
+                                alt={product.name} 
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="text-6xl text-blue-300 flex items-center justify-center h-full w-full">
+                                <Image size={64} className="text-blue-300" />
+                              </div>
+                            )}
+                          </Link>
                           <div className="p-6">
-                            <h3 className="text-xl font-bold mb-2 text-tobecatGray-900">{product.name}</h3>
-                            <p className="text-tobecatGray-600 mb-4 text-sm h-16">{product.description || `High-quality ${category.name.toLowerCase()}`}</p>
+                            <Link to={`/product/${product.id}`} className="block">
+                              <h3 className="text-xl font-bold mb-2 text-tobecatGray-900 hover:text-tobecatBlue-600 transition-colors">
+                                {product.name}
+                              </h3>
+                              <p className="text-tobecatGray-600 mb-4 text-sm h-16">{product.description || `High-quality ${category.name.toLowerCase()}`}</p>
+                            </Link>
                             <div className="flex justify-between items-center">
                               <span className="font-bold text-tobecatBlue-600 text-lg">{formatPrice(product.price)}</span>
-                              <Link to={`/quote?product=${product.id}&category=${category.id}&section=sales`}>
+                              <Link to={`/product/${product.id}`}>
                                 <Button className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white transition-transform hover:scale-105">
-                                  Purchase
+                                  View Details
                                 </Button>
                               </Link>
                             </div>

@@ -6,13 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import * as z from "zod";
-import { Package, ShoppingCart, Ticket, Receipt, FileText } from "lucide-react";
+import { Package, ShoppingCart, Ticket, Receipt, FileText, Image } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ImageUploader, { ProductImage } from "../product/ImageUploader";
 
 // Form schema for adding new products
 const productSchema = z.object({
@@ -71,12 +73,14 @@ const ProductsManager = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [productImages, setProductImages] = useState<ProductImage[]>([]);
   const [categories, setCategories] = useState<string[]>([
     'Solar Panels',
     'Batteries',
     'Inverters',
     'CCTV Cameras',
-    'Solar Generators'
+    'Solar Generators',
+    'All in Ones'
   ]);
 
   // Form for adding new products
@@ -121,7 +125,31 @@ const ProductsManager = () => {
     fetchProducts();
   }, []);
 
-  const handleEditProduct = (product: Product) => {
+  const fetchProductImages = async (productId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('product_images')
+        .select('*')
+        .eq('product_id', productId);
+        
+      if (error) {
+        throw error;
+      }
+      
+      setProductImages(data || []);
+      return data;
+    } catch (error) {
+      console.error("Error fetching product images:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch product images",
+        variant: "destructive",
+      });
+      return [];
+    }
+  };
+
+  const handleEditProduct = async (product: Product) => {
     form.reset({
       name: product.name,
       category: product.category,
@@ -132,6 +160,10 @@ const ProductsManager = () => {
     });
     setEditingProductId(product.id);
     setIsEditing(true);
+    
+    // Fetch product images
+    await fetchProductImages(product.id);
+    
     setIsSheetOpen(true);
   };
 
@@ -147,6 +179,7 @@ const ProductsManager = () => {
       };
       
       let result;
+      let newProductId: string | null = null;
       
       if (isEditing && editingProductId) {
         // Update existing product
@@ -161,13 +194,20 @@ const ProductsManager = () => {
           title: "Product Updated",
           description: `${data.name} has been updated.`,
         });
+        
+        newProductId = editingProductId;
       } else {
         // Add new product
         result = await supabase
           .from('products')
-          .insert([productData]);
+          .insert([productData])
+          .select();
           
         if (result.error) throw result.error;
+        
+        if (result.data && result.data.length > 0) {
+          newProductId = result.data[0].id;
+        }
         
         toast({
           title: "Product Added",
@@ -175,10 +215,23 @@ const ProductsManager = () => {
         });
       }
       
+      // If this is a new product and we have images, we need to update the product_id
+      if (!isEditing && productImages.length > 0 && newProductId) {
+        const updatePromises = productImages.map(image => 
+          supabase
+            .from('product_images')
+            .update({ product_id: newProductId })
+            .eq('id', image.id)
+        );
+        
+        await Promise.all(updatePromises);
+      }
+      
       form.reset();
       setIsSheetOpen(false);
       setIsEditing(false);
       setEditingProductId(null);
+      setProductImages([]);
       fetchProducts(); // Refresh the product list
     } catch (error) {
       console.error("Error saving product:", error);
@@ -196,6 +249,17 @@ const ProductsManager = () => {
     }
     
     try {
+      // First delete all product images to avoid orphaned records
+      const { error: imagesError } = await supabase
+        .from('product_images')
+        .delete()
+        .eq('product_id', id);
+      
+      if (imagesError) {
+        throw imagesError;
+      }
+      
+      // Then delete the product
       const { error } = await supabase
         .from('products')
         .delete()
@@ -232,11 +296,24 @@ const ProductsManager = () => {
     });
     setIsEditing(false);
     setEditingProductId(null);
+    setProductImages([]);
   };
 
   const handleOpenSheet = () => {
     resetForm();
     setIsSheetOpen(true);
+  };
+
+  const handleImagesChange = (images: ProductImage[]) => {
+    setProductImages(images);
+    
+    // Set the primary image URL as the product image_url
+    const primaryImage = images.find(img => img.is_primary);
+    if (primaryImage) {
+      form.setValue('image_url', primaryImage.url);
+    } else if (images.length > 0) {
+      form.setValue('image_url', images[0].url);
+    }
   };
 
   // Format currency in Naira
@@ -260,7 +337,7 @@ const ProductsManager = () => {
               Add New Product
             </Button>
           </SheetTrigger>
-          <SheetContent className="overflow-y-auto">
+          <SheetContent className="overflow-y-auto w-full max-w-2xl">
             <SheetHeader>
               <SheetTitle>{isEditing ? "Edit Product" : "Add New Product"}</SheetTitle>
               <SheetDescription>
@@ -352,7 +429,11 @@ const ProductsManager = () => {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Input placeholder="High-efficiency monocrystalline solar panel..." {...field} />
+                        <Textarea 
+                          placeholder="High-efficiency monocrystalline solar panel..." 
+                          className="min-h-32" 
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -364,9 +445,26 @@ const ProductsManager = () => {
                   name="image_url"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL (Optional)</FormLabel>
+                      <FormLabel>Product Images</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://example.com/image.jpg" {...field} />
+                        <>
+                          <Input 
+                            type="hidden" 
+                            {...field} 
+                          />
+                          {editingProductId && (
+                            <ImageUploader 
+                              productId={editingProductId} 
+                              onImagesChange={handleImagesChange}
+                              existingImages={productImages}
+                            />
+                          )}
+                          {!editingProductId && (
+                            <div className="text-sm text-gray-500 mb-2">
+                              Save the product first to upload images.
+                            </div>
+                          )}
+                        </>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -423,7 +521,7 @@ const ProductsManager = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>ID</TableHead>
+                    <TableHead>Image</TableHead>
                     <TableHead>Product Name</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Price</TableHead>
@@ -434,8 +532,22 @@ const ProductsManager = () => {
                 <TableBody>
                   {products.map((product) => (
                     <TableRow key={product.id}>
-                      <TableCell className="font-medium">{product.id.substring(0, 8)}...</TableCell>
-                      <TableCell>{product.name}</TableCell>
+                      <TableCell>
+                        {product.image_url ? (
+                          <div className="w-12 h-12 rounded overflow-hidden border">
+                            <img 
+                              src={product.image_url} 
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-12 h-12 rounded overflow-hidden border flex items-center justify-center bg-gray-100">
+                            <Image className="h-6 w-6 text-gray-400" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium">{product.name}</TableCell>
                       <TableCell>{product.category}</TableCell>
                       <TableCell>{formatNaira(product.price)}</TableCell>
                       <TableCell>{product.stock}</TableCell>

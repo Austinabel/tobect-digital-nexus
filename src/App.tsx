@@ -4,6 +4,7 @@ import Index from './pages/Index';
 import AboutUs from './pages/AboutUs';
 import Services from './pages/Services';
 import Products from './pages/Products';
+import ProductDetails from './pages/ProductDetails';
 import Blog from './pages/Blog';
 import Testimonials from './pages/Testimonials';
 import Portfolio from './pages/Portfolio';
@@ -28,6 +29,7 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/services" element={<Services />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/portfolio" element={<Portfolio />} />
