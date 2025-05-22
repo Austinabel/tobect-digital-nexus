@@ -14,6 +14,7 @@ import { services } from '@/data/services';
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -106,20 +107,18 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-blackOlive shadow-lg absolute w-full animate-fade-in">
           <div className="flex flex-col py-4 px-4 space-y-4">
-            <div className="relative">
-              <button
-                className="font-medium text-white hover:text-orange-300 transition-colors py-2 flex items-center w-full"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const subMenu = document.getElementById('mobileServicesMenu');
-                  if (subMenu) {
-                    subMenu.classList.toggle('hidden');
-                  }
-                }}
-              >
-                Services <ChevronDown size={16} className="ml-1" />
-              </button>
-              <div id="mobileServicesMenu" className="hidden pl-4 mt-2 space-y-2">
+            <Link
+              to="/services"
+              className="font-medium text-white hover:text-orange-300 transition-colors py-2 flex items-center justify-between"
+              onClick={(e) => {
+                e.preventDefault();
+                setMobileServicesOpen(!mobileServicesOpen);
+              }}
+            >
+              <span>Services</span> <ChevronDown size={16} className={`ml-1 transition-transform ${mobileServicesOpen ? 'rotate-180' : ''}`} />
+            </Link>
+            {mobileServicesOpen && (
+              <div className="pl-4 space-y-2">
                 {services.map((service) => (
                   <Link
                     key={service.id}
@@ -140,7 +139,7 @@ const Navbar = () => {
                   </Link>
                 ))}
               </div>
-            </div>
+            )}
             <Link
               to="/products"
               className="font-medium text-white hover:text-orange-300 transition-colors py-2"
