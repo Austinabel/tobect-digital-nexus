@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Plus, Pencil, Trash, Upload, Image } from 'lucide-react';
+import { Plus, Pencil, Trash, Upload, Image, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { Link } from 'react-router-dom';
 
 interface BlogPost {
   id: string;
@@ -77,10 +78,10 @@ const BlogPostManager = () => {
   };
 
   const handleAddPost = async () => {
-    if (!formData.title || !formData.content) {
+    if (!formData.title || !formData.content || !formData.excerpt) {
       toast({
         title: "Error",
-        description: "Title and content are required",
+        description: "Title, excerpt and content are required",
         variant: "destructive",
       });
       return;
@@ -116,10 +117,10 @@ const BlogPostManager = () => {
   const handleEditPost = async () => {
     if (!isEditingPost) return;
     
-    if (!formData.title || !formData.content) {
+    if (!formData.title || !formData.content || !formData.excerpt) {
       toast({
         title: "Error",
-        description: "Title and content are required",
+        description: "Title, excerpt and content are required",
         variant: "destructive",
       });
       return;
@@ -217,6 +218,22 @@ const BlogPostManager = () => {
       });
     }
   };
+
+  const calculateReadTime = (content: string) => {
+    const wordsPerMinute = 200;
+    const wordCount = content?.split(/\s+/).length || 0;
+    const readTime = Math.ceil(wordCount / wordsPerMinute);
+    return `${readTime} min read`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
   
   return (
     <div>
@@ -256,7 +273,7 @@ const BlogPostManager = () => {
             
             <div>
               <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 mb-1">
-                Excerpt*
+                Excerpt* <span className="text-xs text-gray-500">(A brief summary displayed in listings, 150-200 characters recommended)</span>
               </label>
               <Input
                 id="excerpt"
@@ -267,11 +284,17 @@ const BlogPostManager = () => {
                 required
                 className="focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300"
               />
+              <div className="text-xs text-gray-500 mt-1">
+                {formData.excerpt.length} characters
+                {formData.excerpt.length > 200 && (
+                  <span className="text-yellow-600"> (recommended: 200 or fewer)</span>
+                )}
+              </div>
             </div>
             
             <div>
               <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
-                Content*
+                Content* <span className="text-xs text-gray-500">(Use line breaks for paragraphs)</span>
               </label>
               <Textarea
                 id="content"
@@ -279,9 +302,14 @@ const BlogPostManager = () => {
                 value={formData.content}
                 onChange={handleInputChange}
                 placeholder="Post content"
-                className="min-h-[200px] focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300"
+                className="min-h-[250px] focus:border-tobecatBlue-400 focus:ring-tobecatBlue-300"
                 required
               />
+              <div className="text-xs text-gray-500 mt-1">
+                Word count: {formData.content.split(/\s+/).filter(Boolean).length} words
+                <span className="ml-2">|</span>
+                <span className="ml-2">Estimated read time: {calculateReadTime(formData.content)}</span>
+              </div>
             </div>
 
             <div className="border-2 border-dashed border-tobecatBlue-300 rounded-lg p-6 bg-tobecatBlue-50 transition-all hover:bg-tobecatBlue-100">
@@ -420,14 +448,27 @@ const BlogPostManager = () => {
                 )}
                 <div className="p-4">
                   <div className="flex justify-between">
-                    <div>
+                    <div className="flex-1">
                       <h4 className="text-lg font-medium text-tobecatBlue-800">{post.title}</h4>
-                      <p className="text-sm text-gray-500">
-                        By {post.author} on {new Date(post.date).toLocaleDateString()}
+                      <p className="text-sm text-gray-500 mb-2">
+                        By {post.author} on {formatDate(post.date)}
                       </p>
-                      <p className="mt-2 text-gray-600">{post.excerpt}</p>
+                      <p className="mt-2 text-gray-600 line-clamp-2">{post.excerpt}</p>
+                      <div className="mt-2 text-xs text-gray-500">
+                        {calculateReadTime(post.content)} • {post.content.split(/\s+/).filter(Boolean).length} words
+                      </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2 ml-4">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        asChild
+                        className="text-tobecatBlue-600 hover:text-tobecatBlue-800 hover:bg-tobecatBlue-50"
+                      >
+                        <Link to={`/blog/${post.id}`} target="_blank">
+                          <Eye size={16} />
+                        </Link>
+                      </Button>
                       <Button
                         size="sm"
                         variant="ghost"

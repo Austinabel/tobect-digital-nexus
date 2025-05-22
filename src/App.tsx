@@ -6,6 +6,7 @@ import Services from './pages/Services';
 import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
 import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail';
 import Testimonials from './pages/Testimonials';
 import Portfolio from './pages/Portfolio';
 import Careers from './pages/Careers';
@@ -31,6 +32,7 @@ function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/careers" element={<Careers />} />

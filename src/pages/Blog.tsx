@@ -1,66 +1,79 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { CalendarIcon, Clock, User } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const Blog = () => {
-  const posts = [
-    {
-      id: 1,
-      title: '10 Web Design Trends to Watch in 2025',
-      excerpt: 'Explore the latest design trends that are shaping the web development landscape this year.',
-      date: 'May 3, 2025',
-      category: 'Design',
-      readTime: '5 min read',
-      image: 'bg-tobecatGray-200'
-    },
-    {
-      id: 2,
-      title: 'How to Choose the Right Tech Stack for Your Project',
-      excerpt: 'A comprehensive guide to selecting technologies that align with your business requirements.',
-      date: 'April 27, 2025',
-      category: 'Development',
-      readTime: '8 min read',
-      image: 'bg-tobecatGray-200'
-    },
-    {
-      id: 3,
-      title: 'The Impact of AI on Digital Marketing Strategies',
-      excerpt: 'Discover how artificial intelligence is revolutionizing the way companies approach digital marketing.',
-      date: 'April 15, 2025',
-      category: 'Marketing',
-      readTime: '6 min read',
-      image: 'bg-tobecatGray-200'
-    },
-    {
-      id: 4,
-      title: 'Streamlining Your Business Registration Process in Nigeria',
-      excerpt: 'Expert tips on navigating the CAC registration system efficiently and avoiding common pitfalls.',
-      date: 'April 2, 2025',
-      category: 'Business',
-      readTime: '7 min read',
-      image: 'bg-tobecatGray-200'
-    },
-    {
-      id: 5,
-      title: 'Best Practices for Mobile App UI Design',
-      excerpt: 'Learn the essential principles that lead to intuitive, user-friendly mobile applications.',
-      date: 'March 20, 2025',
-      category: 'Design',
-      readTime: '5 min read',
-      image: 'bg-tobecatGray-200'
-    },
-    {
-      id: 6,
-      title: 'How to Build an Effective Social Media Strategy',
-      excerpt: 'A step-by-step approach to creating and implementing a social media plan that drives engagement.',
-      date: 'March 12, 2025',
-      category: 'Social Media',
-      readTime: '9 min read',
-      image: 'bg-tobecatGray-200'
-    },
-  ];
+  const [posts, setPosts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+  const [page, setPage] = useState(0);
+  const postsPerPage = 6;
+  const [hasMore, setHasMore] = useState(true);
+  
+  useEffect(() => {
+    const fetchBlogPosts = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('*')
+          .order('date', { ascending: false })
+          .range(page * postsPerPage, (page + 1) * postsPerPage - 1);
+        
+        if (error) {
+          throw error;
+        }
+        
+        if (data) {
+          if (page === 0) {
+            setPosts(data);
+          } else {
+            setPosts(prevPosts => [...prevPosts, ...data]);
+          }
+          
+          setHasMore(data.length === postsPerPage);
+        }
+      } catch (error: any) {
+        console.error("Error fetching blog posts:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load blog posts",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchBlogPosts();
+  }, [page, toast]);
+  
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+  
+  const calculateReadTime = (content: string) => {
+    const wordsPerMinute = 200;
+    const wordCount = content?.split(/\s+/).length || 0;
+    const readTime = Math.ceil(wordCount / wordsPerMinute);
+    return `${readTime} min read`;
+  };
+  
+  const loadMore = () => {
+    setPage(prevPage => prevPage + 1);
+  };
   
   return (
     <div className="min-h-screen">
@@ -72,40 +85,100 @@ const Blog = () => {
             <p className="text-xl text-tobecatGray-600">Insights, guides, and industry news</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post) => (
-              <div key={post.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                <div className={`${post.image} h-48 flex items-center justify-center`}>
-                  <span className="text-tobecatGray-500">Blog Image</span>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="inline-block px-3 py-1 text-xs rounded-full bg-tobecatBlue-50 text-tobecatBlue-700">
-                      {post.category}
-                    </span>
-                    <span className="text-tobecatGray-500 text-sm">{post.date}</span>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2 text-tobecatGray-900">{post.title}</h3>
-                  <p className="text-tobecatGray-600 mb-4">{post.excerpt}</p>
-                  <div className="flex items-center justify-between">
-                    <a 
-                      href="#" 
-                      className="inline-block text-tobecatBlue-600 hover:text-tobecatBlue-800 font-medium transition-colors"
-                    >
-                      Read More →
-                    </a>
-                    <span className="text-tobecatGray-500 text-sm">{post.readTime}</span>
+          {isLoading && page === 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, index) => (
+                <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md animate-pulse">
+                  <div className="bg-tobecatGray-200 h-48"></div>
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="h-6 w-20 bg-tobecatGray-200 rounded"></div>
+                      <div className="h-4 w-24 bg-tobecatGray-200 rounded"></div>
+                    </div>
+                    <div className="h-7 bg-tobecatGray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-tobecatGray-200 rounded mb-4"></div>
+                    <div className="h-4 bg-tobecatGray-200 rounded mb-4 w-5/6"></div>
+                    <div className="flex items-center justify-between">
+                      <div className="h-4 w-24 bg-tobecatGray-200 rounded"></div>
+                      <div className="h-4 w-16 bg-tobecatGray-200 rounded"></div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : posts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {posts.map((post) => (
+                <div key={post.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                  <Link to={`/blog/${post.id}`}>
+                    {post.image_url ? (
+                      <div className="h-48 overflow-hidden">
+                        <img 
+                          src={post.image_url} 
+                          alt={post.title} 
+                          className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
+                        />
+                      </div>
+                    ) : (
+                      <div className="bg-tobecatGray-200 h-48 flex items-center justify-center">
+                        <span className="text-tobecatGray-500">Blog Image</span>
+                      </div>
+                    )}
+                  </Link>
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="inline-block px-3 py-1 text-xs rounded-full bg-tobecatBlue-50 text-tobecatBlue-700">
+                        Blog
+                      </span>
+                      <span className="text-tobecatGray-500 text-sm flex items-center">
+                        <CalendarIcon size={14} className="mr-1" />
+                        {formatDate(post.date)}
+                      </span>
+                    </div>
+                    <Link to={`/blog/${post.id}`}>
+                      <h3 className="text-xl font-bold mb-2 text-tobecatGray-900 hover:text-tobecatBlue-600 transition-colors">
+                        {post.title}
+                      </h3>
+                    </Link>
+                    <p className="text-tobecatGray-600 mb-4">{post.excerpt}</p>
+                    <div className="flex items-center justify-between">
+                      <Link 
+                        to={`/blog/${post.id}`}
+                        className="inline-block text-tobecatBlue-600 hover:text-tobecatBlue-800 font-medium transition-colors"
+                      >
+                        Read More →
+                      </Link>
+                      <div className="flex items-center text-tobecatGray-500 text-sm">
+                        <Clock size={14} className="mr-1" />
+                        <span>{calculateReadTime(post.content)}</span>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-gray-100 flex items-center text-tobecatGray-500 text-sm">
+                      <User size={14} className="mr-1" />
+                      <span>{post.author}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <h3 className="text-xl text-tobecatGray-700 mb-4">No blog posts available yet</h3>
+              <p className="text-tobecatGray-500">Check back soon for new articles and insights!</p>
+            </div>
+          )}
           
-          <div className="mt-12 text-center">
-            <button className="px-8 py-3 bg-tobecatBlue-600 hover:bg-tobecatBlue-700 text-white rounded-md transition-colors shadow-md">
-              Load More Articles
-            </button>
-          </div>
+          {hasMore && posts.length > 0 && (
+            <div className="mt-12 text-center">
+              <Button 
+                onClick={loadMore}
+                className="px-8 py-3 h-auto bg-tobecatBlue-600 hover:bg-tobecatBlue-700 text-white rounded-md transition-colors shadow-md"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Loading...' : 'Load More Articles'}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       <Footer />
