@@ -6,7 +6,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { formatPrice } from '@/components/quotes/ProductCategoriesData';
-import { ArrowLeft, Package, Truck, Shield, ShoppingCart, Star, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Package, Truck, Shield, ShoppingCart, Star, ChevronRight, Plus, Minus } from 'lucide-react';
 import { ProductImage } from '@/types/productImages';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -30,6 +30,7 @@ const ProductDetails = () => {
   const [productImages, setProductImages] = useState<ProductImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
   const [activeTab, setActiveTab] = useState('description');
+  const [quantity, setQuantity] = useState(1);
   
   useEffect(() => {
     const fetchProduct = async () => {
@@ -96,6 +97,31 @@ const ProductDetails = () => {
       fetchProduct();
     }
   }, [id]);
+
+  const incrementQuantity = () => {
+    if (product && quantity < product.stock) {
+      setQuantity(quantity + 1);
+    }
+  };
+
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value)) {
+      if (value < 1) {
+        setQuantity(1);
+      } else if (product && value > product.stock) {
+        setQuantity(product.stock);
+      } else {
+        setQuantity(value);
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -282,13 +308,50 @@ const ProductDetails = () => {
                   </span>
                 </div>
                 
+                {/* Quantity selector */}
+                {product.stock > 0 && (
+                  <div className="mb-6">
+                    <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-2">
+                      Quantity
+                    </label>
+                    <div className="flex items-center w-36">
+                      <button 
+                        type="button"
+                        onClick={decrementQuantity}
+                        disabled={quantity <= 1}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 h-10 w-10 flex items-center justify-center rounded-l-md transition-colors border border-r-0 border-gray-300 disabled:opacity-50"
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <input
+                        type="number"
+                        id="quantity"
+                        min="1"
+                        max={product.stock}
+                        value={quantity}
+                        onChange={handleQuantityChange}
+                        className="h-10 w-full text-center border-y border-gray-300 focus:outline-none focus:ring-1 focus:ring-tobecatBlue-500"
+                      />
+                      <button 
+                        type="button"
+                        onClick={incrementQuantity}
+                        disabled={quantity >= product.stock}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 h-10 w-10 flex items-center justify-center rounded-r-md transition-colors border border-l-0 border-gray-300 disabled:opacity-50"
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
                   <Button 
                     className="bg-gradient-to-r from-tobecatBlue-600 to-tobecatBlue-500 hover:from-tobecatBlue-700 hover:to-tobecatBlue-600 text-white px-8 py-6 rounded-lg flex items-center justify-center gap-2 text-lg transition-transform hover:scale-105"
                     disabled={product.stock === 0}
+                    onClick={() => console.log(`Added ${quantity} of ${product.name} to cart`)}
                   >
                     <ShoppingCart />
-                    Add to Cart
+                    Add to Cart {quantity > 1 ? `(${quantity})` : ''}
                   </Button>
                   
                   <Link to="/quote" className="w-full sm:w-auto">
