@@ -1,14 +1,7 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-
-interface Ticket {
-  id: string;
-  date: string;
-  customer: string;
-  subject: string;
-  status: string;
-}
+import { Ticket } from "@/types/product";
 
 interface TicketsTabProps {
   tickets: Ticket[];

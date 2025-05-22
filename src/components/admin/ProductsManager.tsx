@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Package, ShoppingCart, Ticket, Receipt, FileText } from 'lucide-react';
+import { Package, ShoppingCart, Ticket as TicketIcon, Receipt, FileText } from 'lucide-react';
 import ProductsTable from './products/ProductsTable';
 import ProductForm, { ProductFormValues } from './products/ProductForm';
 import OrdersTab from './products/OrdersTab';
@@ -303,7 +303,7 @@ const ProductsManager = () => {
             Orders
           </TabsTrigger>
           <TabsTrigger value="tickets" className="flex items-center gap-2 data-[state=active]:bg-blue-50">
-            <Ticket size={18} />
+            <TicketIcon size={18} />
             Support Tickets
           </TabsTrigger>
           <TabsTrigger value="transactions" className="flex items-center gap-2 data-[state=active]:bg-blue-50">
