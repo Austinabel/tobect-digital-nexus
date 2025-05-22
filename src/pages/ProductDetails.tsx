@@ -156,6 +156,27 @@ const ProductDetails = () => {
     loadProductReviews();
   };
 
+  // Fix: Define the loadProductReviews function outside useEffect so it can be called from handleReviewSubmitted
+  const loadProductReviews = async () => {
+    if (!id) return;
+    
+    setLoadingReviews(true);
+    try {
+      // Load approved reviews
+      const reviewsData = await fetchProductReviews(id);
+      setReviews(reviewsData);
+      setReviewCount(reviewsData.length);
+      
+      // Get average rating
+      const rating = await getProductRating(id);
+      setAverageRating(rating);
+    } catch (error) {
+      console.error("Error loading reviews:", error);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">

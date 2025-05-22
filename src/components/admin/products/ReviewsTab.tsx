@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Table, 
@@ -24,7 +23,7 @@ import {
   Button,
   Switch,
   Skeleton
-} from "@/components/ui/";
+} from "@/components/ui/button";
 import { Star, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from "@/hooks/use-toast";
