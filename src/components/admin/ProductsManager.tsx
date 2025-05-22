@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Package, ShoppingCart, Ticket as TicketIcon, Receipt, FileText } from 'lucide-react';
+import { Package, ShoppingCart, Ticket as TicketIcon, Receipt, FileText, MessageSquare } from 'lucide-react';
 import ProductsTable from './products/ProductsTable';
 import ProductFormManager from './products/ProductFormManager';
 import OrdersTab from './products/OrdersTab';
 import TicketsTab from './products/TicketsTab';
 import TransactionsTab from './products/TransactionsTab';
 import ReportsTab from './products/ReportsTab';
+import ReviewsTab from './products/ReviewsTab';
 import { Product, Order, Ticket, Transaction } from '@/types/product';
 import { ProductImage } from "@/types/productImages";
 import { ProductFormValues } from './products/ProductForm';
@@ -183,6 +184,10 @@ const ProductsManager = () => {
             <Receipt size={18} />
             Transactions
           </TabsTrigger>
+          <TabsTrigger value="reviews" className="flex items-center gap-2 data-[state=active]:bg-blue-50">
+            <MessageSquare size={18} />
+            Reviews
+          </TabsTrigger>
           <TabsTrigger value="reports" className="flex items-center gap-2 data-[state=active]:bg-blue-50">
             <FileText size={18} />
             Reports
@@ -210,6 +215,10 @@ const ProductsManager = () => {
         
         <TabsContent value="transactions" className="space-y-4 pt-2">
           <TransactionsTab transactions={mockTransactions} />
+        </TabsContent>
+        
+        <TabsContent value="reviews" className="space-y-4 pt-2">
+          <ReviewsTab />
         </TabsContent>
         
         <TabsContent value="reports" className="space-y-4 pt-2">

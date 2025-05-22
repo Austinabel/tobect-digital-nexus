@@ -209,6 +209,50 @@ export type Database = {
           },
         ]
       }
+      product_reviews: {
+        Row: {
+          approved: boolean | null
+          comment: string
+          created_at: string
+          id: string
+          product_id: string
+          rating: number
+          reviewer_email: string
+          reviewer_name: string
+          updated_at: string
+        }
+        Insert: {
+          approved?: boolean | null
+          comment: string
+          created_at?: string
+          id?: string
+          product_id: string
+          rating: number
+          reviewer_email: string
+          reviewer_name: string
+          updated_at?: string
+        }
+        Update: {
+          approved?: boolean | null
+          comment?: string
+          created_at?: string
+          id?: string
+          product_id?: string
+          rating?: number
+          reviewer_email?: string
+          reviewer_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string
@@ -361,7 +405,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_product_rating: {
+        Args: { p_product_id: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

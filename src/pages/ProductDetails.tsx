@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +10,10 @@ import { ProductImage } from '@/types/productImages';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ScrollToTop from '@/components/ScrollToTop';
 import { motion } from "framer-motion";
+import ReviewForm from '@/components/product/ReviewForm';
+import ReviewsList from '@/components/product/ReviewsList';
+import { ProductReview } from '@/types/productReviews';
+import { fetchProductReviews, getProductRating } from '@/components/admin/products/ProductReviewService';
 
 interface Product {
   id: string;
@@ -31,6 +34,10 @@ const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
   const [activeTab, setActiveTab] = useState('description');
   const [quantity, setQuantity] = useState(1);
+  const [reviews, setReviews] = useState<ProductReview[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
   
   useEffect(() => {
     const fetchProduct = async () => {
@@ -93,8 +100,29 @@ const ProductDetails = () => {
       }
     };
 
+    const loadProductReviews = async () => {
+      if (!id) return;
+      
+      setLoadingReviews(true);
+      try {
+        // Load approved reviews
+        const reviewsData = await fetchProductReviews(id);
+        setReviews(reviewsData);
+        setReviewCount(reviewsData.length);
+        
+        // Get average rating
+        const rating = await getProductRating(id);
+        setAverageRating(rating);
+      } catch (error) {
+        console.error("Error loading reviews:", error);
+      } finally {
+        setLoadingReviews(false);
+      }
+    };
+
     if (id) {
       fetchProduct();
+      loadProductReviews();
     }
   }, [id]);
 
@@ -121,6 +149,11 @@ const ProductDetails = () => {
         setQuantity(value);
       }
     }
+  };
+
+  const handleReviewSubmitted = () => {
+    // Reload reviews after a new submission
+    loadProductReviews();
   };
 
   if (loading) {
@@ -246,10 +279,19 @@ const ProductDetails = () => {
                 <div className="flex items-center mb-4">
                   <div className="flex items-center text-yellow-500 mr-2">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={16} fill="currentColor" />
+                      <Star 
+                        key={i} 
+                        size={16} 
+                        fill={i < Math.round(averageRating) ? "currentColor" : "none"} 
+                        className={i < Math.round(averageRating) ? "text-yellow-500" : "text-gray-300"}
+                      />
                     ))}
                   </div>
-                  <span className="text-gray-500 text-sm">(12 Reviews)</span>
+                  <span className="text-gray-500 text-sm">
+                    {reviewCount > 0 
+                      ? `(${reviewCount} Review${reviewCount !== 1 ? 's' : ''})` 
+                      : '(No reviews yet)'}
+                  </span>
                 </div>
                 
                 <div className="text-3xl font-bold text-tobecatBlue-600 mb-6">{formatPrice(product.price)}</div>
@@ -393,7 +435,9 @@ const ProductDetails = () => {
               <TabsList className="border-b w-full justify-start">
                 <TabsTrigger value="description" className="pb-2 pt-1 px-4 text-base">Description</TabsTrigger>
                 <TabsTrigger value="specifications" className="pb-2 pt-1 px-4 text-base">Specifications</TabsTrigger>
-                <TabsTrigger value="reviews" className="pb-2 pt-1 px-4 text-base">Reviews</TabsTrigger>
+                <TabsTrigger value="reviews" className="pb-2 pt-1 px-4 text-base">
+                  Reviews {reviewCount > 0 && `(${reviewCount})`}
+                </TabsTrigger>
                 <TabsTrigger value="shipping" className="pb-2 pt-1 px-4 text-base">Shipping & Returns</TabsTrigger>
               </TabsList>
               
@@ -447,10 +491,24 @@ const ProductDetails = () => {
               <TabsContent value="reviews" className="py-6">
                 <div className="prose max-w-none">
                   <h3 className="text-xl font-semibold mb-4">Customer Reviews</h3>
-                  <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">No reviews yet for this product.</p>
-                    <Button variant="outline">Write a Review</Button>
-                  </div>
+                  
+                  {loadingReviews ? (
+                    <div className="text-center py-8">
+                      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                      <p className="text-gray-500">Loading reviews...</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-8">
+                      <ReviewsList reviews={reviews} />
+                      
+                      <div className="pt-8 border-t border-gray-200">
+                        <ReviewForm 
+                          productId={id || ''} 
+                          onReviewSubmitted={handleReviewSubmitted}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
               

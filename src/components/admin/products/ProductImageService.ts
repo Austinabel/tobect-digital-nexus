@@ -9,8 +9,10 @@ export const fetchProductImages = async (productId: string): Promise<ProductImag
   try {
     // Use the RPC function to fetch images
     const { data, error } = await supabase
-      .rpc('get_product_images', { p_product_id: productId })
-      .returns<ProductImage[]>();
+      .from('product_images')
+      .select('*')
+      .eq('product_id', productId)
+      .order('is_primary', { ascending: false });
 
     if (error) {
       throw error;
