@@ -19,7 +19,7 @@ const WhatsAppButton = () => {
     return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
 
-  const phoneNumber = "+2348000TOBECAT"; // Replace with your actual WhatsApp number
+  const phoneNumber = "+2348037946368"; // Replace with your actual WhatsApp number
   const message = "Hello! I'm interested in your services.";
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
