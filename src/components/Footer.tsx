@@ -27,7 +27,7 @@ const Footer = () => {
             </p>
             <div className="flex space-x-4">
               <a href="https://wa.me/+2348037946368" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
-                <Whatsapp className="h-5 w-5" />
+                <Facebook className="h-5 w-5" />
               </a>
               <a href="#" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
                 <XLogo />
