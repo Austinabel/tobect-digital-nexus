@@ -36,12 +36,6 @@ const ContactInformation = ({ className }: ContactInformationProps) => {
             <p className="text-tobecatGray-600">tobecattech@gmail.com</p>
           </div>
         </div>
-        
-        <div className="flex items-start">
-          <div className="mr-4 bg-white p-3 rounded-lg shadow-sm">
-            <MapPin className="h-6 w-6 text-tobecatBlue-600" />
-          </div>
-        </div>
       </div>
     </div>
   );
