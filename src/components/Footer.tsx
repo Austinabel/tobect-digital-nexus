@@ -26,13 +26,13 @@ const Footer = () => {
               Your one-stop IT solutions partner for business growth and digital transformation.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
-                <Facebook className="h-5 w-5" />
+              <a href="https://wa.me/+2348037946368" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
+                <Whatsapp className="h-5 w-5" />
               </a>
               <a href="#" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
                 <XLogo />
               </a>
-              <a href="#" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
+              <a href="https://www.instagram.com/tobecat_tech" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
             </div>
@@ -114,11 +114,11 @@ const Footer = () => {
               </li>
               <li className="flex items-center text-gray-300">
                 <span className="mr-2">📱</span>
-                +234 800 TOBECAT
+                +234 8034885760
               </li>
               <li className="flex items-center text-gray-300">
                 <span className="mr-2">✉️</span>
-                info@tobecat.com
+                tobecattech@gmail.com
               </li>
               <li className="flex items-center text-gray-300">
                 <span className="mr-2">🕙</span>
