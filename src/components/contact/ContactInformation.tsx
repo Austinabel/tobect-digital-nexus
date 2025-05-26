@@ -23,6 +23,7 @@ const ContactInformation = ({ className }: ContactInformationProps) => {
           <div>
             <h4 className="text-lg font-semibold text-tobecatGray-800">Phone</h4>
             <p className="text-tobecatGray-600">+234 800 TOBECAT</p>
+            <p className="text-tobecatGray-600">+234 80 34885760</p>
           </div>
         </div>
         
@@ -32,20 +33,13 @@ const ContactInformation = ({ className }: ContactInformationProps) => {
           </div>
           <div>
             <h4 className="text-lg font-semibold text-tobecatGray-800">Email</h4>
-            <p className="text-tobecatGray-600">info@tobecat.com</p>
+            <p className="text-tobecatGray-600">tobecattech@gmail.com</p>
           </div>
         </div>
         
         <div className="flex items-start">
           <div className="mr-4 bg-white p-3 rounded-lg shadow-sm">
             <MapPin className="h-6 w-6 text-tobecatBlue-600" />
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold text-tobecatGray-800">Location</h4>
-            <p className="text-tobecatGray-600">
-              Tobecat Headquarters<br />
-              Lagos, Nigeria
-            </p>
           </div>
         </div>
       </div>
