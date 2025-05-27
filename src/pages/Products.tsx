@@ -11,6 +11,15 @@ import { formatPrice } from '@/components/quotes/ProductCategoriesData';
 import ScrollToTop from '@/components/ScrollToTop';
 import { supabase } from '@/integrations/supabase/client';
 import { motion } from "framer-motion";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 // Types
 interface Product {
@@ -23,11 +32,14 @@ interface Product {
   image_url?: string;
 }
 
+const PRODUCTS_PER_PAGE = 12; // Number of products to show per page
+
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') || 'all';
   
@@ -65,12 +77,24 @@ const Products = () => {
   const filteredProducts = products.filter(product => {
     const matchesSearch = 
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchQuery.toLowerCase());
+      product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchQuery.toLowerCase());
       
     const matchesCategory = activeCategory === 'all' || product.category === activeCategory;
     
     return matchesSearch && matchesCategory;
   });
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const endIndex = startIndex + PRODUCTS_PER_PAGE;
+  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeCategory]);
   
   const handleCategoryChange = (category: string) => {
     if (category === 'all') {
@@ -79,6 +103,20 @@ const Products = () => {
       searchParams.set('category', category);
     }
     setSearchParams(searchParams);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    handleCategoryChange('all');
   };
 
   return (
@@ -113,17 +151,35 @@ const Products = () => {
               <div className="relative flex-grow">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                 <Input 
-                  placeholder="Search products..." 
+                  placeholder="Search products by name, description, or category..." 
                   className="pl-10"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearchChange}
                 />
               </div>
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={clearFilters}
+              >
                 <Filter size={18} />
-                <span>Filters</span>
+                <span>Clear Filters</span>
               </Button>
             </div>
+
+            {/* Results count */}
+            {!isLoading && (
+              <div className="mb-4 text-sm text-gray-600">
+                {filteredProducts.length === 0 ? (
+                  <span>No products found</span>
+                ) : (
+                  <span>
+                    Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} products
+                    {searchQuery && ` for "${searchQuery}"`}
+                  </span>
+                )}
+              </div>
+            )}
             
             {/* Category tabs */}
             <Tabs defaultValue={activeCategory} onValueChange={handleCategoryChange}>
@@ -151,61 +207,132 @@ const Products = () => {
                   <div className="flex justify-center py-12">
                     <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                   </div>
-                ) : filteredProducts.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredProducts.map((product) => (
-                      <motion.div
-                        key={product.id}
-                        className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all border border-gray-100 group"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                      >
-                        <Link to={`/product/${product.id}`} className="block">
-                          <div className="aspect-square overflow-hidden bg-gray-100">
-                            {product.image_url ? (
-                              <img 
-                                src={product.image_url} 
-                                alt={product.name}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <span className="text-gray-400">No image</span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="p-4">
-                            <span className="text-sm text-tobecatBlue-600 font-medium block mb-1">{product.category}</span>
-                            <h3 className="font-semibold text-lg mb-2 text-gray-800 line-clamp-2">{product.name}</h3>
-                            <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
-                            <div className="flex justify-between items-center">
-                              <span className="font-bold text-tobecatBlue-700">{formatPrice(product.price)}</span>
-                              <span className={`text-xs px-2 py-1 rounded ${
-                                product.stock > 0 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : 'bg-red-100 text-red-800'
-                              }`}>
-                                {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                              </span>
+                ) : currentProducts.length > 0 ? (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                      {currentProducts.map((product) => (
+                        <motion.div
+                          key={product.id}
+                          className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all border border-gray-100 group"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5 }}
+                        >
+                          <Link to={`/product/${product.id}`} className="block">
+                            <div className="aspect-square overflow-hidden bg-gray-100">
+                              {product.image_url ? (
+                                <img 
+                                  src={product.image_url} 
+                                  alt={product.name}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <span className="text-gray-400">No image</span>
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        </Link>
-                      </motion.div>
-                    ))}
-                  </div>
+                            <div className="p-4">
+                              <span className="text-sm text-tobecatBlue-600 font-medium block mb-1">{product.category}</span>
+                              <h3 className="font-semibold text-lg mb-2 text-gray-800 line-clamp-2">{product.name}</h3>
+                              <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold text-tobecatBlue-700">{formatPrice(product.price)}</span>
+                                <span className={`text-xs px-2 py-1 rounded ${
+                                  product.stock > 0 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                                </span>
+                              </div>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <div className="flex justify-center mt-8">
+                        <Pagination>
+                          <PaginationContent>
+                            <PaginationItem>
+                              <PaginationPrevious 
+                                href="#"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  if (currentPage > 1) handlePageChange(currentPage - 1);
+                                }}
+                                className={currentPage <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                              />
+                            </PaginationItem>
+                            
+                            {/* Page numbers */}
+                            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                              let pageNumber;
+                              if (totalPages <= 5) {
+                                pageNumber = i + 1;
+                              } else if (currentPage <= 3) {
+                                pageNumber = i + 1;
+                              } else if (currentPage >= totalPages - 2) {
+                                pageNumber = totalPages - 4 + i;
+                              } else {
+                                pageNumber = currentPage - 2 + i;
+                              }
+                              
+                              return (
+                                <PaginationItem key={pageNumber}>
+                                  <PaginationLink
+                                    href="#"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handlePageChange(pageNumber);
+                                    }}
+                                    isActive={currentPage === pageNumber}
+                                    className="cursor-pointer"
+                                  >
+                                    {pageNumber}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              );
+                            })}
+                            
+                            {totalPages > 5 && currentPage < totalPages - 2 && (
+                              <PaginationItem>
+                                <PaginationEllipsis />
+                              </PaginationItem>
+                            )}
+                            
+                            <PaginationItem>
+                              <PaginationNext 
+                                href="#"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  if (currentPage < totalPages) handlePageChange(currentPage + 1);
+                                }}
+                                className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                              />
+                            </PaginationItem>
+                          </PaginationContent>
+                        </Pagination>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <p className="text-gray-500">No products found for the selected criteria.</p>
+                    <p className="text-gray-500 mb-4">
+                      {searchQuery 
+                        ? `No products found matching "${searchQuery}"` 
+                        : "No products found for the selected criteria."
+                      }
+                    </p>
                     <Button 
                       variant="link" 
-                      onClick={() => {
-                        setSearchQuery('');
-                        handleCategoryChange('all');
-                      }}
+                      onClick={clearFilters}
                       className="mt-2"
                     >
-                      Clear filters
+                      Clear all filters
                     </Button>
                   </div>
                 )}
