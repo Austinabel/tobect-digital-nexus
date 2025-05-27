@@ -16,7 +16,7 @@ export const services: ServiceCategory[] = [
   {
     id: 1,
     title: "Graphics & Design",
-    icon: "pen",
+    icon: "Palette",
     description: "Professional graphic design services for all your business needs",
     subcategories: [
       { name: "UI/UX Designers", id: "ui-ux-designers" },
@@ -33,7 +33,7 @@ export const services: ServiceCategory[] = [
   {
     id: 2,
     title: "Web & App Development",
-    icon: "code",
+    icon: "Code",
     description: "Custom web and mobile app development solutions for businesses",
     subcategories: [
       { name: "Website Development", id: "website-dev" },
@@ -53,7 +53,7 @@ export const services: ServiceCategory[] = [
   {
     id: 3,
     title: "CAC & Business Registration",
-    icon: "file",
+    icon: "FileText",
     description: "Comprehensive business registration and documentation services",
     subcategories: [
       { name: "CAC Registration (BN, LTD, NGO)", id: "cac-reg" },
@@ -70,7 +70,7 @@ export const services: ServiceCategory[] = [
   {
     id: 4,
     title: "Marketing & Advertising",
-    icon: "chart-bar",
+    icon: "BarChart3",
     description: "Strategic marketing and advertising solutions to grow your business",
     subcategories: [
       { name: "Digital Campaign Strategy", id: "digital-campaign" },
@@ -87,7 +87,7 @@ export const services: ServiceCategory[] = [
   {
     id: 5,
     title: "Social Media Management",
-    icon: "instagram",
+    icon: "Instagram",
     description: "Comprehensive social media management and growth strategies",
     subcategories: [
       { name: "Full Account Management", id: "account-management" },
@@ -103,7 +103,7 @@ export const services: ServiceCategory[] = [
   {
     id: 6,
     title: "Travel & Bookings",
-    icon: "plane",
+    icon: "Plane",
     description: "Complete travel management and booking services",
     subcategories: [
       { name: "Flight Booking (Local & International)", id: "flight-booking" },
@@ -116,7 +116,7 @@ export const services: ServiceCategory[] = [
   {
     id: 7,
     title: "Video & Multimedia",
-    icon: "video",
+    icon: "Video",
     description: "Professional video and multimedia production services",
     subcategories: [
       { name: "Video Editing (Promo, Vlog, Reels)", id: "video-editing" },
@@ -130,7 +130,7 @@ export const services: ServiceCategory[] = [
   {
     id: 8,
     title: "Writing & Content Services",
-    icon: "pen",
+    icon: "PenTool",
     description: "Professional writing and content creation services",
     subcategories: [
       { name: "Business Proposal Writing", id: "proposal-writing" },
@@ -145,7 +145,7 @@ export const services: ServiceCategory[] = [
   {
     id: 9,
     title: "Branding & Business Strategy",
-    icon: "briefcase",
+    icon: "Briefcase",
     description: "Strategic branding and business development services",
     subcategories: [
       { name: "Business Naming", id: "business-naming" },
@@ -158,7 +158,7 @@ export const services: ServiceCategory[] = [
   {
     id: 10,
     title: "Tech Support & Maintenance",
-    icon: "wrench",
+    icon: "Wrench",
     description: "Reliable technical support and maintenance services",
     subcategories: [
       { name: "Website Maintenance Plans", id: "website-maintenance" },

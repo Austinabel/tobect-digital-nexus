@@ -39,8 +39,8 @@ const Services = () => {
           </div>
 
           <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="mb-8 overflow-x-auto">
-              <TabsList className="w-full justify-start md:justify-center flex-wrap border-b bg-transparent p-0">
+            <div className="mb-8">
+              <TabsList className="w-full h-auto flex-wrap gap-2 md:gap-1 bg-transparent p-0 border-b justify-start md:justify-center">
                 {services.map((service) => {
                   const IconComponent = service.icon && typeof service.icon === 'string' 
                     ? (Icons as any)[service.icon] || Icons.FileText
@@ -51,10 +51,12 @@ const Services = () => {
                       key={service.id} 
                       id={`tab-${service.id}`}
                       value={service.id.toString()}
-                      className="flex items-center gap-2 py-3 px-4 data-[state=active]:border-b-2 data-[state=active]:border-tobecatBlue-600 rounded-none bg-transparent data-[state=active]:bg-sky-50 data-[state=active]:text-tobecatBlue-600"
+                      className="flex items-center gap-1 md:gap-2 py-2 px-2 md:py-3 md:px-4 text-xs md:text-sm data-[state=active]:border-b-2 data-[state=active]:border-tobecatBlue-600 rounded-none bg-transparent data-[state=active]:bg-sky-50 data-[state=active]:text-tobecatBlue-600 whitespace-nowrap"
                     >
-                      <IconComponent size={18} />
-                      {service.title}
+                      <IconComponent size={14} className="md:hidden" />
+                      <IconComponent size={18} className="hidden md:block" />
+                      <span className="hidden sm:inline">{service.title}</span>
+                      <span className="sm:hidden text-xs">{service.title.split(' ')[0]}</span>
                     </TabsTrigger>
                   );
                 })}

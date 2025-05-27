@@ -1,5 +1,5 @@
 
-import { Facebook, Instagram, Info, Briefcase, Star, Book, Users } from 'lucide-react';
+import { Instagram, Info, Briefcase, Star, Book, Users, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Custom X (Twitter) logo SVG component
@@ -27,7 +27,7 @@ const Footer = () => {
             </p>
             <div className="flex space-x-4">
               <a href="https://wa.me/+2348037946368" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
-                <Facebook className="h-5 w-5" />
+                <MessageCircle className="h-5 w-5" />
               </a>
               <a href="#" className="bg-gray-800 hover:bg-orange-500 p-2 rounded-full transition-colors">
                 <XLogo />
