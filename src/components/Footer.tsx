@@ -110,7 +110,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center text-gray-300">
                 <span className="mr-2">📍</span>
-                Lagos, Nigeria
+                Awka | Lagos | Abuja
               </li>
               <li className="flex items-center text-gray-300">
                 <span className="mr-2">📱</span>
