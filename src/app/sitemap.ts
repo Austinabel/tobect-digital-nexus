@@ -4,6 +4,9 @@ import { getCatalog } from "@/lib/catalog-server";
 import { getPolicy } from "@/lib/content-server";
 import { SOLUTIONS } from "@/lib/data/solutions";
 
+/** Rebuilt at most hourly, so products, kits and categories added in the admin reach search engines without a redeploy. */
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { SITE } = await getSiteLinks();
   const { categories: CATEGORIES, products: PRODUCTS, kits: KITS } = await getCatalog();
