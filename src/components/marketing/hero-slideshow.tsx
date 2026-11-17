@@ -63,7 +63,6 @@ export function HeroSlideshow({ slides }: { slides: HeroSlide[] }) {
                 alt=""
                 fill
                 sizes="100vw"
-                quality={70}
                 priority={i === 0}
                 style={{ objectPosition: slide.position ?? "50% 50%" }}
                 className={cn(
