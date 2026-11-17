@@ -40,7 +40,7 @@ export function ProductImage({ product, sizes, priority, compact, ratio = "squar
           {compact ? (
             <span className="sr-only">Product photo not available yet</span>
           ) : (
-            <span className="absolute bottom-2.5 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full border border-hair bg-white/90 px-2.5 py-1 text-[0.66rem] font-semibold text-slate">
+            <span className="absolute bottom-2.5 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full border border-hair bg-white/90 px-2.5 py-1 text-[0.72rem] font-semibold text-slate">
               <IconImageOff className="size-3" />
               Photo coming soon
             </span>

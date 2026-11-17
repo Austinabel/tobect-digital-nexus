@@ -86,7 +86,7 @@ export function HeroSlideshow({ slides }: { slides: HeroSlide[] }) {
       {slides.length > 1 && (
         // Sits above the trust bar that overlaps the hero's bottom edge (-mt-12 / lg:-mt-14).
         <div className="absolute bottom-[68px] right-4 z-10 flex items-center gap-2 sm:right-6 lg:bottom-[80px] lg:right-9">
-          <div className="flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-2 backdrop-blur-sm">
+          <div className="flex items-center gap-0.5 rounded-full bg-black/25 px-1.5 backdrop-blur-sm">
             {slides.map((slide, i) => (
               <button
                 key={slide.id}
@@ -94,7 +94,7 @@ export function HeroSlideshow({ slides }: { slides: HeroSlide[] }) {
                 aria-label={`Show background image ${i + 1}`}
                 aria-current={i === index ? "true" : undefined}
                 onClick={() => setIndex(i)}
-                className="group grid h-6 place-items-center px-0.5"
+                className="group grid h-10 min-w-6 place-items-center px-1.5"
               >
                 <span
                   className={cn(

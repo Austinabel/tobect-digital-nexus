@@ -313,3 +313,9 @@ html {
     transform: none;
   }
 }
+
+/* The WhatsApp button would sit on top of the open mobile menu and of
+   drawers/dialogs (e.g. the shop filters and their Apply button). */
+body:has(#primary-nav-mobile, [aria-modal="true"]) .whatsapp-float {
+  display: none;
+}

@@ -18,7 +18,7 @@ export function WishlistButton({ slug, name, className }: { slug: string; name: 
       aria-pressed={saved}
       aria-label={saved ? `Remove ${name} from saved items` : `Save ${name}`}
       className={cn(
-        "grid size-9 place-items-center rounded-full border bg-white/95 shadow-sm transition-colors",
+        "grid size-10 place-items-center rounded-full border bg-white/95 shadow-sm transition-colors",
         saved ? "border-red/30 text-red" : "border-hair text-slate hover:border-red/40 hover:text-red",
         className,
       )}

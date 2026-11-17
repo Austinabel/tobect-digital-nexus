@@ -15,13 +15,13 @@ import { IconMinus, IconPlus, IconQuote, IconCheck, IconInfo } from "@/component
 function Stepper({ value, min, max, onChange, label }: { value: number; min: number; max: number; onChange: (n: number) => void; label: string }) {
   return (
     <div className="flex h-10 items-center rounded-full border-[1.5px] border-hair bg-white" role="group" aria-label={label}>
-      <button type="button" aria-label={`Fewer — ${label}`} disabled={value <= min} onClick={() => onChange(value - 1)} className="grid h-full w-9 place-items-center text-slate hover:text-blue disabled:opacity-35">
+      <button type="button" aria-label={`Fewer — ${label}`} disabled={value <= min} onClick={() => onChange(value - 1)} className="grid h-full w-11 place-items-center text-slate hover:text-blue disabled:opacity-35">
         <IconMinus className="size-3.5" />
       </button>
       <span className="w-8 text-center font-heading font-bold tabular-nums text-ink" aria-live="polite">
         {value}
       </span>
-      <button type="button" aria-label={`More — ${label}`} disabled={value >= max} onClick={() => onChange(value + 1)} className="grid h-full w-9 place-items-center text-slate hover:text-blue disabled:opacity-35">
+      <button type="button" aria-label={`More — ${label}`} disabled={value >= max} onClick={() => onChange(value + 1)} className="grid h-full w-11 place-items-center text-slate hover:text-blue disabled:opacity-35">
         <IconPlus className="size-3.5" />
       </button>
     </div>
@@ -117,7 +117,7 @@ export function KitConfigurator({ slug }: { slug: string }) {
                       type="checkbox"
                       checked={on}
                       onChange={() => update({ addons: on ? config.addons.filter((x) => x !== a.key) : [...config.addons, a.key].sort() })}
-                      className="mt-0.5 size-4 accent-[var(--color-blue)]"
+                      className="mt-0.5 size-5 shrink-0 accent-[var(--color-blue)]"
                     />
                     <span className="grow">
                       <span className="block font-semibold text-ink">{a.label}</span>

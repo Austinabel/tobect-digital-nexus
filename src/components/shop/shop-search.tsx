@@ -144,7 +144,7 @@ export function ShopSearch({ suggestions, defaultValue = "" }: { suggestions: Se
               setValue(term);
               go(term);
             }}
-            className="rounded-full border border-white/25 bg-white/10 px-3 py-1 font-semibold text-white transition-colors hover:bg-white/20"
+            className="inline-flex min-h-10 items-center rounded-full border border-white/25 bg-white/10 px-3.5 font-semibold text-white transition-colors hover:bg-white/20"
           >
             {term}
           </button>

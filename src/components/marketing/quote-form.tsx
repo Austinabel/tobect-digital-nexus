@@ -151,7 +151,7 @@ export function QuoteForm({ initialMessage = "" }: QuoteFormProps) {
                   type="checkbox"
                   checked={checked}
                   onChange={() => setServices((prev) => (checked ? prev.filter((x) => x !== s) : [...prev, s]))}
-                  className="mt-0.5 size-4 accent-[var(--color-blue)]"
+                  className="mt-0.5 size-5 shrink-0 accent-[var(--color-blue)]"
                 />
                 <span className="text-ink">{s}</span>
               </label>

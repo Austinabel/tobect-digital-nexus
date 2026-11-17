@@ -388,7 +388,7 @@ export default async function AboutPage() {
               <span className="font-heading text-[0.7rem] font-bold uppercase tracking-[0.18em] text-gold">Head office</span>
               <h3 className="mt-1 font-heading text-[1.3rem] font-extrabold">{SITE.address.city}</h3>
               <p className="mt-2 text-[0.92rem] text-white/80">{SITE.address.street}</p>
-              <a href={mapsHref(headOffice)} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 font-heading text-[0.82rem] font-semibold text-blue-deep hover:bg-white/90">
+              <a href={mapsHref(headOffice)} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-3 font-heading text-[0.82rem] font-semibold text-blue-deep hover:bg-white/90">
                 <IconMapPin className="size-4" /> Get directions
               </a>
             </li>
@@ -401,7 +401,7 @@ export default async function AboutPage() {
                   href={whatsappHref(`Hello ${SITE.shortName}, please share the address of your ${city} branch.`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-5 inline-flex items-center gap-1.5 rounded-full border-2 border-[#bfe4cd] px-4 py-1.5 font-heading text-[0.82rem] font-semibold text-whatsapp hover:border-whatsapp"
+                  className="mt-5 inline-flex items-center gap-1.5 rounded-full border-2 border-[#bfe4cd] px-4 py-2.5 font-heading text-[0.82rem] font-semibold text-whatsapp hover:border-whatsapp"
                 >
                   <IconWhatsApp className="size-4" /> Ask for directions
                 </a>

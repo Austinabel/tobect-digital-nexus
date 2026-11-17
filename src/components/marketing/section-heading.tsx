@@ -27,7 +27,7 @@ export function SectionHeading({ kicker, title, intro, link, as: Heading = "h2",
       {link && (
         <Link
           href={link.href}
-          className="group inline-flex items-center gap-2 whitespace-nowrap rounded-full py-1 font-heading text-[0.9rem] font-semibold text-red transition-colors hover:text-red-dark"
+          className="group inline-flex items-center gap-2 whitespace-nowrap rounded-full -my-2 py-3 font-heading text-[0.9rem] font-semibold text-red transition-colors hover:text-red-dark"
         >
           {link.label}
           <IconArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />

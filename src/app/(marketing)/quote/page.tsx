@@ -48,17 +48,17 @@ export default async function QuotePage(props: PageProps<"/quote">) {
               <h2 className="font-heading text-[1.05rem] font-bold text-white">Prefer to talk?</h2>
               <ul className="mt-4 space-y-3.5 text-[0.9rem]">
                 <li>
-                  <a href={PHONE_HREF} className="flex items-center gap-3 hover:text-white">
+                  <a href={PHONE_HREF} className="-my-2.5 flex items-center gap-3 py-2.5 hover:text-white">
                     <IconPhone className="size-4 text-[#6f9bff]" /> {SITE.phone}
                   </a>
                 </li>
                 <li>
-                  <a href={whatsappHref()} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-white">
+                  <a href={whatsappHref()} target="_blank" rel="noopener noreferrer" className="-my-2.5 flex items-center gap-3 py-2.5 hover:text-white">
                     <IconWhatsApp className="size-4 text-whatsapp" /> {SITE.whatsapp} (WhatsApp)
                   </a>
                 </li>
                 <li>
-                  <a href={EMAIL_HREF} className="flex items-center gap-3 break-all hover:text-white">
+                  <a href={EMAIL_HREF} className="-my-2.5 flex items-center gap-3 break-all py-2.5 hover:text-white">
                     <IconMail className="size-4 shrink-0 text-[#6f9bff]" /> {SITE.email}
                   </a>
                 </li>

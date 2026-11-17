@@ -88,7 +88,7 @@ export function CollectionRow({ id, kicker, title, products, link }: { id: strin
             </h2>
           </div>
           {link && (
-            <Link href={link.href} className="inline-flex items-center gap-1.5 font-heading text-[0.86rem] font-bold text-blue hover:underline">
+            <Link href={link.href} className="-my-3 inline-flex items-center gap-1.5 py-3 font-heading text-[0.86rem] font-bold text-blue hover:underline">
               {link.label}
               <IconArrowRight className="size-4" />
             </Link>

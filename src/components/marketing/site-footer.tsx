@@ -45,10 +45,10 @@ function FooterColumn({ title, links }: { title: string; links: { label: string;
   return (
     <div>
       <h2 className="mb-4 font-heading text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-white">{title}</h2>
-      <ul className="flex flex-col gap-2.5">
+      <ul className="-my-2.5 flex flex-col">
         {links.map((link) => (
           <li key={link.label}>
-            <Link href={link.href} className="text-[0.88rem] text-[#9fb0c4] transition-colors hover:text-white">
+            <Link href={link.href} className="inline-block py-2.5 text-[0.88rem] text-[#9fb0c4] transition-colors hover:text-white">
               {link.label}
             </Link>
           </li>
@@ -59,7 +59,7 @@ function FooterColumn({ title, links }: { title: string; links: { label: string;
 }
 
 const iconLink =
-  "grid size-9.5 place-items-center rounded-[10px] border border-[#24384c] text-[#9fb0c4] transition-colors hover:border-white hover:text-white";
+  "grid size-11 place-items-center rounded-[10px] border border-[#24384c] text-[#9fb0c4] transition-colors hover:border-white hover:text-white";
 
 export async function SiteFooter() {
   const { SITE, PHONE_HREF, EMAIL_HREF, whatsappHref } = await getSiteLinks();
@@ -142,21 +142,21 @@ export async function SiteFooter() {
             <ul className="grid gap-3.5 text-[0.88rem] leading-snug sm:grid-cols-2 lg:grid-cols-1">
               <li className="flex items-start gap-2.5">
                 <IconPhone className="mt-0.5 size-4 shrink-0 text-[#6f9bff]" />
-                <a href={PHONE_HREF} className="hover:text-white">
+                <a href={PHONE_HREF} className="-my-1 inline-block py-1 hover:text-white">
                   {SITE.phone}
                   <span className="block text-[0.76rem] text-[#6a7d92]">Call</span>
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
                 <IconWhatsApp className="mt-0.5 size-4 shrink-0 text-whatsapp" />
-                <a href={whatsappHref()} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                <a href={whatsappHref()} target="_blank" rel="noopener noreferrer" className="-my-1 inline-block py-1 hover:text-white">
                   {SITE.whatsapp}
                   <span className="block text-[0.76rem] text-[#6a7d92]">WhatsApp</span>
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
                 <IconMail className="mt-0.5 size-4 shrink-0 text-[#6f9bff]" />
-                <a href={EMAIL_HREF} className="break-all hover:text-white">
+                <a href={EMAIL_HREF} className="-my-3 inline-block break-all py-3 hover:text-white">
                   {SITE.email}
                 </a>
               </li>
@@ -185,10 +185,10 @@ export async function SiteFooter() {
             &copy; {year} {SITE.legalName}{COMPANY.cacNumber ? ` · CAC Reg. No. ${COMPANY.cacNumber}` : ""}. All rights reserved.
           </span>
           <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-2">
-            <Link href="/terms" className="hover:text-white">
+            <Link href="/terms" className="-my-3 inline-block py-3 hover:text-white">
               Terms of Service
             </Link>
-            <Link href="/privacy" className="hover:text-white">
+            <Link href="/privacy" className="-my-3 inline-block py-3 hover:text-white">
               Privacy Policy
             </Link>
           </nav>

@@ -35,7 +35,7 @@ export async function CategoryNav({ active = "all" }: { active?: string }) {
                   <span aria-hidden className={cn("size-9 [&>svg]:size-full", on ? "text-blue" : "text-ink/80")}>
                     {categoryGlyphs[item.glyph]}
                   </span>
-                  <span className="font-heading text-[0.74rem] font-semibold leading-tight">{item.name}</span>
+                  <span className="font-heading text-[0.78rem] font-semibold leading-tight">{item.name}</span>
                 </Link>
               </li>
             );

@@ -36,8 +36,8 @@ function Group({ title, children, defaultOpen = true }: { title: string; childre
 
 function Check({ name, value, label, count, checked, sub }: { name: string; value: string; label: string; count: number; checked: boolean; sub?: boolean }) {
   return (
-    <label className={cn("flex cursor-pointer items-center gap-2.5 rounded-lg px-1 py-1 text-[0.86rem] hover:bg-field", sub && "ml-5 text-[0.82rem]", count === 0 && !checked && "opacity-50")}>
-      <input type="checkbox" name={name} value={value} defaultChecked={checked} className="size-4 shrink-0 accent-[var(--color-blue)]" />
+    <label className={cn("flex cursor-pointer items-center gap-2.5 rounded-lg px-1 py-2 text-[0.86rem] hover:bg-field", sub && "ml-5 text-[0.82rem]", count === 0 && !checked && "opacity-50")}>
+      <input type="checkbox" name={name} value={value} defaultChecked={checked} className="size-5 shrink-0 accent-[var(--color-blue)]" />
       <span className="grow text-ink">{label}</span>
       <span className="text-[0.76rem] tabular-nums text-slate-light">({count})</span>
     </label>
@@ -96,7 +96,7 @@ function FilterForm({ basePath, query, facets, categoryLinks, autoApply, onAppli
                 <Link
                   href={c.href}
                   aria-current={c.active ? "page" : undefined}
-                  className={cn("flex justify-between rounded-lg px-1 py-1 text-[0.86rem] hover:bg-field", c.sub && "ml-4 text-[0.82rem]", c.active ? "font-bold text-blue" : "text-ink")}
+                  className={cn("flex justify-between rounded-lg px-1 py-2 text-[0.86rem] hover:bg-field", c.sub && "ml-4 text-[0.82rem]", c.active ? "font-bold text-blue" : "text-ink")}
                 >
                   {c.name}
                   <span className="text-[0.76rem] font-normal text-slate-light">({c.count})</span>
@@ -239,7 +239,7 @@ export function FilterDrawerButton(props: FilterPanelProps) {
               <h2 className="font-heading text-[1.02rem] font-bold text-ink">Filter Products</h2>
               <div className="flex items-center gap-3">
                 {props.activeCount > 0 && <ClearAll basePath={props.basePath} query={props.query} onDone={() => setOpen(false)} />}
-                <button ref={closeRef} type="button" onClick={() => setOpen(false)} aria-label="Close filters" className="grid size-9 place-items-center rounded-full hover:bg-field">
+                <button ref={closeRef} type="button" onClick={() => setOpen(false)} aria-label="Close filters" className="grid size-10 place-items-center rounded-full hover:bg-field">
                   <IconClose className="size-5" />
                 </button>
               </div>

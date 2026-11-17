@@ -74,7 +74,7 @@ export async function ShopHero({ query, now }: { query?: string; now: Date }) {
                 </span>
                 <span className="min-w-0">
                   <span className="block font-heading text-[0.82rem] font-bold leading-tight">{title}</span>
-                  <span className="block text-[0.72rem] leading-snug text-white/70">{text}</span>
+                  <span className="block text-[0.76rem] leading-snug text-white/70">{text}</span>
                 </span>
               </li>
             ))}

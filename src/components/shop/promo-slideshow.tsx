@@ -161,17 +161,17 @@ export function PromoSlideshow({ slides }: { slides: Campaign[] }) {
 
       {total > 1 && (
         <div className="relative mt-5 flex items-center justify-center gap-2 sm:mt-6">
-          <button type="button" onClick={() => go(index - 1)} aria-label="Previous offer" className="grid size-9 place-items-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20">
+          <button type="button" onClick={() => go(index - 1)} aria-label="Previous offer" className="grid size-10 place-items-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20">
             <IconChevronLeft className="size-4" />
           </button>
-          <div className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-1.5">
+          <div className="flex items-center gap-1 rounded-full bg-white/10 px-1.5">
             {slides.map((s, i) => (
-              <button key={s.id} type="button" onClick={() => go(i)} aria-label={`Show offer ${i + 1}: ${s.title}`} aria-current={i === index ? "true" : undefined} className="group grid h-6 place-items-center px-0.5">
+              <button key={s.id} type="button" onClick={() => go(i)} aria-label={`Show offer ${i + 1}: ${s.title}`} aria-current={i === index ? "true" : undefined} className="group grid h-10 place-items-center px-1.5">
                 <span className={cn("block h-1.5 -skew-x-[20deg] transition-all duration-300", i === index ? "w-6 bg-white" : "w-2.5 bg-white/45 group-hover:bg-white/75")} />
               </button>
             ))}
           </div>
-          <button type="button" onClick={() => go(index + 1)} aria-label="Next offer" className="grid size-9 place-items-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20">
+          <button type="button" onClick={() => go(index + 1)} aria-label="Next offer" className="grid size-10 place-items-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20">
             <IconChevronRight className="size-4" />
           </button>
           {!reducedMotion && (
@@ -179,7 +179,7 @@ export function PromoSlideshow({ slides }: { slides: Campaign[] }) {
               type="button"
               onClick={() => setPaused((p) => !p)}
               aria-label={paused ? "Play offers slideshow" : "Pause offers slideshow"}
-              className="grid size-9 place-items-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20"
+              className="grid size-10 place-items-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20"
             >
               {paused ? (
                 <svg viewBox="0 0 24 24" fill="currentColor" className="size-3.5">

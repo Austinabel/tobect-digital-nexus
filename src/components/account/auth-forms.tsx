@@ -44,7 +44,7 @@ export function LoginForm({ next }: { next: string }) {
       <label className="block">
         <span className="mb-1.5 flex items-baseline justify-between">
           <span className="text-[0.82rem] font-semibold text-ink">Password</span>
-          <Link href="/account/forgot-password" className="text-[0.8rem] font-semibold text-blue hover:underline">
+          <Link href="/account/forgot-password" className="-my-3 inline-block py-3 text-[0.8rem] font-semibold text-blue hover:underline">
             Forgot password?
           </Link>
         </span>

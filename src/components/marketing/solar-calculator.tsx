@@ -39,7 +39,7 @@ export function numberValue(n: number): number | "" {
 function ResultCell({ label, value, sub, highlight }: { label: string; value: string; sub?: string; highlight?: boolean }) {
   return (
     <div className={cn("p-3 sm:p-3.5", highlight ? "bg-blue text-white" : "bg-white")}>
-      <dt className={cn("font-heading text-[0.62rem] font-semibold uppercase tracking-[0.12em]", highlight ? "text-white/75" : "text-slate")}>
+      <dt className={cn("font-heading text-[0.7rem] font-semibold uppercase tracking-[0.12em]", highlight ? "text-white/75" : "text-slate")}>
         {label}
       </dt>
       <dd className={cn("mt-1 font-heading text-[1.02rem] font-bold leading-tight tabular-nums", highlight ? "text-white" : "text-ink")}>
@@ -61,21 +61,21 @@ export function LoadRow({
 }) {
   const id = `load-${line.key}`;
   return (
-    <li className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-2 border-b border-[#dfe8f5] py-2.5 last:border-none sm:grid-cols-[minmax(0,1fr)_96px_84px_64px_36px]">
+    <li className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-2 border-b border-[#dfe8f5] py-2.5 last:border-none sm:grid-cols-[minmax(0,1fr)_112px_84px_64px_40px]">
       <input
         aria-label="Appliance name"
         value={line.name}
         onChange={(e) => onChange({ name: e.target.value })}
-        className="min-w-0 truncate rounded-md bg-transparent px-1 py-1 text-[0.88rem] font-semibold text-ink outline-none hover:bg-white/70 focus:bg-white focus:ring-2 focus:ring-blue/20"
+        className="min-w-0 truncate rounded-md bg-transparent px-1 py-2 text-[0.88rem] font-semibold text-ink outline-none hover:bg-white/70 focus:bg-white focus:ring-2 focus:ring-blue/20"
       />
 
-      <div className="col-span-2 row-start-2 grid grid-cols-[96px_1fr_1fr] gap-2 sm:contents">
+      <div className="col-span-2 row-start-2 grid grid-cols-[128px_1fr_1fr] gap-2 sm:contents">
         <div className="flex h-10 items-center rounded-[10px] border border-[#cdddf1] bg-white">
           <button
             type="button"
             aria-label={`Fewer ${line.name}`}
             onClick={() => onChange({ quantity: Math.max(0, (Number.isFinite(line.quantity) ? line.quantity : 0) - 1) })}
-            className="grid h-full w-8 place-items-center text-slate hover:text-blue"
+            className="grid h-full w-10 shrink-0 place-items-center text-slate hover:text-blue"
           >
             <IconMinus className="size-3.5" />
           </button>
@@ -94,7 +94,7 @@ export function LoadRow({
             type="button"
             aria-label={`More ${line.name}`}
             onClick={() => onChange({ quantity: Math.min(999, (Number.isFinite(line.quantity) ? line.quantity : 0) + 1) })}
-            className="grid h-full w-8 place-items-center text-slate hover:text-blue"
+            className="grid h-full w-10 shrink-0 place-items-center text-slate hover:text-blue"
           >
             <IconPlus className="size-3.5" />
           </button>
@@ -135,7 +135,7 @@ export function LoadRow({
         type="button"
         aria-label={`Remove ${line.name}`}
         onClick={onRemove}
-        className="col-start-2 row-start-1 grid size-9 place-items-center rounded-[10px] text-slate transition-colors hover:bg-white hover:text-red sm:col-start-auto sm:row-start-auto"
+        className="col-start-2 row-start-1 grid size-10 place-items-center rounded-[10px] text-slate transition-colors hover:bg-white hover:text-red sm:col-start-auto sm:row-start-auto"
       >
         <IconTrash className="size-4" />
       </button>
@@ -274,7 +274,7 @@ export function SolarCalculator({ initialType = "home", className }: { initialTy
           <h4 className="font-heading text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-slate">
             Your appliances
           </h4>
-          <div aria-hidden className="hidden grid-cols-[96px_84px_64px_36px] gap-x-2 text-center text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-slate sm:grid">
+          <div aria-hidden className="hidden grid-cols-[112px_84px_64px_40px] gap-x-2 text-center text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-slate sm:grid">
             <span>Qty</span>
             <span>Watts</span>
             <span>Hrs/day</span>

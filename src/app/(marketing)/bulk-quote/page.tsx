@@ -31,12 +31,12 @@ export default async function BulkQuotePage() {
               <h2 className="font-heading text-[1.05rem] font-bold text-white">Talk to sales</h2>
               <ul className="mt-4 space-y-3.5 text-[0.9rem]">
                 <li>
-                  <a href={whatsappHref(`Hello ${SITE.shortName}, I'd like to discuss a bulk / commercial order.`)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-white">
+                  <a href={whatsappHref(`Hello ${SITE.shortName}, I'd like to discuss a bulk / commercial order.`)} target="_blank" rel="noopener noreferrer" className="-my-2.5 flex items-center gap-3 py-2.5 hover:text-white">
                     <IconWhatsApp className="size-4 text-whatsapp" /> WhatsApp Sales · {SITE.whatsapp}
                   </a>
                 </li>
                 <li>
-                  <a href={PHONE_HREF} className="flex items-center gap-3 hover:text-white">
+                  <a href={PHONE_HREF} className="-my-2.5 flex items-center gap-3 py-2.5 hover:text-white">
                     <IconPhone className="size-4 text-[#6f9bff]" /> {SITE.phone}
                   </a>
                 </li>

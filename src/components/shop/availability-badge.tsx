@@ -13,7 +13,7 @@ export function AvailabilityBadge({ availability, className }: { availability?: 
         : { label: "Confirm availability", dot: "bg-gold", text: "text-slate" };
 
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-[0.7rem] font-semibold", config.text, className)}>
+    <span className={cn("inline-flex items-center gap-1.5 text-[0.75rem] font-semibold", config.text, className)}>
       <span aria-hidden className={cn("size-1.5 rounded-full", config.dot)} />
       {config.label}
     </span>

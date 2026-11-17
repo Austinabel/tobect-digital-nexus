@@ -43,7 +43,7 @@ export function CatalogueToolbar({ basePath, query }: { basePath: string; query:
             }}
             aria-label={label}
             aria-pressed={query.view === mode}
-            className={cn("grid size-9 place-items-center rounded-[10px]", query.view === mode ? "bg-blue text-white" : "text-slate hover:text-blue")}
+            className={cn("grid size-10 place-items-center rounded-[10px]", query.view === mode ? "bg-blue text-white" : "text-slate hover:text-blue")}
           >
             <Icon className="size-[18px]" />
           </Link>

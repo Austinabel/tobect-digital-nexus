@@ -73,7 +73,7 @@ export default async function HomePage() {
           className={`relative z-[1] grid items-center gap-10 pb-28 pt-12 sm:pt-14 lg:min-h-[min(calc(100svh-72px),760px)] lg:grid-cols-[1fr_1.02fr] lg:gap-8 lg:pb-32 lg:pt-14 ${container}`}
         >
           <div className="max-w-[620px]">
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 font-heading text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-[#d6e4ff] sm:text-[0.74rem]">
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 font-heading text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#d6e4ff] sm:text-[0.78rem]">
               <span>Clean Energy</span>
               <span aria-hidden className="text-[#ff4d63]">
                 &bull;
@@ -131,7 +131,7 @@ export default async function HomePage() {
               </span>
               <span className="min-w-0">
                 <b className="block font-heading text-[0.84rem] font-semibold leading-tight text-ink sm:text-[0.95rem]">{title}</b>
-                <span className="mt-0.5 block text-[0.72rem] leading-snug text-slate sm:text-[0.8rem]">{desc}</span>
+                <span className="mt-0.5 block text-[0.78rem] leading-snug text-slate sm:text-[0.8rem]">{desc}</span>
               </span>
             </li>
           ))}

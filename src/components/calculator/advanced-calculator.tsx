@@ -159,7 +159,7 @@ function Panel({
 function Stat({ label, value, sub, tone = "white" }: { label: string; value: string; sub?: string; tone?: "white" | "blue" }) {
   return (
     <div className={cn("rounded-2xl px-3.5 py-3", tone === "blue" ? "bg-blue text-white" : "bg-white/[0.08] text-white ring-1 ring-white/10")}>
-      <dt className="font-heading text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-white/70">{label}</dt>
+      <dt className="font-heading text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-white/70">{label}</dt>
       <dd className="mt-1 font-heading text-[1.12rem] font-extrabold leading-tight tabular-nums">{value}</dd>
       {sub && <dd className="mt-0.5 text-[0.72rem] leading-snug text-white/70">{sub}</dd>}
     </div>
@@ -312,7 +312,7 @@ export function AdvancedCalculator({ initialType = "home", shared, signedIn }: {
               onChange={(t) => setInput((s) => ({ ...s, applicationType: t, loads: presetLines(t, appliances), simultaneity: APPLICATION_TYPES[t].simultaneity }))}
             />
             <div className="mt-4 rounded-2xl bg-field px-3 sm:px-4">
-              <div aria-hidden className="hidden grid-cols-[minmax(0,1fr)_96px_84px_64px_36px] gap-2 border-b border-[#dfe8f5] py-2 font-heading text-[0.64rem] font-semibold uppercase tracking-[0.1em] text-slate sm:grid">
+              <div aria-hidden className="hidden grid-cols-[minmax(0,1fr)_112px_84px_64px_40px] gap-2 border-b border-[#dfe8f5] py-2 font-heading text-[0.64rem] font-semibold uppercase tracking-[0.1em] text-slate sm:grid">
                 <span>Appliance</span>
                 <span className="text-center">Qty</span>
                 <span>Watts</span>
@@ -757,7 +757,7 @@ export function AdvancedCalculator({ initialType = "home", shared, signedIn }: {
                     ["After 5 years", savings.fiveYearNetNgn !== null ? `${savings.fiveYearNetNgn < 0 ? "−" : ""}${formatNaira(Math.abs(savings.fiveYearNetNgn))}` : "—"],
                   ].map(([k, v]) => (
                     <div key={k} className="rounded-2xl bg-mist p-3">
-                      <dt className="font-heading text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-slate">{k}</dt>
+                      <dt className="font-heading text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-slate">{k}</dt>
                       <dd className="mt-1 font-heading text-[1rem] font-extrabold tabular-nums text-ink">{v}</dd>
                     </div>
                   ))}
@@ -792,7 +792,7 @@ export function AdvancedCalculator({ initialType = "home", shared, signedIn }: {
               <Stat label="Daily solar" value={`${design.dailyGenerationKwh} kWh`} sub={`Covers ~${design.solarCoveragePct}% of use`} />
             </dl>
             <div className="mt-2.5 rounded-2xl bg-white/[0.08] p-3.5 ring-1 ring-white/10">
-              <p className="font-heading text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-white/70">Cost from our shop</p>
+              <p className="font-heading text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-white/70">Cost from our shop</p>
               <p className="mt-1 font-heading text-[1.12rem] font-extrabold tabular-nums">
                 {pricing.priced.length ? formatNaira(pricing.pricedSubtotalNgn) : "Quoted"}
                 {pricing.priced.length > 0 && <span className="ml-1.5 text-[0.74rem] font-semibold text-white/70">+ {pricing.unpriced.length} items quoted</span>}
@@ -854,7 +854,7 @@ export function AdvancedCalculator({ initialType = "home", shared, signedIn }: {
                     </form>
                   )
                 ) : (
-                  <Link href={`/account/login?next=${encodeURIComponent(`/solar-calculator?d=${code}`)}`} className="block text-center text-[0.84rem] font-semibold text-white hover:underline">
+                  <Link href={`/account/login?next=${encodeURIComponent(`/solar-calculator?d=${code}`)}`} className="block py-2.5 text-center text-[0.84rem] font-semibold text-white hover:underline">
                     Sign in to save this design to your account
                   </Link>
                 )}

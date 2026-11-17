@@ -26,7 +26,7 @@ function Price({ product, large }: { product: Product; large?: boolean }) {
 function SaleTag({ product }: { product: Product }) {
   if (!(product.compareAtPriceNgn && product.compareAtPriceNgn > product.priceNgn)) return null;
   const pct = Math.round((1 - product.priceNgn / product.compareAtPriceNgn) * 100);
-  return <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-red px-2 py-0.5 font-heading text-[0.68rem] font-bold text-white">-{pct}%</span>;
+  return <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-red px-2 py-0.5 font-heading text-[0.72rem] font-bold text-white">-{pct}%</span>;
 }
 
 export function ProductCard({ product, priority, layout = "grid" }: { product: Product; priority?: boolean; layout?: "grid" | "list" }) {
@@ -36,7 +36,7 @@ export function ProductCard({ product, priority, layout = "grid" }: { product: P
   const specs = product.specs.length > 0 && (
     <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Key specifications">
       {product.specs.map((spec) => (
-        <li key={spec} className="rounded-md bg-mist px-1.5 py-0.5 text-[0.68rem] font-semibold text-blue-deep">
+        <li key={spec} className="rounded-md bg-mist px-1.5 py-0.5 text-[0.72rem] font-semibold text-blue-deep">
           {spec}
         </li>
       ))}
@@ -51,7 +51,7 @@ export function ProductCard({ product, priority, layout = "grid" }: { product: P
           <ProductImage product={product} compact sizes="160px" />
         </Link>
         <div className="min-w-0">
-          <span className="font-heading text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-slate-light">{product.brand ?? " "}</span>
+          <span className="font-heading text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-light">{product.brand ?? " "}</span>
           <h3 className="mt-0.5 font-heading text-[1rem] font-semibold leading-snug text-ink">
             <Link href={href} className="hover:text-blue">
               {product.name}
@@ -89,7 +89,7 @@ export function ProductCard({ product, priority, layout = "grid" }: { product: P
       </Link>
 
       <div className="flex grow flex-col p-3.5 sm:p-4">
-        <span className="font-heading text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-slate-light">
+        <span className="font-heading text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-light">
           {product.brand ?? " "}
         </span>
         <h3 className="mt-1 font-heading text-[0.92rem] font-semibold leading-snug text-ink sm:text-[0.96rem]">

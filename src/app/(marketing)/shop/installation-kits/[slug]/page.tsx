@@ -195,7 +195,7 @@ export default async function KitPage(props: PageProps<"/shop/installation-kits/
                   Runtime depends on your appliances and usage. Use our calculator, or send us your appliance list and an engineer
                   will confirm the system fits.
                 </p>
-                <Link href="/solar-calculator" className="mt-2 inline-block text-[0.84rem] font-semibold text-blue hover:underline">
+                <Link href="/solar-calculator" className="mt-0.5 inline-block py-2.5 text-[0.84rem] font-semibold text-blue hover:underline">
                   Open the solar calculator →
                 </Link>
               </div>

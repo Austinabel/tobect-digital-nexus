@@ -25,7 +25,7 @@ export async function KitsSection({ showAllLink = true }: { showAllLink?: boolea
               </p>
             </div>
             {showAllLink && (
-              <Link href="/shop/installation-kits" className="inline-flex items-center gap-1.5 font-heading text-[0.86rem] font-bold text-red hover:underline">
+              <Link href="/shop/installation-kits" className="-my-3 inline-flex items-center gap-1.5 py-3 font-heading text-[0.86rem] font-bold text-red hover:underline">
                 View All Packages
                 <IconArrowRight className="size-4" />
               </Link>
