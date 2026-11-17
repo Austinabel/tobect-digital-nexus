@@ -319,3 +319,15 @@ html {
 body:has(#primary-nav-mobile, [aria-modal="true"]) .whatsapp-float {
   display: none;
 }
+
+/* Phones & tablets: shop pages carry an app-style bottom bar (or a buy /
+   checkout bar). Keep the page clear of it and drop the WhatsApp bubble,
+   whose job the bar already does. */
+@media (max-width: 1023.98px) {
+  body:has(.shop-tabbar, .shop-actionbar) .site-footer-inner {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+  }
+  body:has(.shop-tabbar, .shop-actionbar) .whatsapp-float {
+    display: none;
+  }
+}

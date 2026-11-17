@@ -110,18 +110,19 @@ export async function Catalogue({ query, basePath, lockedCategory, title = "Shop
   const filtered = hasActiveFilters(query);
 
   return (
-    <section id="catalogue" aria-labelledby="catalogue-title" className="scroll-mt-20 bg-white py-8 lg:py-10">
+    <section id="catalogue" aria-labelledby="catalogue-title" className="scroll-mt-20 bg-white py-5 lg:py-10">
       <CatalogueShell>
         <div className="mx-auto grid max-w-[1240px] gap-6 px-4 sm:px-6 lg:grid-cols-[250px_1fr] lg:px-9">
           <FilterSidebar {...panel} />
           <div className="min-w-0">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <span className="flex items-center gap-2 font-heading text-[0.7rem] font-bold uppercase tracking-[0.18em] text-red">
+                <span className={cn("items-center gap-2 font-heading text-[0.7rem] font-bold uppercase tracking-[0.18em] text-red", lockedCategory && !query.q ? "hidden lg:flex" : "flex")}>
                   <span aria-hidden className="h-0.5 w-6 rounded bg-red" />
                   {query.q ? "Search results" : lockedCategory ? CATEGORY_NAMES[lockedCategory] : "All Products"}
                 </span>
-                <h2 id="catalogue-title" className="mt-1 font-heading text-[clamp(1.4rem,2.6vw,1.9rem)] font-extrabold tracking-tight text-ink">
+                {/* on a category page the page heading already names it, so phones skip the repeat */}
+                <h2 id="catalogue-title" className={cn("mt-1 font-heading text-[clamp(1.4rem,2.6vw,1.9rem)] font-extrabold tracking-tight text-ink", lockedCategory && !query.q && "sr-only lg:not-sr-only")}>
                   {query.q ? <>Results for &ldquo;{query.q}&rdquo;</> : title}
                 </h2>
                 <p className="mt-0.5 text-[0.86rem] text-slate" aria-live="polite">

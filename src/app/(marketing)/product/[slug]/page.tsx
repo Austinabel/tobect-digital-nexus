@@ -78,6 +78,8 @@ export default async function ProductPage(props: PageProps<"/product/[slug]">) {
     }),
   };
 
+  const askHref = whatsappHref(`Hello ${SITE.shortName}, I'm interested in the ${product.name}. Is it available, and what is the current price?`);
+
   return (
     <>
       <JsonLd data={productJsonLd} />
@@ -114,7 +116,7 @@ export default async function ProductPage(props: PageProps<"/product/[slug]">) {
         </nav>
       </div>
 
-      <section className="bg-gradient-to-b from-white to-mist/60 py-8 lg:py-14">
+      <section className="bg-gradient-to-b from-white to-mist/60 py-5 lg:py-14">
         <div className="mx-auto grid max-w-[1240px] gap-8 px-4 sm:px-6 lg:grid-cols-[1fr_1fr] lg:gap-14 lg:px-9">
           <div className="group overflow-hidden rounded-3xl border border-hair bg-white lg:sticky lg:top-24 lg:self-start">
             <ProductImage product={product} priority sizes="(min-width: 1024px) 580px, 100vw" />
@@ -158,11 +160,11 @@ export default async function ProductPage(props: PageProps<"/product/[slug]">) {
             <CatalogueNotice className="mt-4" />
 
             <div className="mt-6">
-              <PurchasePanel slug={product.slug} name={product.name} disabled={soldOut} />
+              <PurchasePanel slug={product.slug} name={product.name} disabled={soldOut} askHref={askHref} />
             </div>
             <div className="mt-3 flex flex-col gap-2.5 sm:flex-row">
               <a
-                href={whatsappHref(`Hello ${SITE.shortName}, I'm interested in the ${product.name}. Is it available, and what is the current price?`)}
+                href={askHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-full border-2 border-[#bfe4cd] bg-white px-6 font-heading text-[0.9rem] font-semibold text-whatsapp transition-colors hover:border-whatsapp"

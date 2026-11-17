@@ -79,7 +79,7 @@ export async function SiteFooter() {
 
   return (
     <footer className="bg-[#0a1626] text-[#9fb0c4] print:hidden">
-      <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-14 sm:px-6 sm:pb-8 lg:px-9 lg:pt-20">
+      <div className="site-footer-inner mx-auto max-w-[1240px] px-4 pb-24 pt-14 sm:px-6 sm:pb-8 lg:px-9 lg:pt-20">
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr_1.3fr]">
           {/* 1. Company + 6. Social */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1">

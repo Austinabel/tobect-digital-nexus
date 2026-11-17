@@ -28,7 +28,7 @@ export async function KitCard({ kit: listed }: { kit: ShopKit }) {
   const availability = kitAvailability(kit, config, kitCatalogue);
 
   return (
-    <article className="group flex h-full w-[82vw] max-w-[300px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-hair bg-white shadow-[0_1px_2px_rgba(13,27,47,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_30px_60px_-30px_rgba(13,27,47,0.3)] sm:w-auto sm:max-w-none">
+    <article className="group flex h-full w-[76vw] max-w-[300px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-hair bg-white shadow-[0_1px_2px_rgba(13,27,47,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_30px_60px_-30px_rgba(13,27,47,0.3)] sm:w-auto sm:max-w-none">
       <Link href={href} tabIndex={-1} aria-hidden className="relative block aspect-[16/8] overflow-hidden bg-[linear-gradient(115deg,#0b1930_0%,#10306b_60%,#1556d9_130%)]">
         {kit.photo && <Image
           src={kit.photo}

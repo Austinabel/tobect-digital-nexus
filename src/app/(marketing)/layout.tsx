@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { WhatsAppFloat } from "@/components/marketing/whatsapp-float";
+import { ShopTabBar } from "@/components/shop/shop-tab-bar";
 import { CatalogProvider } from "@/components/catalog-provider";
 import { getCatalog } from "@/lib/catalog-server";
 import { SiteProvider } from "@/components/site-provider";
@@ -20,6 +21,7 @@ export default async function MarketingLayout({ children }: { children: ReactNod
       <main className="flex-1">{children}</main>
       <SiteFooter />
       <WhatsAppFloat />
+      <ShopTabBar />
     </AppliancesProvider>
     </CatalogProvider>
     </SiteProvider>

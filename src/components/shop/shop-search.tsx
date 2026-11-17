@@ -134,8 +134,8 @@ export function ShopSearch({ suggestions, defaultValue = "" }: { suggestions: Se
         )}
       </form>
 
-      <div className="mt-3.5 flex flex-wrap items-center gap-2 text-[0.8rem]">
-        <span className="font-semibold text-white/70">Popular:</span>
+      <div className="-mx-4 mt-3 flex items-center gap-2 overflow-x-auto px-4 text-[0.8rem] [scrollbar-width:none] sm:mx-0 sm:px-0 lg:mt-3.5 lg:flex-wrap [&::-webkit-scrollbar]:hidden">
+        <span className="shrink-0 font-semibold text-white/70">Popular:</span>
         {POPULAR.map((term) => (
           <button
             key={term}
@@ -144,7 +144,7 @@ export function ShopSearch({ suggestions, defaultValue = "" }: { suggestions: Se
               setValue(term);
               go(term);
             }}
-            className="inline-flex min-h-10 items-center rounded-full border border-white/25 bg-white/10 px-3.5 font-semibold text-white transition-colors hover:bg-white/20"
+            className="inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full border border-white/25 bg-white/10 px-3.5 font-semibold text-white transition-colors hover:bg-white/20"
           >
             {term}
           </button>

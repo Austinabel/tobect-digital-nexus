@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { useActionState, useCallback, useMemo, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart";
 import { formatNaira } from "@/lib/data/products";
@@ -12,7 +12,7 @@ import { describeKitConfig, normaliseKitConfig, priceKit } from "@/lib/shop/kits
 import { placeOrder } from "@/app/(marketing)/checkout/actions";
 import { fieldClass, labelClass } from "@/components/account/auth-forms";
 import { NIGERIAN_STATES } from "@/lib/nigeria";
-import { IconCard, IconCheck, IconInfo, IconUser } from "@/components/icons";
+import { IconCheck, IconInfo } from "@/components/icons";
 
 const noopSubscribe = () => () => {};
 
@@ -33,7 +33,6 @@ export function CheckoutForm({ signedIn, defaults, onlinePayment }: { signedIn: 
   const { lines } = useCart();
   const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
   const [state, action, pending] = useActionState(placeOrder, undefined);
-  const [guest, setGuest] = useState(signedIn);
 
   // Display-only summary; the server re-prices everything when the order is placed.
   const summary = useMemo(
@@ -65,38 +64,6 @@ export function CheckoutForm({ signedIn, defaults, onlinePayment }: { signedIn: 
         <Link href="/shop" className="mt-5 inline-flex h-12 items-center rounded-full bg-red px-7 font-heading text-[0.92rem] font-semibold text-white hover:bg-red-dark">
           Go to Shop
         </Link>
-      </div>
-    );
-  }
-
-  if (!guest) {
-    return (
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-3xl border border-hair bg-white p-6">
-          <span className="grid size-11 place-items-center rounded-xl bg-mist text-blue">
-            <IconUser className="size-5" />
-          </span>
-          <h2 className="mt-3 font-heading text-[1.15rem] font-bold text-ink">Have an account?</h2>
-          <p className="mt-1 text-[0.88rem] text-slate">Sign in to use your saved details and track this order.</p>
-          <div className="mt-5 grid gap-2.5">
-            <Link href="/account/login?next=/checkout" className="inline-flex h-12 items-center justify-center rounded-full bg-blue font-heading text-[0.92rem] font-semibold text-white hover:bg-blue-deep">
-              Sign In
-            </Link>
-            <Link href="/account/register?next=/checkout" className="inline-flex h-12 items-center justify-center rounded-full border-2 border-[#c9d8f2] font-heading text-[0.9rem] font-semibold text-blue hover:border-blue">
-              Create an Account
-            </Link>
-          </div>
-        </div>
-        <div className="rounded-3xl border border-hair bg-white p-6">
-          <span className="grid size-11 place-items-center rounded-xl bg-mist text-blue">
-            <IconCard className="size-5" />
-          </span>
-          <h2 className="mt-3 font-heading text-[1.15rem] font-bold text-ink">Checkout as a guest</h2>
-          <p className="mt-1 text-[0.88rem] text-slate">No account needed — just your contact and delivery details.</p>
-          <button type="button" onClick={() => setGuest(true)} className="mt-5 inline-flex h-12 w-full items-center justify-center rounded-full bg-red font-heading text-[0.92rem] font-semibold text-white hover:bg-red-dark">
-            Continue as Guest
-          </button>
-        </div>
       </div>
     );
   }
@@ -243,6 +210,24 @@ export function CheckoutForm({ signedIn, defaults, onlinePayment }: { signedIn: 
           &larr; Back to cart
         </Link>
       </aside>
+
+      {/* phones & tablets: total + Place Order fixed to the bottom of the screen */}
+      <div className="shop-actionbar fixed inset-x-0 bottom-0 z-[65] border-t border-hair bg-white/95 px-4 pb-[calc(0.6rem+env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_-16px_rgba(13,27,47,0.35)] backdrop-blur-md print:hidden lg:hidden">
+        <div className="mx-auto flex max-w-[640px] items-center gap-3">
+          <div className="min-w-0">
+            <span className="block text-[0.76rem] text-slate">Subtotal</span>
+            <span className="block font-heading text-[1.15rem] font-extrabold tabular-nums text-ink">{formatNaira(subtotal)}</span>
+          </div>
+          <button
+            type="submit"
+            disabled={pending}
+            className="ml-auto inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-red px-6 font-heading text-[0.95rem] font-semibold text-white shadow-[0_14px_26px_-14px_var(--color-red)] hover:bg-red-dark disabled:opacity-60"
+          >
+            <IconCheck className="size-[18px]" />
+            {pending ? "Placing order…" : "Place Order"}
+          </button>
+        </div>
+      </div>
     </form>
   );
 }

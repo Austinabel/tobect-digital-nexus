@@ -33,7 +33,7 @@ function doubledPath(start: number, curve: string) {
 
 export function HeroWave() {
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[60px] overflow-hidden sm:h-[80px] lg:h-[100px]">
+    <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-[80px] overflow-hidden lg:block lg:h-[100px]">
       {LAYERS.map((layer, i) => (
         <div
           key={i}

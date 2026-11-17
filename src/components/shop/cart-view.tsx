@@ -26,7 +26,7 @@ export function CartView() {
   const catalog = useCatalog();
   const kitCatalogue = useMemo(() => kitCatalogueFrom(catalog.products), [catalog]);
   const getProduct = useCallback((slug: string) => findProduct(catalog, slug), [catalog]);
-  const { lines, setQuantity, remove, clear } = useCart();
+  const { lines, count, setQuantity, remove, clear } = useCart();
   // The cart lives in localStorage, so render a neutral state until we're on the client.
   const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
   const [name, setName] = useState("");
@@ -294,6 +294,26 @@ export function CartView() {
         </p>
         <CatalogueNotice className="mt-3" />
       </aside>
+
+      {/* phones & tablets: total + checkout fixed to the bottom of the screen */}
+      <div className="shop-actionbar fixed inset-x-0 bottom-0 z-[65] border-t border-hair bg-white/95 px-4 pb-[calc(0.6rem+env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_-16px_rgba(13,27,47,0.35)] backdrop-blur-md print:hidden lg:hidden">
+        <div className="mx-auto flex max-w-[640px] items-center gap-3">
+          <div className="min-w-0">
+            <span className="block text-[0.76rem] text-slate">Subtotal · {count} {count === 1 ? "item" : "items"}</span>
+            <span className="block font-heading text-[1.15rem] font-extrabold tabular-nums text-ink">{formatNaira(subtotal)}</span>
+          </div>
+          {blocked ? (
+            <span className="ml-auto text-right text-[0.8rem] font-semibold text-red-dark">Fix the items above</span>
+          ) : (
+            <Link
+              href="/checkout"
+              className="ml-auto inline-flex h-12 shrink-0 items-center justify-center rounded-full bg-red px-7 font-heading text-[0.95rem] font-semibold text-white shadow-[0_14px_26px_-14px_var(--color-red)] hover:bg-red-dark"
+            >
+              Checkout
+            </Link>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

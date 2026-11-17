@@ -83,21 +83,22 @@ export function ProductCard({ product, priority, layout = "grid" }: { product: P
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-hair bg-white shadow-[0_1px_2px_rgba(13,27,47,0.04)] transition-all duration-200 hover:-translate-y-1 hover:border-[#c9d8f2] hover:shadow-[0_30px_60px_-30px_rgba(13,27,47,0.3)]">
       <SaleTag product={product} />
-      <WishlistButton slug={product.slug} name={product.name} className="absolute right-2.5 top-2.5 z-10" />
+      <WishlistButton slug={product.slug} name={product.name} className="absolute right-2.5 top-2.5 z-[3]" />
       <Link href={href} tabIndex={-1} aria-hidden className="block border-b border-hair">
         <ProductImage product={product} priority={priority} sizes="(min-width: 1280px) 220px, (min-width: 640px) 33vw, 50vw" />
       </Link>
 
-      <div className="flex grow flex-col p-3.5 sm:p-4">
+      <div className="flex grow flex-col p-3 sm:p-4">
         <span className="font-heading text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-light">
           {product.brand ?? " "}
         </span>
         <h3 className="mt-1 font-heading text-[0.92rem] font-semibold leading-snug text-ink sm:text-[0.96rem]">
-          <Link href={href} className="hover:text-blue focus-visible:text-blue">
+          {/* the whole card is the link (its ::after covers the card); buttons sit above it */}
+          <Link href={href} className="line-clamp-2 after:absolute after:inset-0 after:z-[1] after:content-[''] hover:text-blue focus-visible:text-blue sm:line-clamp-none">
             {product.name}
           </Link>
         </h3>
-        {product.model && <span className="mt-0.5 text-[0.72rem] text-slate">Model {product.model}</span>}
+        {product.model && <span className="mt-0.5 hidden text-[0.72rem] text-slate sm:block">Model {product.model}</span>}
         {specs}
 
         <div className="mt-auto pt-3">
@@ -105,10 +106,10 @@ export function ProductCard({ product, priority, layout = "grid" }: { product: P
             <Price product={product} />
             <AvailabilityBadge availability={product.availability} />
           </div>
-          <div className="mt-3 grid gap-2">
+          <div className="relative z-[2] mt-2.5 grid gap-2 sm:mt-3">
             <Link
               href={href}
-              className="inline-flex h-10 items-center justify-center rounded-[10px] border-[1.5px] border-[#c9d8f2] font-heading text-[0.82rem] font-semibold text-blue transition-colors hover:border-blue"
+              className="hidden h-10 items-center justify-center rounded-[10px] border-[1.5px] border-[#c9d8f2] font-heading text-[0.82rem] font-semibold text-blue transition-colors hover:border-blue sm:inline-flex"
             >
               View Details
             </Link>

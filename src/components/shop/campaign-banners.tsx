@@ -104,7 +104,7 @@ export async function CampaignBanners({ now }: { now: Date }) {
   if (!primary && !secondary && !tiles.length) return null;
 
   return (
-    <section aria-label="Offers and promotions" className="bg-white pt-6 lg:pt-8">
+    <section aria-label="Offers and promotions" className="hidden bg-white pt-8 lg:block">
       <div className="mx-auto max-w-[1240px] space-y-4 px-4 sm:px-6 lg:px-9">
         <div className="grid gap-4 lg:grid-cols-[1.45fr_1fr]">
           {primary && <Banner c={primary} size="large" glyphs={["panel", "generator", "battery"]} />}
@@ -135,7 +135,7 @@ export async function WideBanner({ now }: { now: Date }) {
   const linkProps = external ? { target: "_blank", rel: "noopener noreferrer" } : {};
 
   return (
-    <section aria-label="Promotion" className="bg-white py-6 lg:py-8">
+    <section aria-label="Promotion" className="hidden bg-white py-8 lg:block">
       <div className="mx-auto max-w-[1240px] px-4 sm:px-6 lg:px-9">
         {c.designedBanner && c.desktopImage ? (
           <Link href={href} {...linkProps} className="relative block aspect-[4/3] overflow-hidden rounded-3xl sm:aspect-[1240/300]">

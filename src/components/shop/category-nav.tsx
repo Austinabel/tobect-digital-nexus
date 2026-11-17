@@ -16,8 +16,8 @@ export async function CategoryNav({ active = "all" }: { active?: string }) {
   const ITEMS = navItems((await getCatalog()).categories.filter((c) => !c.parent));
   return (
     <nav aria-label="Shop categories" className="border-b border-hair bg-white">
-      <div className="mx-auto max-w-[1240px] px-4 py-4 sm:px-6 lg:px-9">
-        <ul className="-mx-4 flex snap-x gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:thin] sm:mx-0 sm:px-0 xl:grid xl:grid-cols-11 xl:overflow-visible">
+      <div className="mx-auto max-w-[1240px] px-4 py-3 sm:px-6 lg:px-9 lg:py-4">
+        <ul className="-mx-4 flex snap-x gap-1 overflow-x-auto px-3 [scrollbar-width:none] sm:mx-0 sm:px-0 lg:gap-2.5 lg:pb-1 xl:grid xl:grid-cols-11 xl:overflow-visible [&::-webkit-scrollbar]:hidden">
           {ITEMS.map((item) => {
             const on = item.slug === active;
             return (
@@ -26,13 +26,20 @@ export async function CategoryNav({ active = "all" }: { active?: string }) {
                   href={item.href}
                   aria-current={on ? "page" : undefined}
                   className={cn(
-                    "flex h-full w-[96px] flex-col items-center gap-2 rounded-2xl border px-2 py-3 text-center transition-all xl:w-auto",
+                    // phones: app-style round icons; desktop: bordered tiles
+                    "group flex h-full w-[74px] flex-col items-center gap-1.5 px-0.5 py-1 text-center transition-all lg:w-[96px] lg:gap-2 lg:rounded-2xl lg:border lg:px-2 lg:py-3 xl:w-auto",
                     on
-                      ? "border-blue/40 bg-mist text-blue shadow-[0_10px_24px_-16px_var(--color-blue)]"
-                      : "border-hair bg-white text-ink hover:-translate-y-0.5 hover:border-[#c9d8f2] hover:text-blue",
+                      ? "text-blue lg:border-blue/40 lg:bg-mist lg:shadow-[0_10px_24px_-16px_var(--color-blue)]"
+                      : "text-ink lg:border-hair lg:bg-white lg:hover:-translate-y-0.5 lg:hover:border-[#c9d8f2] lg:hover:text-blue",
                   )}
                 >
-                  <span aria-hidden className={cn("size-9 [&>svg]:size-full", on ? "text-blue" : "text-ink/80")}>
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "grid size-14 place-items-center rounded-full p-3.5 [&>svg]:size-full lg:size-9 lg:rounded-none lg:bg-transparent lg:p-0",
+                      on ? "bg-blue text-white lg:text-blue" : "bg-mist text-blue lg:text-ink/80",
+                    )}
+                  >
                     {categoryGlyphs[item.glyph]}
                   </span>
                   <span className="font-heading text-[0.78rem] font-semibold leading-tight">{item.name}</span>
