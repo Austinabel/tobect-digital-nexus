@@ -290,3 +290,26 @@ html {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Homepage brand strip: logos drift left → right in a seamless loop (two identical copies). */
+.brand-marquee-track {
+  animation: brand-marquee 50s linear infinite;
+}
+.brand-marquee:hover .brand-marquee-track,
+.brand-marquee:focus-within .brand-marquee-track {
+  animation-play-state: paused;
+}
+@keyframes brand-marquee {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-marquee-track {
+    animation: none !important;
+    transform: none;
+  }
+}
