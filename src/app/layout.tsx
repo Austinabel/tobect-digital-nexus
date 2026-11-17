@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Sora, Manrope, Caveat, Geist_Mono } from "next/font/google";
+import { getSite } from "@/lib/site-server";
 import "./globals.css";
 
 const heading = Sora({
@@ -25,13 +26,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Tobecat Technologies | Powering the Future with Renewable Energy",
-    template: "%s | Tobecat Technologies",
-  },
-  description:
-    "Tobecat Technologies Nigeria Limited supplies and installs solar panels, inverters, lithium batteries, solar generators, CCTV and security systems for homes and businesses across Nigeria.",
+/** Site-wide titles and descriptions come from Admin → Site settings. */
+export async function generateMetadata(): Promise<Metadata> {
+  const SITE = await getSite();
+  const title = `${SITE.name} | ${SITE.tagline}`;
+  return {
+    metadataBase: new URL(SITE.url),
+    title: { default: title, template: `%s | ${SITE.name}` },
+    description: SITE.description,
+    applicationName: SITE.name,
+    openGraph: { type: "website", locale: "en_NG", url: "/", siteName: SITE.name, title, description: SITE.description },
+    twitter: { card: "summary_large_image", title, description: SITE.description },
+    robots: { index: true, follow: true },
+    formatDetection: { telephone: false },
+  };
+}
+
+export const viewport: Viewport = {
+  themeColor: "#1556d9",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

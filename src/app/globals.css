@@ -56,18 +56,18 @@
   --radius-4xl: calc(var(--radius) * 2.5);
 
   /* Tobecat brand palette */
-  --color-ink: #0d1b2f;
+  --color-ink: #0b1930;
   --color-slate: #55647a;
   --color-slate-light: #8a97ab;
-  --color-blue: #1a56db;
+  --color-blue: #1556d9;
   --color-blue-deep: #0b3f9e;
   --color-blue-darkest: #072e77;
-  --color-red: #e1112b;
-  --color-red-dark: #b60d22;
+  --color-red: #f01436;
+  --color-red-dark: #c40f2b;
   --color-whatsapp: #23a455;
   --color-gold: #f5a623;
   --color-amber: #f6a723;
-  --color-mist: #eef4fd;
+  --color-mist: #eef5ff;
   --color-mist-2: #e4eefb;
   --color-hair: #dbe5f1;
   --color-field: #f4f8fd;
@@ -75,37 +75,37 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #0d1b2f;
+  --foreground: #0b1930;
   --card: #ffffff;
-  --card-foreground: #0d1b2f;
+  --card-foreground: #0b1930;
   --popover: #ffffff;
-  --popover-foreground: #0d1b2f;
-  --primary: #1a56db;
+  --popover-foreground: #0b1930;
+  --primary: #1556d9;
   --primary-foreground: #ffffff;
-  --secondary: #eef4fd;
-  --secondary-foreground: #0d1b2f;
+  --secondary: #eef5ff;
+  --secondary-foreground: #0b1930;
   --muted: #f4f8fd;
   --muted-foreground: #55647a;
   --accent: #e4eefb;
-  --accent-foreground: #0d1b2f;
-  --destructive: #e1112b;
+  --accent-foreground: #0b1930;
+  --destructive: #f01436;
   --border: #dbe5f1;
   --input: #dbe5f1;
-  --ring: #1a56db;
-  --chart-1: #1a56db;
+  --ring: #1556d9;
+  --chart-1: #1556d9;
   --chart-2: #0b3f9e;
-  --chart-3: #e1112b;
+  --chart-3: #f01436;
   --chart-4: #23a455;
   --chart-5: #f5a623;
   --radius: 1rem;
   --sidebar: #ffffff;
-  --sidebar-foreground: #0d1b2f;
-  --sidebar-primary: #1a56db;
+  --sidebar-foreground: #0b1930;
+  --sidebar-primary: #1556d9;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eef4fd;
-  --sidebar-accent-foreground: #0d1b2f;
+  --sidebar-accent: #eef5ff;
+  --sidebar-accent-foreground: #0b1930;
   --sidebar-border: #dbe5f1;
-  --sidebar-ring: #1a56db;
+  --sidebar-ring: #1556d9;
   color-scheme: light;
 }
 
@@ -132,40 +132,161 @@
     content: "";
     @apply h-[3px] w-[26px] rounded-full bg-red;
   }
+}
 
-  .animate-floaty {
-    animation: floaty 6s ease-in-out infinite;
-  }
-  .animate-floaty-delay {
-    animation: floaty 7.5s ease-in-out infinite 0.8s;
-  }
-  .animate-sun-spin {
-    animation: sun-spin 64s linear infinite;
-    transform-box: fill-box;
-    transform-origin: center;
+@layer utilities {
+  /* Gentle scroll-linked section reveal. Pure CSS: browsers without
+     scroll-driven animations simply show the section immediately. */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 28%;
+    }
   }
 }
 
-@keyframes floaty {
+@layer utilities {
+  .animate-flow-x {
+    animation: flow-x 1.8s linear infinite;
+  }
+  .animate-gauge {
+    animation: gauge-fill 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .animate-soc {
+    animation: soc-pulse 2.2s ease-in-out infinite;
+  }
+  .animate-float-soft {
+    animation: float-soft 7s ease-in-out infinite;
+  }
+  .animate-float-soft-delay {
+    animation: float-soft 8s ease-in-out infinite 1.2s;
+  }
+}
+
+@keyframes flow-x {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes gauge-fill {
+  from {
+    stroke-dasharray: 0 100;
+  }
+}
+
+@keyframes soc-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes float-soft {
   0%,
   100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-9px);
+    transform: translateY(-8px);
   }
 }
 
-@keyframes sun-spin {
-  to {
-    transform: rotate(360deg);
+/* Shop hero wave: the track holds two copies of a seamless wave, so moving
+   it by exactly half its width loops with no visible jump. */
+@keyframes wave-drift {
+  from {
+    transform: translate3d(0, 0, 0);
   }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes wave-swell {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(var(--wave-swell, 1));
+  }
+}
+
+.wave-track {
+  animation: wave-drift var(--wave-speed, 20s) linear infinite;
+  animation-direction: var(--wave-direction, normal);
+}
+
+.wave-swell {
+  transform-origin: bottom;
+  animation: wave-swell var(--wave-swell-speed, 6s) ease-in-out infinite alternate;
+}
+
+/* Slim scrollbar for dark panels (calculator results): transparent track,
+   soft white thumb that brightens on hover. Standard properties for
+   Chrome/Edge/Firefox; ::-webkit-scrollbar for Safari. */
+.results-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.18) transparent;
+  overscroll-behavior: contain;
+}
+.results-scroll:hover {
+  scrollbar-color: rgb(255 255 255 / 0.34) transparent;
+}
+.results-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.results-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: 20px;
+}
+.results-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.18);
+}
+.results-scroll:hover::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.34);
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-floaty,
-  .animate-floaty-delay,
-  .animate-sun-spin {
-    animation-duration: 0.001s;
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal,
+  .animate-flow-x,
+  .animate-gauge,
+  .animate-soc,
+  .animate-float-soft,
+  .animate-float-soft-delay,
+  .wave-track,
+  .wave-swell {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
   }
 }

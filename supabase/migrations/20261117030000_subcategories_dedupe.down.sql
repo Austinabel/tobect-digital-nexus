@@ -1,0 +1,12 @@
+drop index if exists public.media_assets_sha256_key;
+alter table public.media_assets drop column if exists sha256;
+drop index if exists public.products_brand_model_key;
+drop index if exists public.products_barcode_key;
+drop index if exists public.products_sku_key;
+alter table public.products drop column if exists barcode;
+alter table public.products drop column if exists sku;
+drop trigger if exists categories_one_level on public.categories;
+drop function if exists public.categories_one_level();
+drop index if exists public.categories_parent_idx;
+alter table public.categories drop constraint if exists categories_parent_not_self;
+alter table public.categories drop column if exists parent_slug;

@@ -4,14 +4,18 @@ export interface Category {
   slug: string;
   name: string;
   glyph: CategoryGlyphKey;
+  /** real category/product photo URL — leave undefined until one exists (the glyph is shown instead) */
+  image?: string;
+  /** set on a subcategory: the slug of its parent category */
+  parent?: string;
 }
 
 /**
- * Placeholder catalogue data for early UI work. Replace with a
- * Supabase query (`categories` table) once the database is wired up —
- * the shape here is deliberately close to what that table will hold.
+ * STARTER CATEGORIES — what a fresh install starts with (also in
+ * supabase/seed.sql). The live site reads categories from the database
+ * (see src/lib/catalog.ts) and they're managed in the admin.
  */
-export const CATEGORIES: Category[] = [
+export const STARTER_CATEGORIES: Category[] = [
   { slug: "solar-panels", name: "Solar Panels", glyph: "panel" },
   { slug: "inverters", name: "Inverters", glyph: "inverter" },
   { slug: "lithium-batteries", name: "Lithium Batteries", glyph: "battery" },

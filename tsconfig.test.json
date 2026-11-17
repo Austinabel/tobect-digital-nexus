@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ],
+    "outDir": ".test-build",
+    "rootDir": "src",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ]
+  },
+  "include": [
+    "src/lib/calculator.ts",
+    "src/lib/calculator.test.ts",
+    "src/lib/solar-design.ts",
+    "src/lib/solar-design.test.ts",
+    "src/lib/design-pricing.ts",
+    "src/lib/design-pdf.ts",
+    "src/lib/design-extras.test.ts",
+    "src/lib/shop/*.ts",
+    "src/lib/design-share.ts",
+    "src/lib/admin/image-file.ts",
+    "src/lib/admin/image-file.test.ts",
+    "src/lib/admin/product-form.ts",
+    "src/lib/admin/product-form.test.ts",
+    "src/lib/admin/campaign-form.ts",
+    "src/lib/admin/campaign-form.test.ts",
+    "src/lib/admin/kit-form.ts",
+    "src/lib/admin/kit-form.test.ts",
+    "src/lib/content.ts",
+    "src/lib/content.test.ts",
+    "src/lib/site.ts",
+    "src/lib/admin/reports.ts",
+    "src/lib/admin/reports.test.ts",
+    "src/lib/admin/product-dedupe.ts",
+    "src/lib/admin/product-dedupe.test.ts",
+    "src/lib/admin/url-safety.ts",
+    "src/lib/admin/url-safety.test.ts",
+    "src/lib/admin/product-import.ts",
+    "src/lib/admin/product-import.test.ts"
+  ]
+}

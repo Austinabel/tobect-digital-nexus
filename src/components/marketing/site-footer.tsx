@@ -1,4 +1,8 @@
+import { getAbout, getPolicy } from "@/lib/content-server";
+import Image from "next/image";
 import Link from "next/link";
+import { getCatalog } from "@/lib/catalog-server";
+import { getSiteLinks } from "@/lib/site-server";
 import {
   IconBolt,
   IconFacebook,
@@ -10,6 +14,7 @@ import {
   IconMail,
   IconMapPin,
   IconClock,
+  IconBuilding,
 } from "@/components/icons";
 
 const QUICK_LINKS = [
@@ -19,43 +24,31 @@ const QUICK_LINKS = [
   { label: "Installation", href: "/installation" },
   { label: "Projects", href: "/projects" },
   { label: "About Us", href: "/about" },
-  { label: "Contact", href: "/contact" },
-];
-
-const SHOP_LINKS = [
-  { label: "Solar Panels", href: "/shop/solar-panels" },
-  { label: "Inverters", href: "/shop/inverters" },
-  { label: "Batteries", href: "/shop/lithium-batteries" },
-  { label: "Generators", href: "/shop/solar-generators" },
-  { label: "CCTV & Security", href: "/shop/cctv-security" },
-  { label: "Solar Lights", href: "/shop/solar-lights" },
-  { label: "Accessories", href: "/shop/accessories" },
+  { label: "Request a Quote", href: "/quote" },
 ];
 
 const SUPPORT_LINKS = [
-  { label: "FAQs", href: "/support#faqs" },
-  { label: "Warranty", href: "/warranty" },
+  { label: "FAQs", href: "/faq" },
   { label: "Product Support", href: "/support#product" },
   { label: "Installation Support", href: "/support#installation" },
   { label: "Contact Us", href: "/contact" },
 ];
 
-const SOCIALS = [
-  { label: "Facebook", href: "#", Icon: IconFacebook },
-  { label: "Instagram", href: "#", Icon: IconInstagram },
-  { label: "YouTube", href: "#", Icon: IconYoutube },
-  { label: "WhatsApp", href: "https://wa.me/2348037946366", Icon: IconWhatsApp },
-  { label: "LinkedIn", href: "#", Icon: IconLinkedin },
-];
+const SOCIAL_ICONS = {
+  Facebook: IconFacebook,
+  Instagram: IconInstagram,
+  YouTube: IconYoutube,
+  LinkedIn: IconLinkedin,
+} as const;
 
 function FooterColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
   return (
     <div>
-      <h4 className="mb-3.5 font-heading text-[0.8rem] font-semibold tracking-wide text-white">{title}</h4>
+      <h2 className="mb-4 font-heading text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-white">{title}</h2>
       <ul className="flex flex-col gap-2.5">
         {links.map((link) => (
           <li key={link.label}>
-            <Link href={link.href} className="text-[0.86rem] text-[#9fb0c4] transition-colors hover:text-white">
+            <Link href={link.href} className="text-[0.88rem] text-[#9fb0c4] transition-colors hover:text-white">
               {link.label}
             </Link>
           </li>
@@ -65,74 +58,135 @@ function FooterColumn({ title, links }: { title: string; links: { label: string;
   );
 }
 
-export function SiteFooter() {
+const iconLink =
+  "grid size-9.5 place-items-center rounded-[10px] border border-[#24384c] text-[#9fb0c4] transition-colors hover:border-white hover:text-white";
+
+export async function SiteFooter() {
+  const { SITE, PHONE_HREF, EMAIL_HREF, whatsappHref } = await getSiteLinks();
+  const [COMPANY, returns, delivery] = await Promise.all([getAbout(), getPolicy("returns"), getPolicy("delivery")]);
+  // policy pages are listed only once they have text (an empty policy page is not published)
+  const policyLinks = [
+    { label: "Terms of Service", href: "/terms" },
+    ...(returns.body.trim() ? [{ label: "Refund & Returns Policy", href: "/returns" }] : []),
+    ...(delivery.body.trim() ? [{ label: "Delivery Policy", href: "/delivery" }] : []),
+    { label: "Warranty", href: "/warranty" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "FAQs", href: "/faq" },
+  ];
+  const supportLinks = SUPPORT_LINKS;
+  const CATEGORIES = (await getCatalog()).categories.filter((c) => !c.parent);
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="bg-[#0a1626] text-[#9fb0c4]">
-      <div className="mx-auto max-w-[1240px] px-4 pb-7 pt-12 sm:px-6 lg:px-9 lg:pt-20">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr]">
-          <div>
+    <footer className="bg-[#0a1626] text-[#9fb0c4] print:hidden">
+      <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-14 sm:px-6 sm:pb-8 lg:px-9 lg:pt-20">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr_1.3fr]">
+          {/* 1. Company + 6. Social */}
+          <div className="col-span-2 md:col-span-4 lg:col-span-1">
+            {SITE.brand.logoFooterUrl ? (
+              <Link href="/" aria-label={`${SITE.name} — home`} className="inline-block rounded-2xl bg-white px-4 py-3">
+                <Image src={SITE.brand.logoFooterUrl} alt="" width={1400} height={379} sizes="240px" className="h-auto w-[220px] sm:w-[240px]" />
+              </Link>
+            ) : (
             <div className="flex items-center gap-2.5">
-              <span className="grid size-9.5 place-items-center rounded-[11px] bg-gradient-to-br from-[#2f6bff] to-blue-deep text-white">
-                <IconBolt className="size-[18px]" />
-              </span>
+              {SITE.brand.logoUrl ? (
+                <Image src={SITE.brand.logoUrl} alt="" width={38} height={38} className="size-9.5 rounded-[11px] bg-white object-contain p-0.5" />
+              ) : (
+                <span className="grid size-9.5 place-items-center rounded-[11px] bg-gradient-to-br from-[#2f6bff] to-blue-deep text-white">
+                  <IconBolt className="size-[18px]" />
+                </span>
+              )}
               <span className="font-heading text-[1.2rem] font-extrabold leading-none tracking-tight text-white">
-                TOBECAT
-                <small className="mt-[2px] block font-body text-[0.5rem] font-semibold tracking-[0.18em] text-[#6a7d92]">
-                  TECHNOLOGIES NIG LTD
-                </small>
+                {SITE.brand.wordmark}
+                {SITE.brand.wordmarkSub && (
+                  <small className="mt-[2px] block font-body text-[0.5rem] font-semibold tracking-[0.18em] text-[#6a7d92]">{SITE.brand.wordmarkSub}</small>
+                )}
               </span>
             </div>
-            <p className="mt-3.5 max-w-[32ch] text-[0.86rem]">Powering the future with renewable energy.</p>
-            <div className="mt-4 flex gap-2.5">
-              {SOCIALS.map(({ label, href, Icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="grid size-8.5 place-items-center rounded-[9px] border border-[#24384c] text-[#9fb0c4] transition-colors hover:border-white hover:text-white"
-                >
-                  <Icon className="size-[15px]" />
-                </a>
-              ))}
+            )}
+            <p className="mt-4 max-w-[34ch] text-[0.88rem] leading-relaxed">
+              {SITE.legalName}
+              {SITE.footerBlurb && ` — ${SITE.footerBlurb}`}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2.5" aria-label="Contact and social channels">
+              <a href={whatsappHref()} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className={iconLink}>
+                <IconWhatsApp className="size-4" />
+              </a>
+              <a href={EMAIL_HREF} aria-label="Email" className={iconLink}>
+                <IconMail className="size-4" />
+              </a>
+              {SITE.social.map(({ label, href }) => {
+                const Icon = SOCIAL_ICONS[label];
+                return (
+                  <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className={iconLink}>
+                    <Icon className="size-4" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
           <FooterColumn title="Quick Links" links={QUICK_LINKS} />
-          <FooterColumn title="Shop by Category" links={SHOP_LINKS} />
-          <FooterColumn title="Support" links={SUPPORT_LINKS} />
+          <FooterColumn
+            title="Shop by Category"
+            links={CATEGORIES.slice(0, 7).map((c) => ({ label: c.name, href: `/shop/${c.slug}` }))}
+          />
+          <FooterColumn title="Customer Support" links={supportLinks} />
+          <FooterColumn title="Policies" links={policyLinks} />
 
-          <div>
-            <h4 className="mb-3.5 font-heading text-[0.8rem] font-semibold tracking-wide text-white">Get in Touch</h4>
-            <div className="flex flex-col gap-3 text-[0.84rem] leading-snug">
-              <div className="flex items-start gap-2.5">
-                <IconPhone className="mt-0.5 size-[15px] shrink-0 text-blue" />
-                <span>08037946366 (Call/WhatsApp)</span>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <IconMail className="mt-0.5 size-[15px] shrink-0 text-blue" />
-                <span>Tobecattech@gmail.com</span>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <IconMapPin className="mt-0.5 size-[15px] shrink-0 text-blue" />
-                <span>
-                  Lagos warehouse,
+          {/* 5. Get in touch */}
+          <div className="col-span-2 md:col-span-4 lg:col-span-1">
+            <h2 className="mb-4 font-heading text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-white">
+              Get in Touch
+            </h2>
+            <ul className="grid gap-3.5 text-[0.88rem] leading-snug sm:grid-cols-2 lg:grid-cols-1">
+              <li className="flex items-start gap-2.5">
+                <IconPhone className="mt-0.5 size-4 shrink-0 text-[#6f9bff]" />
+                <a href={PHONE_HREF} className="hover:text-white">
+                  {SITE.phone}
+                  <span className="block text-[0.76rem] text-[#6a7d92]">Call</span>
+                </a>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <IconWhatsApp className="mt-0.5 size-4 shrink-0 text-whatsapp" />
+                <a href={whatsappHref()} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                  {SITE.whatsapp}
+                  <span className="block text-[0.76rem] text-[#6a7d92]">WhatsApp</span>
+                </a>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <IconMail className="mt-0.5 size-4 shrink-0 text-[#6f9bff]" />
+                <a href={EMAIL_HREF} className="break-all hover:text-white">
+                  {SITE.email}
+                </a>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <IconMapPin className="mt-0.5 size-4 shrink-0 text-[#6f9bff]" />
+                <address className="not-italic">
+                  {SITE.address.street},
                   <br />
-                  Alaba international market
-                </span>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <IconClock className="mt-0.5 size-[15px] shrink-0 text-blue" />
-                <span>Mon &ndash; Sat: 8AM &ndash; 6PM</span>
-              </div>
-            </div>
+                  {SITE.address.city}, {SITE.address.country}
+                </address>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <IconBuilding className="mt-0.5 size-4 shrink-0 text-[#6f9bff]" />
+                <span>Branches: {SITE.branches.join(" & ")}</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <IconClock className="mt-0.5 size-4 shrink-0 text-[#6f9bff]" />
+                <span>{SITE.hours}</span>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-[#1c2c3d] pt-5 text-[0.8rem] text-[#6a7d92]">
-          <span>&copy; 2025 Tobecat Technologies Nig Ltd. All rights reserved.</span>
-          <nav className="flex gap-5">
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-[#1c2c3d] pt-6 text-[0.8rem] text-[#6a7d92]">
+          <span>
+            &copy; {year} {SITE.legalName}{COMPANY.cacNumber ? ` · CAC Reg. No. ${COMPANY.cacNumber}` : ""}. All rights reserved.
+          </span>
+          <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-2">
             <Link href="/terms" className="hover:text-white">
-              Terms &amp; Conditions
+              Terms of Service
             </Link>
             <Link href="/privacy" className="hover:text-white">
               Privacy Policy
