@@ -3,6 +3,10 @@ import Link from "next/link";
 import { SiteButton } from "@/components/marketing/site-button";
 import { HeroSlideshow } from "@/components/marketing/hero-slideshow";
 import { HeroEquipment } from "@/components/marketing/hero-equipment";
+import { PromoSlideshow } from "@/components/shop/promo-slideshow";
+import { MobileBannerSlider } from "@/components/shop/mobile-banner-slider";
+import { campaignsFor } from "@/lib/merch-server";
+import { safeCampaignHref } from "@/lib/shop/campaigns";
 import { CategoryGrid } from "@/components/marketing/category-grid";
 import { ProductGrid } from "@/components/marketing/product-grid";
 import { SolarCalculator } from "@/components/marketing/solar-calculator";
@@ -58,12 +62,22 @@ const WHY_FEATURES = [
 
 const container = "mx-auto max-w-[1240px] px-4 sm:px-6 lg:px-9";
 
+/** Re-check banners every few minutes, so scheduled offers start and end on time without anyone editing the site. */
+export const revalidate = 300;
+
 export default async function HomePage() {
   const { SITE, whatsappHref } = await getSiteLinks();
-  const heroSlides = await getHomeSlides();
+  const [heroSlides, offers] = await Promise.all([getHomeSlides(), campaignsFor("shop-hero", new Date(), 6)]);
+  // the same offers slideshow as the shop header; links are sanitised on the server
+  const offerSlides = offers.map((s) => ({ ...s, ctaHref: safeCampaignHref(s.ctaHref) ?? "/shop" }));
   return (
     <>
       <JsonLd data={organizationJsonLd(SITE)} />
+
+      {/* phones: the offers slider first thing on the page (computers see it in the hero) */}
+      <div className="pb-3 lg:hidden">
+        <MobileBannerSlider slides={offerSlides} />
+      </div>
 
       {/* ===================== HERO: solar-farm slideshow background + equipment showcase ===================== */}
       <section className="relative isolate overflow-hidden bg-blue-darkest text-white">
@@ -114,7 +128,12 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <HeroEquipment className="lg:max-w-[580px] lg:justify-self-end" />
+          {offerSlides.length ? (
+            <div className="hidden w-full lg:block lg:max-w-[600px] lg:justify-self-end">
+              <PromoSlideshow slides={offerSlides} />
+            </div>
+          ) : null}
+          <HeroEquipment className={offerSlides.length ? "lg:hidden" : "lg:max-w-[580px] lg:justify-self-end"} />
         </div>
       </section>
 

@@ -6,7 +6,7 @@
 import { safeCampaignHref, type CampaignPosition } from "../shop/campaigns";
 
 export const POSITIONS: { value: CampaignPosition; label: string; hint: string }[] = [
-  { value: "shop-hero", label: "Shop hero slideshow", hint: "Slanted slideshow at the top of the shop. Image 1600×1000; keep text in the middle 75%." },
+  { value: "shop-hero", label: "Hero slideshow (homepage & shop)", hint: "Slanted slideshow at the top of the homepage and the shop. Image 1600×1000; keep text in the middle 75%." },
   { value: "shop-primary", label: "Shop banner — large", hint: "Large banner under the shop header. Image about 1200×560." },
   { value: "shop-secondary", label: "Shop banner — side", hint: "Smaller banner beside the large one. Image about 1200×560." },
   { value: "shop-tile", label: "Shop tile (up to 3)", hint: "Row of up to three tiles under the banners. Image about 1200×560." },
