@@ -21,7 +21,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ["/solar-calculator", 0.9],
     ["/bulk-quote", 0.7],
     ["/installation", 0.7],
-    ["/projects", 0.6],
     ["/about", 0.6],
     ["/support", 0.6],
     ["/contact", 0.6],

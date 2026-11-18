@@ -137,9 +137,9 @@ export const CONTENT_SCHEMAS: Record<ContentKey, ContentSchema> = {
   projects: {
     key: "projects",
     title: "Projects",
-    path: "/projects",
+    path: "/",
     group: "Company",
-    intro: "Installations you've completed. Shown on the homepage and the Projects page; both stay hidden while the list is empty. Real projects and photos only.",
+    intro: "Installations you've completed. Shown on the homepage once you add one (the Projects page is switched off for now). Real projects and photos only.",
     fields: [
       {
         key: "items",

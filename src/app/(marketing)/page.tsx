@@ -20,6 +20,7 @@ import { Testimonials } from "@/components/marketing/testimonials";
 import { CatalogueNotice } from "@/components/shop/catalogue-notice";
 import { JsonLd, organizationJsonLd } from "@/components/json-ld";
 import { getHomeSlides } from "@/lib/merch-server";
+import { getProjects } from "@/lib/content-server";
 import { SOLUTIONS } from "@/lib/data/solutions";
 import { SOLUTION_ICONS } from "@/components/marketing/solution-icons";
 import { getSite, getSiteLinks } from "@/lib/site-server";
@@ -67,7 +68,7 @@ export const revalidate = 300;
 
 export default async function HomePage() {
   const { SITE, whatsappHref } = await getSiteLinks();
-  const [heroSlides, offers] = await Promise.all([getHomeSlides(), campaignsFor("shop-hero", new Date(), 6)]);
+  const [heroSlides, offers, projects] = await Promise.all([getHomeSlides(), campaignsFor("shop-hero", new Date(), 6), getProjects()]);
   // the same offers slideshow as the shop header; links are sanitised on the server
   const offerSlides = offers.map((s) => ({ ...s, ctaHref: safeCampaignHref(s.ctaHref) ?? "/shop" }));
   return (
@@ -283,18 +284,19 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ===================== PROJECTS ===================== */}
+      {/* ===================== PROJECTS (only once real projects are added; the Projects page is off for now) ===================== */}
+      {projects.length > 0 && (
       <section className="reveal bg-white py-14 sm:py-18 lg:py-22" aria-labelledby="projects-heading">
         <div className={container}>
           <SectionHeading
             kicker="Our Installation Projects"
             title={<span id="projects-heading">Recent Installation Projects</span>}
             intro="Real projects. Reliable solutions. Proven results."
-            link={{ href: "/projects", label: "View All Projects" }}
           />
           <ProjectShowcase />
         </div>
       </section>
+      )}
 
       {/* ===================== TESTIMONIALS (only with genuine reviews) ===================== */}
       <Testimonials />

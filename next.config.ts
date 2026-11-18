@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/products", destination: "/shop", permanent: true },
       { source: "/services", destination: "/solutions", permanent: true },
-      { source: "/portfolio", destination: "/projects", permanent: true },
+      { source: "/portfolio", destination: "/", permanent: true },
       { source: "/get-quote", destination: "/quote", permanent: true },
       { source: "/privacy-policy", destination: "/privacy", permanent: true },
       { source: "/cookies", destination: "/privacy", permanent: true },

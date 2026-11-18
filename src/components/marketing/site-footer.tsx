@@ -22,7 +22,6 @@ const QUICK_LINKS = [
   { label: "Shop", href: "/shop" },
   { label: "Solar Solutions", href: "/solutions" },
   { label: "Installation", href: "/installation" },
-  { label: "Projects", href: "/projects" },
   { label: "About Us", href: "/about" },
   { label: "Request a Quote", href: "/quote" },
 ];
