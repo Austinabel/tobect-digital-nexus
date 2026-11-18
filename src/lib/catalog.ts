@@ -51,3 +51,4 @@ export function searchCatalog(c: Catalog, query: string): Product[] {
 
 /** The shop category for complete solar setups; its page also shows the solar kits (the old /shop/installation-kits). */
 export const SETUPS_CATEGORY = "complete-solar-setups";
+

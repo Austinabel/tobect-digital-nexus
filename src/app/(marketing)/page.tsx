@@ -257,8 +257,8 @@ export default async function HomePage() {
         <div className={container}>
           <SectionHeading
             kicker="Featured Products"
-            title="Best Selling Products"
-            intro="Hand-picked inverters, batteries, panels and security kits from our catalogue."
+            title="Today's Top Picks"
+            intro="A fresh selection of inverters, batteries, panels and more from our catalogue — new picks every day."
             link={{ href: "/shop", label: "View All Products" }}
           />
           <ProductGrid layout="row" />
