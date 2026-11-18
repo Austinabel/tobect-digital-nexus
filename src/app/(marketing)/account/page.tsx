@@ -69,7 +69,9 @@ export default async function AccountPage(props: PageProps<"/account">) {
                   return (
                     <li key={o.id} className="flex flex-wrap items-center justify-between gap-3 py-4">
                       <div className="min-w-0">
-                        <p className="font-heading font-bold text-ink">{o.order_number}</p>
+                        <Link href={`/account/orders/${o.id}`} className="font-heading font-bold text-blue hover:underline">
+                          {o.order_number} — view details →
+                        </Link>
                         <p className="text-[0.8rem] text-slate">
                           {new Date(o.created_at).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })} ·{" "}
                           {(o.order_items as { name: string; quantity: number }[]).map((i) => `${i.quantity} × ${i.name}`).join(", ")}
