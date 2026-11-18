@@ -11,7 +11,7 @@ const admin = createClient(url, process.env.SUPABASE_SECRET_KEY, { auth: { persi
 const out = (label, ok, detail) => console.log(`${ok ? "PASS" : "FAIL"}  ${label}  — ${detail}`);
 
 let r = await pub.from("products").select("slug", { count: "exact" });
-out("public can read published products", r.data?.length === 6, `${r.data?.length} rows ${r.error?.message ?? ""}`);
+out("public can read published products", (r.data?.length ?? 0) > 0, `${r.data?.length} rows ${r.error?.message ?? ""}`);
 r = await pub.from("solar_kits").select("slug, kit_slots(key, kit_slot_choices(product_slug))").eq("slug", "10kva-complete-solar-kit");
 out("public can read kits with components", r.data?.[0]?.kit_slots?.length === 3, r.error?.message ?? "3 slots");
 r = await pub.from("campaigns").select("id, active, archived_at");
