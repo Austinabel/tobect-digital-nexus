@@ -44,6 +44,8 @@
     "src/lib/admin/url-safety.ts",
     "src/lib/admin/url-safety.test.ts",
     "src/lib/admin/product-import.ts",
-    "src/lib/admin/product-import.test.ts"
+    "src/lib/admin/product-import.test.ts",
+    "src/lib/admin/jiji-import.ts",
+    "src/lib/admin/jiji-import.test.ts"
   ]
 }

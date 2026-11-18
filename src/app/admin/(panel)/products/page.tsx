@@ -68,6 +68,9 @@ export default async function ProductsAdminPage(props: PageProps<"/admin/product
         intro="Everything in the shop. Changes appear on the website as soon as you save."
         actions={
           <div className="flex flex-wrap gap-2">
+            <Link href="/admin/products/import/jiji" className={`${ghostButtonClass} h-10`}>
+              Import from Jiji
+            </Link>
             <Link href="/admin/products/import" className={`${ghostButtonClass} h-10`}>
               Bulk import (Excel / CSV)
             </Link>
