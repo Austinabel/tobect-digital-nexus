@@ -21,7 +21,7 @@ const tab = "flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 pt
 
 /** Bottom sheet listing every shop category (top level, then subcategories). */
 function CategorySheet({ onClose }: { onClose: () => void }) {
-  const { categories, kits } = useCatalog();
+  const { categories } = useCatalog();
   const closeRef = useRef<HTMLButtonElement>(null);
   const top = categories.filter((c) => !c.parent);
 
@@ -40,7 +40,6 @@ function CategorySheet({ onClose }: { onClose: () => void }) {
   const items = [
     { href: "/shop", name: "All Products", glyph: "all" as const },
     ...top.map((c) => ({ href: `/shop/${c.slug}`, name: c.name, glyph: c.glyph })),
-    ...(kits.length ? [{ href: "/shop/installation-kits", name: "Installation Kits", glyph: "kit" as const }] : []),
   ];
 
   return (

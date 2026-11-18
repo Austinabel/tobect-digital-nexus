@@ -8,7 +8,6 @@ type NavItem = { slug: string; name: string; glyph: CategoryGlyphKey; href: stri
 const navItems = (CATEGORIES: { slug: string; name: string; glyph: CategoryGlyphKey }[]): NavItem[] => [
   { slug: "all", name: "All Products", glyph: "all", href: "/shop" },
   ...CATEGORIES.map((c) => ({ slug: c.slug, name: c.name, glyph: c.glyph, href: `/shop/${c.slug}` })),
-  { slug: "installation-kits", name: "Installation Kits", glyph: "kit", href: "/shop/installation-kits" },
 ];
 
 /** Icon tiles for every shop category. Scrolls sideways on small screens. */

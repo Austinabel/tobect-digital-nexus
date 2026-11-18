@@ -5,6 +5,7 @@ import {
   classifyJijiLink,
   conditionFrom,
   detailsFromTitle,
+  isCompleteSetup,
   isServiceListing,
   jijiLinksIn,
   listingLinksOnSellerPage,
@@ -171,4 +172,11 @@ test("a whole listing becomes form fields that the product form accepts", () => 
   assert.equal(tv.fields.category, "", "no guess: staff pick the category");
   assert.equal(isServiceListing({ jijiCategory: "solar-sales-and-installation-services" }), true);
   assert.equal(isServiceListing({ jijiCategory: "power-equipments" }), false);
+});
+
+test("complete solar setups are told apart from single products and solar generators", () => {
+  for (const t of ["15KVA Set Up With 20KWH Lithium Battery", "6kva + 10kwh With BMS Solar System", "Amazing Combo! 15kva One Inverter And 15kwh Blisslife Lithium Battery", "Complete Solar Set Up 3600w Solar Generator With 2 Panels"])
+    assert.equal(isCompleteSetup(t), true, t);
+  for (const t of ["SVC RPS 1.2kw Inverter + 4kwh Solar Generator", "Haisic 215kWh / 100kva All-in-One Commercial Industrial ESS Cabinet", "Felicity Solar 10kVA 48V Hybrid Inverter With 120A MPPT", "16kwh Lifepo4 Battery With 10 Yrs Warranty", "1000w Itel Solar Kit"])
+    assert.equal(isCompleteSetup(t), false, t);
 });

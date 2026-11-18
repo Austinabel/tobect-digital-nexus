@@ -169,7 +169,7 @@ export const PRODUCT_TYPES: Record<string, ProductType> = {
 
 /** Keyword → product type, checked against the category's web address. Order matters. */
 const MATCHERS: [RegExp, string][] = [
-  [/generator|power-?station|power-?system|power-?bank|\bups\b/, "power-system"],
+  [/generator|power-?station|power-?system|power-?bank|\bups\b|set-?ups?|solar-?systems?/, "power-system"],
   [/batter/, "battery"],
   [/inverter/, "inverter"],
   [/panel|\bpv\b|module/, "solar-panel"],

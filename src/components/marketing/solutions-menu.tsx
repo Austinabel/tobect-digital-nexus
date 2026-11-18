@@ -8,7 +8,7 @@ import { SOLUTION_ICONS } from "@/components/marketing/solution-icons";
 import { IconArrowRight, IconCalculator, IconCheck, IconChevronDown, IconWrench, IconPackage } from "@/components/icons";
 
 const QUICK_LINKS = [
-  { label: "Solar Installation Kits", href: "/shop/installation-kits", Icon: IconPackage },
+  { label: "Complete Solar Setups", href: "/shop/complete-solar-setups", Icon: IconPackage },
   { label: "Installation Service", href: "/installation", Icon: IconWrench },
 ];
 

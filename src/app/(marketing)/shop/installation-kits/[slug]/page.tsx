@@ -75,7 +75,7 @@ export default async function KitPage(props: PageProps<"/shop/installation-kits/
             </li>
             <li aria-hidden>/</li>
             <li>
-              <Link href="/shop/installation-kits" className="hover:text-blue">Installation Kits</Link>
+              <Link href="/shop/complete-solar-setups" className="hover:text-blue">Complete Solar Setups</Link>
             </li>
             <li aria-hidden>/</li>
             <li aria-current="page" className="font-semibold text-ink">{kit.name}</li>

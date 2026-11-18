@@ -5,7 +5,8 @@ import { CategoryNav } from "@/components/shop/category-nav";
 import { Catalogue } from "@/components/shop/catalogue";
 import { ShopPromoTiles, ShopTrustBar } from "@/components/shop/shop-bottom";
 import { getCatalog } from "@/lib/catalog-server";
-import { findCategory, subcategoriesOf } from "@/lib/catalog";
+import { SETUPS_CATEGORY, findCategory, subcategoriesOf } from "@/lib/catalog";
+import { KitsSection } from "@/components/shop/kits-section";
 import Link from "next/link";
 import { catalogueSearch, hasActiveFilters, parseCatalogueQuery } from "@/lib/shop/catalogue-query";
 import { getSite } from "@/lib/site-server";
@@ -67,6 +68,7 @@ export default async function CategoryPage(props: PageProps<"/shop/[category]">)
           </ul>
         </nav>
       )}
+      {category.slug === SETUPS_CATEGORY && <KitsSection showAllLink={false} />}
       <Catalogue query={query} basePath={`/shop/${category.slug}`} lockedCategory={category.slug} title={category.name} />
       <ShopTrustBar />
       <ShopPromoTiles hasNewArrivals={false} hasDeals={false} />

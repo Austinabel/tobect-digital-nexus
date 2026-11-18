@@ -38,7 +38,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...SOLUTIONS.map((s) => ({ url: url(`/solutions/${s.slug}`), lastModified: now, priority: 0.7 })),
     ...CATEGORIES.map((c) => ({ url: url(`/shop/${c.slug}`), lastModified: now, priority: 0.8 })),
     ...PRODUCTS.map((p) => ({ url: url(`/product/${p.slug}`), lastModified: now, priority: 0.7 })),
-    { url: url("/shop/installation-kits"), lastModified: now, priority: 0.8 },
     ...KITS.map((k) => ({ url: url(`/shop/installation-kits/${k.slug}`), lastModified: now, priority: 0.7 })),
   ];
 }

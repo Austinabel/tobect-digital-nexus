@@ -21,7 +21,6 @@ function suggestions(catalog: Catalog): SearchSuggestion[] {
   const { categories: CATEGORIES, products: PRODUCTS } = catalog;
   return [
     ...CATEGORIES.map((c) => ({ label: c.name, kind: "Category" as const, href: `/shop/${c.slug}` })),
-    { label: "Installation Kits", kind: "Category" as const, href: "/shop/installation-kits", keywords: "solar package complete" },
     ...catalogueBrands(catalog).map((b) => ({ label: b.name, kind: "Brand" as const, href: `/shop?brand=${b.slug}#catalogue` })),
     ...PRODUCTS.map((p) => ({
       label: p.name,

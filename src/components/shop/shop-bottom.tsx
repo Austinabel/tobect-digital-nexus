@@ -134,7 +134,7 @@ export async function ShopPromoTiles({ hasNewArrivals, hasDeals, hideKits }: { h
   if (hasDeals)
     tiles.push({ key: "deals", title: "Sale & Deals", text: "Save on selected products and bundles.", cta: "Shop Deals", href: "/shop#deals", tone: "red", art: <IconTag /> });
   if (tiles.length < 2 && !hideKits)
-    tiles.push({ key: "kits", title: "Complete Solar Kits", text: "Inverter, battery, panels and accessories in one package.", cta: "Shop Kits", href: "/shop/installation-kits", tone: "light", art: categoryGlyphs.kit });
+    tiles.push({ key: "kits", title: "Complete Solar Setups", text: "Inverter, battery, panels and accessories in one package.", cta: "Shop Setups", href: "/shop/complete-solar-setups", tone: "light", art: categoryGlyphs.kit });
   tiles.push({
     key: "bulk",
     title: "Bulk & Commercial Orders",

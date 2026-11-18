@@ -98,7 +98,6 @@ export async function Catalogue({ query, basePath, lockedCategory, title = "Shop
         ...ordered
           .filter((c) => !c.parent || c.parent === lockedRoot)
           .map((c) => ({ slug: c.slug, name: c.name, href: `/shop/${c.slug}#catalogue`, count: allCounts.get(c.slug) ?? 0, active: c.slug === lockedCategory, ...(c.parent ? { sub: true } : {}) })),
-        { slug: "installation-kits", name: "Installation Kits", href: "/shop/installation-kits", count: catalog.kits.length, active: false },
       ]
     : undefined;
 

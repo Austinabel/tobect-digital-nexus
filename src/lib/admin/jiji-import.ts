@@ -399,6 +399,14 @@ export interface JijiDraft {
   typeId: string | null;
 }
 
+const SETUPS_CATEGORY = "complete-solar-setups";
+
+/** "15KVA Set Up With 20KWH Lithium Battery", "6KVA 48V + 5KWH Solar System", "Combo! 15kva Inverter And 15kwh Battery". */
+export function isCompleteSetup(title: string): boolean {
+  const t = title.toLowerCase();
+  return /set ?up|solar system|\bcombo\b/.test(t) || (/\d\s*kva\b|\d\s*kw\b/.test(t) && /kwh/.test(t) && /\+|\band\b|\bwith\b/.test(t) && !/generator|power station|\bess\b|\bcabinet\b/.test(t));
+}
+
 /** The product-form fields for a Jiji listing. Published is decided by the caller. */
 export function listingToFields(
   l: JijiListing,
@@ -407,7 +415,7 @@ export function listingToFields(
   const typeId = productTypeFromTitle(`${l.title} ${l.attrs.Type ?? ""}`, l.jijiCategory);
   const fields: Record<string, string> = {
     name: l.title.slice(0, 120),
-    category: categoryForType(typeId, opts.categories, opts.typeOf),
+    category: isCompleteSetup(l.title) && opts.categories.some((c) => c.slug === SETUPS_CATEGORY) ? SETUPS_CATEGORY : categoryForType(typeId, opts.categories, opts.typeOf),
     price: l.price ? String(l.price) : "",
     description: l.description.slice(0, 4000),
     availability: "in-stock",

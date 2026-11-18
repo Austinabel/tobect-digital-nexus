@@ -517,6 +517,13 @@ export const categoryGlyphs = {
       <path d="M3.5 8.5 8.5 3.5l3 3-5 5ZM13.5 16.5l3-3 4 4-3 3Z" />
     </svg>
   ),
+  /** small appliances: a plug */
+  appliance: (
+    <svg {...base} strokeWidth={1.5}>
+      <path d="M9 3v5M15 3v5M6.5 8h11v3.5a5.5 5.5 0 0 1-11 0Z" />
+      <path d="M12 17v4" />
+    </svg>
+  ),
   all: (
     <svg {...base} strokeWidth={1.5}>
       <rect x="4" y="4" width="6.5" height="6.5" rx="1.2" />
