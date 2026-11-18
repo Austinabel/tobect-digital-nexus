@@ -11,7 +11,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
 import sharp from "sharp";
-import { SPEC_FILTERS } from "@/lib/shop/catalogue-query";
+import { fieldsFor } from "@/lib/shop/product-fields";
 
 /** Scanning is offered only when the server has an Anthropic API key. */
 export const scanAvailable = () => Boolean(process.env.ANTHROPIC_API_KEY);
@@ -50,7 +50,7 @@ export async function readProductPhotos(
 
   const catList = categories.map((c) => {
     const parent = c.parent ? categories.find((p) => p.slug === c.parent) : undefined;
-    const keys = (SPEC_FILTERS[c.slug] ?? (c.parent ? SPEC_FILTERS[c.parent] : undefined) ?? []).map((s) => s.key);
+    const keys = fieldsFor(c.slug, c.parent).map((s) => (s.unit ? `${s.key} (number in ${s.unit})` : s.options ? `${s.key} (one of: ${s.options.join(" / ")})` : s.key));
     return `- ${c.slug}: ${parent ? `${parent.name} › ` : ""}${c.name}${keys.length ? ` (attribute keys: ${keys.join(", ")})` : ""}`;
   });
 

@@ -3,7 +3,7 @@
  * product-form.test.ts): takes the submitted fields, returns either a clean
  * database row or per-field error messages. The browser form is never trusted.
  */
-import { SPEC_FILTERS } from "../shop/catalogue-query";
+import { chipsFromAttributes, cleanFieldValue, fieldsFor, productTypeFor } from "../shop/product-fields";
 import { cleanBarcode, cleanSku } from "./product-dedupe";
 
 export interface ProductRowInput {
@@ -32,7 +32,8 @@ export interface ProductRowInput {
   imageIds: string[];
 }
 
-export type FieldErrors = Partial<Record<keyof ProductRowInput | "form" | "duplicates", string>>;
+/** `attr_<key>` holds the message for one product-detail field */
+export type FieldErrors = Partial<Record<keyof ProductRowInput | "form" | "duplicates" | `attr_${string}`, string>>;
 
 export const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -95,22 +96,29 @@ export function parseProductForm(f: Fields, ctx: { categories: string[]; isNew: 
   const stock = whole(f.stock_quantity, 0, 1_000_000);
   if (Number.isNaN(stock)) errors.stock_quantity = "Enter a whole number of units, or leave empty if you don't track stock.";
 
-  const specs = (f.specs ?? "")
+  let specs = (f.specs ?? "")
     .split(/[\n,]/)
     .map((s) => s.trim())
     .filter(Boolean);
   if (specs.length > 8) errors.specs = "Up to 8 key specs.";
   if (specs.some((s) => s.length > 40)) errors.specs = "Keep each key spec under 40 characters.";
 
-  // Filter values: only the attributes defined for this category.
+  // Product details: only the fields defined for this category's product type.
+  // A choice field's "Other" button sends its typed value in attr_<key>_other.
+  const detailFields = ctx.categories.includes(category) ? fieldsFor(category, root) : [];
   const attributes: Record<string, string> = {};
-  for (const { key } of SPEC_FILTERS[category] ?? SPEC_FILTERS[root] ?? []) {
-    const v = text(f[`attr_${key}`], 40);
-    if (v) attributes[key] = v;
+  for (const field of detailFields) {
+    const submitted = f[`attr_${field.key}`];
+    const raw = submitted === "__other" ? f[`attr_${field.key}_other`] : submitted;
+    const { value, error } = cleanFieldValue(field, raw);
+    if (error) errors[`attr_${field.key}`] = error;
+    else if (value) attributes[field.key] = value;
   }
+  // No key specs typed: build the card chips from the details (e.g. "5.12 kWh, 100 Ah, 51.2 V").
+  if (!specs.length) specs = chipsFromAttributes(detailFields, attributes);
 
   let inverter_spec: ProductRowInput["inverter_spec"] = null;
-  if (root === "inverters") {
+  if (ctx.categories.includes(category) && productTypeFor(category, root).id === "inverter") {
     const bv = (f.inv_battery_v ?? "").trim();
     const maxPv = whole(f.inv_max_pv_v, 1, 1500);
     const mppt = whole(f.inv_mppt_min_v, 0, 1500);

@@ -5,7 +5,7 @@
  * (parseProductForm + duplicate detection), so an import can never create a
  * product the form would refuse.
  */
-import { SPEC_FILTERS } from "../shop/catalogue-query";
+import { allFields } from "../shop/product-fields";
 import { parseProductForm, slugify, MAX_IMAGES, type ProductRowInput } from "./product-form";
 import { findDuplicates, type DuplicateMatch, type ExistingProduct } from "./product-dedupe";
 
@@ -35,11 +35,9 @@ export const IMPORT_COLUMNS: { key: string; label: string; aliases: string[]; re
   { key: "seo_description", label: "seo_description", aliases: ["search description", "meta description"], help: "Optional" },
 ];
 
-/** Every spec-filter column ("capacity", "wattage", …) across categories, by key and label. */
+/** Every product-detail column ("capacity", "wattage", "condition", …) across product types, by key and label. */
 export function specColumns(): { key: string; label: string }[] {
-  const seen = new Map<string, string>();
-  for (const list of Object.values(SPEC_FILTERS)) for (const s of list) if (!seen.has(s.key)) seen.set(s.key, s.label);
-  return [...seen].map(([key, label]) => ({ key, label }));
+  return allFields();
 }
 
 const norm = (h: string) => h.toLowerCase().replace(/[\s_\-()./]+/g, " ").trim();

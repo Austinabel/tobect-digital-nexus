@@ -4,6 +4,8 @@
  * and the unit tests share exactly the same logic.
  */
 
+import { fieldsFor } from "./product-fields";
+
 export type AvailabilityFilter = "in-stock" | "pre-order" | "out-of-stock";
 export type SortKey = "featured" | "price-asc" | "price-desc" | "name" | "newest";
 export type ViewMode = "grid" | "list";
@@ -52,34 +54,13 @@ export const AVAILABILITY_OPTIONS: { key: AvailabilityFilter; label: string }[] 
   { key: "out-of-stock", label: "Out of Stock" },
 ];
 
-/** Spec filters per category. A facet only appears when products actually carry that attribute. */
-export const SPEC_FILTERS: Record<string, { key: string; label: string }[]> = {
-  "solar-panels": [
-    { key: "wattage", label: "Wattage" },
-    { key: "panelType", label: "Panel type" },
-    { key: "technology", label: "Technology" },
-  ],
-  inverters: [
-    { key: "capacity", label: "Capacity" },
-    { key: "phase", label: "Phase" },
-    { key: "inverterType", label: "Hybrid / off-grid" },
-    { key: "mppt", label: "MPPT configuration" },
-  ],
-  "lithium-batteries": [
-    { key: "voltage", label: "Voltage" },
-    { key: "capacity", label: "Capacity" },
-    { key: "chemistry", label: "Chemistry" },
-    { key: "bms", label: "BMS rating" },
-  ],
-  "solar-generators": [{ key: "output", label: "Output" }],
-  "cctv-security": [
-    { key: "resolution", label: "Resolution" },
-    { key: "cameraType", label: "Camera type" },
-    { key: "connectivity", label: "Connectivity" },
-    { key: "nightVision", label: "Night vision" },
-  ],
-  "solar-lights": [{ key: "wattage", label: "Wattage" }],
-};
+/**
+ * Spec filters per category: the product-detail fields marked as filters
+ * (see product-fields.ts). A facet only appears when products carry it.
+ */
+export function specFiltersFor(slug: string, parentSlug?: string | null): { key: string; label: string }[] {
+  return fieldsFor(slug, parentSlug).filter((f) => f.filter).map(({ key, label }) => ({ key, label }));
+}
 
 type Params = Record<string, string | string[] | undefined>;
 
@@ -255,7 +236,7 @@ export function runCatalogueQuery<T extends CatalogueItem>(
   const inView = new Set(filterItems(all, query, categoryNames, "attrs").map(rootCategory));
   const specCategory = query.categories.length === 1 ? query.categories[0] : inView.size === 1 ? [...inView][0] : undefined;
   const specRoot = specCategory ? all.find((i) => pathOf(i).includes(specCategory)) : undefined;
-  const specList = specCategory ? SPEC_FILTERS[specCategory] ?? (specRoot ? SPEC_FILTERS[rootCategory(specRoot)] : undefined) ?? [] : [];
+  const specList = specCategory ? specFiltersFor(specCategory, specRoot ? rootCategory(specRoot) : undefined) : [];
   const specs = specList
     .map(({ key, label }) => {
       const counts = countBy(

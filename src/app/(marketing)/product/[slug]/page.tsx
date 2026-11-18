@@ -15,6 +15,7 @@ import { findCategory, findProduct, productsInCategory } from "@/lib/catalog";
 import { getSiteLinks } from "@/lib/site-server";
 import { IconWhatsApp, IconQuote, IconTruck, IconWrench, IconShieldCheck } from "@/components/icons";
 import { getSite } from "@/lib/site-server";
+import { fieldsFor } from "@/lib/shop/product-fields";
 
 export async function generateMetadata(props: PageProps<"/product/[slug]">): Promise<Metadata> {
   const SITE = await getSite();
@@ -47,6 +48,9 @@ export default async function ProductPage(props: PageProps<"/product/[slug]">) {
 
   const category = findCategory(catalog, product.category);
   const parentCategory = category?.parent ? findCategory(catalog, category.parent) : undefined;
+  const detailRows = fieldsFor(product.category, category?.parent)
+    .filter((f) => product.attributes?.[f.key])
+    .map((f) => ({ label: f.label.replace(/ \((?:Ah|kWh|kVA|kW|W|Wh|V|A|m|in|litres|hours|%|m³\/h)\)$/, ""), value: product.attributes![f.key] }));
   const related = productsInCategory(catalog, product.category).filter((p) => p.slug !== product.slug).slice(0, 4);
   const soldOut = product.availability === "out-of-stock";
   // Only a genuine reduction (previous price set and higher) is shown as a saving.
@@ -197,7 +201,10 @@ export default async function ProductPage(props: PageProps<"/product/[slug]">) {
                 { label: "Brand", value: product.brand },
                 { label: "Model", value: product.model },
                 { label: "Category", value: category?.name },
-                ...product.specs.map((s, i) => ({ label: i === 0 ? "Key specs" : "", value: s })),
+                // the details entered for this kind of product (battery type, voltage, Ah, condition…)
+                ...detailRows,
+                // key specs only when there are no details to show (they're usually made from them)
+                ...(detailRows.length ? [] : product.specs.map((s, i) => ({ label: i === 0 ? "Key specs" : "", value: s }))),
               ]
                 .filter((row): row is { label: string; value: string } => Boolean(row.value))
                 .map((row, i) => (

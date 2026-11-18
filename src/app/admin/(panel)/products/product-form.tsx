@@ -7,7 +7,7 @@ import { flushSync } from "react-dom";
 import { cn } from "@/lib/utils";
 import { buttonClass, ghostButtonClass, inputClass } from "@/components/admin/admin-ui";
 import { submitWithoutReset } from "@/components/admin/submit-without-reset";
-import { SPEC_FILTERS } from "@/lib/shop/catalogue-query";
+import { fieldsFor, numberPart, productTypeFor, type ProductField } from "@/lib/shop/product-fields";
 import { MAX_IMAGES } from "@/lib/admin/product-form";
 import type { DuplicateMatch } from "@/lib/admin/product-dedupe";
 import { saveProduct } from "./actions";
@@ -99,6 +99,163 @@ function Section({ title, intro, children, id }: { title: string; intro?: ReactN
   );
 }
 
+const chipClass = (on: boolean) =>
+  cn(
+    "inline-flex min-h-10 items-center rounded-full border px-3.5 text-[0.86rem] font-semibold transition-colors",
+    on ? "border-blue bg-blue text-white" : "border-hair bg-white text-ink hover:border-blue hover:text-blue",
+  );
+
+/** Category as big tap targets: main categories, then the chosen one's subcategories. */
+function CategoryPicker({ categories, value, onChange, error, highlight }: { categories: FormCategory[]; value: string; onChange: (slug: string) => void; error?: string; highlight?: boolean }) {
+  const top = categories.filter((c) => !c.parent_slug);
+  const current = categories.find((c) => c.slug === value);
+  const chosenTop = current?.parent_slug ?? (current ? current.slug : "");
+  const subs = categories.filter((c) => c.parent_slug === chosenTop);
+  return (
+    <fieldset className={cn("rounded-xl", highlight && "ring-2 ring-gold/70")}>
+      <legend className="mb-1.5 block text-[0.8rem] font-semibold text-ink">Category *</legend>
+      <input type="hidden" name="category" value={value} />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+        {top.map((t) => {
+          const on = chosenTop === t.slug;
+          return (
+            <button
+              key={t.slug}
+              type="button"
+              aria-pressed={on}
+              onClick={() => onChange(t.slug)}
+              className={cn(
+                "min-h-12 rounded-xl border px-3 py-2 text-left text-[0.86rem] font-semibold leading-tight transition-colors",
+                on ? "border-blue bg-blue text-white" : "border-hair bg-white text-ink hover:border-blue",
+              )}
+            >
+              {t.name}
+            </button>
+          );
+        })}
+      </div>
+      {subs.length > 0 && (
+        <div className="mt-3">
+          <p className="mb-1.5 text-[0.76rem] font-semibold text-slate">Type (optional)</p>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" aria-pressed={value === chosenTop} onClick={() => onChange(chosenTop)} className={chipClass(value === chosenTop)}>
+              Any {categories.find((c) => c.slug === chosenTop)?.name}
+            </button>
+            {subs.map((s) => (
+              <button key={s.slug} type="button" aria-pressed={value === s.slug} onClick={() => onChange(s.slug)} className={chipClass(value === s.slug)}>
+                {s.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {error && <span className="mt-1 block text-[0.78rem] text-red-dark">{error}</span>}
+    </fieldset>
+  );
+}
+
+/** One product-detail field: tap-to-choose buttons, or a number box with its unit and one-tap common values. */
+function DetailField({ field, value, onChange, error, highlight }: { field: ProductField; value: string; onChange: (v: string) => void; error?: string; highlight?: boolean }) {
+  const inputId = useId();
+  const isOption = field.options?.includes(value) ?? false;
+  const [otherOpen, setOtherOpen] = useState(Boolean(value) && !isOption);
+  const showOther = otherOpen || (Boolean(value) && !isOption);
+
+  if (field.kind === "choice") {
+    return (
+      <fieldset className={cn("sm:col-span-2", highlight && "rounded-xl ring-2 ring-gold/70")}>
+        <legend className="mb-1.5 block text-[0.8rem] font-semibold text-ink">{field.label}</legend>
+        <input type="hidden" name={`attr_${field.key}`} value={value} />
+        <div className="flex flex-wrap gap-2">
+          {field.options!.map((o) => (
+            <button
+              key={o}
+              type="button"
+              aria-pressed={value === o}
+              onClick={() => {
+                setOtherOpen(false);
+                onChange(value === o ? "" : o); // tap again to clear
+              }}
+              className={chipClass(value === o)}
+            >
+              {o}
+            </button>
+          ))}
+          <button
+            type="button"
+            aria-pressed={showOther}
+            onClick={() => {
+              if (showOther) {
+                setOtherOpen(false);
+                if (!isOption) onChange("");
+              } else {
+                setOtherOpen(true);
+                if (isOption) onChange("");
+              }
+            }}
+            className={chipClass(showOther)}
+          >
+            Other…
+          </button>
+        </div>
+        {showOther && (
+          <input
+            aria-label={`${field.label} (other)`}
+            value={isOption ? "" : value}
+            onChange={(ev) => onChange(ev.target.value)}
+            maxLength={40}
+            placeholder="Type it"
+            autoFocus={otherOpen && !value}
+            className={cn(inputClass, "mt-2 max-w-sm")}
+          />
+        )}
+        {error && <span className="mt-1 block text-[0.78rem] text-red-dark">{error}</span>}
+      </fieldset>
+    );
+  }
+
+  return (
+    <div className={cn(highlight && "rounded-xl ring-2 ring-gold/70")}>
+      <label htmlFor={inputId} className="mb-1 block text-[0.8rem] font-semibold text-ink">
+        {field.label}
+      </label>
+      <div className="relative">
+        <input
+          id={inputId}
+          name={`attr_${field.key}`}
+          value={value}
+          onChange={(ev) => onChange(ev.target.value)}
+          inputMode={field.kind === "number" ? "decimal" : undefined}
+          maxLength={40}
+          autoComplete="off"
+          className={cn(inputClass, field.unit && "pr-16")}
+        />
+        {field.unit && <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[0.82rem] font-semibold text-slate">{field.unit}</span>}
+      </div>
+      {field.quick && (
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
+          {field.quick.map((q) => (
+            <button
+              key={q}
+              type="button"
+              onClick={() => onChange(value === String(q) ? "" : String(q))}
+              aria-pressed={value === String(q)}
+              className={cn(
+                "inline-flex h-9 items-center rounded-lg border px-2.5 text-[0.8rem] font-semibold tabular-nums",
+                value === String(q) ? "border-blue bg-blue text-white" : "border-hair bg-field text-ink hover:border-blue",
+              )}
+            >
+              {q}
+              {field.unit && field.unit.length <= 3 ? ` ${field.unit}` : ""}
+            </button>
+          ))}
+        </div>
+      )}
+      {error ? <span className="mt-1 block text-[0.78rem] text-red-dark">{error}</span> : field.hint ? <span className="mt-1 block text-[0.74rem] text-slate">{field.hint}</span> : null}
+    </div>
+  );
+}
+
 function DuplicatePanel({ matches, mustConfirm }: { matches: DuplicateMatch[]; mustConfirm: boolean }) {
   if (!matches.length) return null;
   const certain = matches.some((m) => m.strength === "certain");
@@ -175,9 +332,17 @@ export function ProductForm({
   const brandList = useId();
   const byId = new Map(library.map((m) => [m.id, m]));
   const parentOf = new Map(categories.map((c) => [c.slug, c.parent_slug]));
-  const root = parentOf.get(category) ?? category;
-  const specFields = SPEC_FILTERS[category] ?? SPEC_FILTERS[root] ?? [];
-  const top = categories.filter((c) => !c.parent_slug);
+  const productType = category ? productTypeFor(category, parentOf.get(category)) : undefined;
+  // Product details are controlled: number fields hold just the number ("48"), the unit is added on save.
+  const [attrs, setAttrs] = useState<Record<string, string>>(() => {
+    const numeric = new Set(fieldsFor(initial.category, categories.find((c) => c.slug === initial.category)?.parent_slug).filter((f) => f.kind === "number").map((f) => f.key));
+    const start: Record<string, string> = {};
+    for (const [k, v] of Object.entries(initial.attributes)) start[k] = numeric.has(k) ? numberPart(v) || v : v;
+    // most stock is new: preselect it for a new listing
+    if (mode === "new" && !start.condition) start.condition = "New";
+    return start;
+  });
+  const setAttr = (key: string, v: string) => setAttrs((a) => ({ ...a, [key]: v }));
   const shownDuplicates = state?.duplicates ?? duplicates;
 
   /* ---------- reading / filling the uncontrolled fields ---------- */
@@ -280,13 +445,19 @@ export function ProductForm({
             flushSync(() => setCategory(r.category!));
             got.push("Category");
           }
-          const chosenRoot = parentOf.get(chosen) ?? chosen;
-          const specList = SPEC_FILTERS[chosen] ?? SPEC_FILTERS[chosenRoot] ?? [];
+          const chosenType = chosen ? productTypeFor(chosen, parentOf.get(chosen)) : undefined;
+          const found: Record<string, string> = {};
           for (const a of r.attributes) {
-            const spec = specList.find((x) => x.key === a.key);
-            if (spec && fillIfEmpty(`attr_${a.key}`, a.value.slice(0, 40))) got.push(spec.label);
+            const spec = chosenType?.fields.find((x) => x.key === a.key);
+            const v = spec ? (spec.kind === "number" ? numberPart(a.value) : a.value.trim().slice(0, 40)) : "";
+            if (spec && v && !attrs[a.key]?.trim()) {
+              found[a.key] = v;
+              got.push(spec.label);
+            }
           }
-          if (chosenRoot === "inverters") {
+          // only fill details staff haven't set yet
+          setAttrs((prev) => ({ ...prev, ...Object.fromEntries(Object.entries(found).filter(([k]) => !prev[k]?.trim())) }));
+          if (chosenType?.id === "inverter") {
             if (r.inverter_battery_v && [12, 24, 48].includes(r.inverter_battery_v) && fillIfEmpty("inv_battery_v", String(r.inverter_battery_v))) got.push("Battery voltage");
             if (fillIfEmpty("inv_max_pv_v", r.inverter_max_pv_v ? String(r.inverter_max_pv_v) : null)) got.push("Max PV voltage");
             if (fillIfEmpty("inv_mppt_min_v", r.inverter_mppt_min_v ? String(r.inverter_mppt_min_v) : null)) got.push("MPPT minimum");
@@ -503,6 +674,9 @@ export function ProductForm({
         {/* ---------- 2. details ---------- */}
         <Section title={mode === "new" ? "2. Product details" : "Product details"}>
           <div className="grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <CategoryPicker categories={categories} value={category} onChange={setCategory} error={e.category_slug} highlight={filled.includes("Category")} />
+            </div>
             <Field label="Product name *" error={e.name} hint="e.g. Deye 8kW Hybrid Inverter — brand, type and main rating" className="sm:col-span-2">
               <input name="name" defaultValue={initial.name} required maxLength={120} autoComplete="off" className={cn(inputClass, hl("Name"))} />
             </Field>
@@ -516,24 +690,6 @@ export function ProductForm({
             </Field>
             <Field label="Model number" error={e.model} hint="Exactly as on the label">
               <input name="model" defaultValue={initial.model} maxLength={60} autoComplete="off" className={cn(inputClass, hl("Model"))} />
-            </Field>
-            <Field label="Category *" error={e.category_slug} className="sm:col-span-2">
-              <select name="category" value={category} onChange={(ev) => setCategory(ev.target.value)} className={cn(inputClass, hl("Category"))}>
-                <option value="">Choose a category…</option>
-                {top.map((t) => [
-                  <option key={t.slug} value={t.slug}>
-                    {t.name}
-                  </option>,
-                  ...categories
-                    .filter((c) => c.parent_slug === t.slug)
-                    .map((c) => (
-                      <option key={c.slug} value={c.slug}>
-                        {"   ↳ "}
-                        {c.name}
-                      </option>
-                    )),
-                ])}
-              </select>
             </Field>
             <Field label="SKU (your shop code)" error={e.sku} hint="Optional — must be unique">
               <input name="sku" defaultValue={initial.sku} maxLength={40} autoComplete="off" autoCapitalize="characters" className={inputClass} />
@@ -567,48 +723,20 @@ export function ProductForm({
           </div>
         </Section>
 
-        {/* ---------- 3. price & stock ---------- */}
-        <Section title={mode === "new" ? "3. Price & stock" : "Price & stock"}>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Price (₦) *" error={e.price_ngn}>
-              <input name="price" inputMode="numeric" defaultValue={initial.price} required className={inputClass} />
-            </Field>
-            <Field label="Previous price (₦)" hint="Only for a genuine reduction — shows the product in Sale & Deals." error={e.compare_at_price_ngn}>
-              <input name="compare_at_price" inputMode="numeric" defaultValue={initial.compareAt} className={inputClass} />
-            </Field>
-            <Field label="Availability" error={e.availability}>
-              <select name="availability" defaultValue={initial.availability} className={inputClass}>
-                <option value="">Not tracked — customer asks to confirm</option>
-                <option value="in-stock">In stock</option>
-                <option value="pre-order">Pre-order</option>
-                <option value="out-of-stock">Out of stock</option>
-              </select>
-            </Field>
-            <Field label="Units in stock" hint="Leave empty if you don't track stock. Orders can't exceed it when set." error={e.stock_quantity}>
-              <input name="stock_quantity" inputMode="numeric" defaultValue={initial.stock} className={inputClass} />
-            </Field>
-          </div>
-        </Section>
-
-        {/* ---------- 4. specifications ---------- */}
-        <Section title={mode === "new" ? "4. Specifications" : "Specifications"}>
-          <Field label="Key specs (shown as chips on the product card)" hint="Separate with commas or new lines — up to 8, e.g. 8 kW, Hybrid, 48 V" error={e.specs}>
-            <textarea name="specs" rows={2} defaultValue={initial.specs} className={cn(inputClass, "h-auto py-2", hl("Key specs"))} />
-          </Field>
-          {specFields.length > 0 && (
-            <div className="mt-4">
-              <p className="text-[0.8rem] font-semibold text-ink">Shop filter values</p>
-              <p className="mb-2 text-[0.74rem] text-slate">Customers filter the shop by these. Use the same wording across products (e.g. always “10 kVA”).</p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {specFields.map((sf) => (
-                  <Field key={sf.key} label={sf.label}>
-                    <input name={`attr_${sf.key}`} defaultValue={initial.attributes[sf.key] ?? ""} maxLength={40} className={cn(inputClass, hl(sf.label))} />
-                  </Field>
-                ))}
-              </div>
+        {/* ---------- 3. details for this kind of product ---------- */}
+        <Section
+          id="details"
+          title={`${mode === "new" ? "3. " : ""}${productType?.label ?? "Specifications"}`}
+          intro={productType ? "Tap to choose, or type a number — the unit is added for you. Leave anything you don't know empty." : "Choose a category above and the right details for that product appear here."}
+        >
+          {productType && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {productType.fields.map((f) => (
+                <DetailField key={`${productType.id}-${f.key}`} field={f} value={attrs[f.key] ?? ""} onChange={(v) => setAttr(f.key, v)} error={e[`attr_${f.key}`]} highlight={filled.includes(f.label)} />
+              ))}
             </div>
           )}
-          {root === "inverters" && (
+          {productType?.id === "inverter" && (
             <div className="mt-4 rounded-xl bg-mist/60 p-4">
               <p className="text-[0.8rem] font-semibold text-ink">Datasheet values (used by the solar calculator)</p>
               <p className="mb-3 text-[0.74rem] text-slate">Copy from the manufacturer&rsquo;s datasheet or label. Leave empty if you&rsquo;re not sure — the calculator then asks the customer.</p>
@@ -631,6 +759,32 @@ export function ProductForm({
               {e.inverter_spec && <p className="mt-2 text-[0.78rem] text-red-dark">{e.inverter_spec}</p>}
             </div>
           )}
+          <Field label="Key specs (chips on the product card)" hint="Optional — leave empty and they're made from the details above. Up to 8, separated by commas." error={e.specs} className="mt-5">
+            <textarea name="specs" rows={2} defaultValue={initial.specs} className={cn(inputClass, "h-auto py-2", hl("Key specs"))} />
+          </Field>
+        </Section>
+
+        {/* ---------- 4. price & stock ---------- */}
+        <Section title={mode === "new" ? "4. Price & stock" : "Price & stock"}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Price (₦) *" error={e.price_ngn}>
+              <input name="price" inputMode="numeric" defaultValue={initial.price} required className={inputClass} />
+            </Field>
+            <Field label="Previous price (₦)" hint="Only for a genuine reduction — shows the product in Sale & Deals." error={e.compare_at_price_ngn}>
+              <input name="compare_at_price" inputMode="numeric" defaultValue={initial.compareAt} className={inputClass} />
+            </Field>
+            <Field label="Availability" error={e.availability}>
+              <select name="availability" defaultValue={initial.availability} className={inputClass}>
+                <option value="">Not tracked — customer asks to confirm</option>
+                <option value="in-stock">In stock</option>
+                <option value="pre-order">Pre-order</option>
+                <option value="out-of-stock">Out of stock</option>
+              </select>
+            </Field>
+            <Field label="Units in stock" hint="Leave empty if you don't track stock. Orders can't exceed it when set." error={e.stock_quantity}>
+              <input name="stock_quantity" inputMode="numeric" defaultValue={initial.stock} className={inputClass} />
+            </Field>
+          </div>
         </Section>
 
         {/* ---------- 5. description ---------- */}
