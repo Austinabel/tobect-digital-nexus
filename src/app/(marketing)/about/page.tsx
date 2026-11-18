@@ -32,6 +32,8 @@ import {
 } from "@/components/icons";
 // Stock photo (Unsplash License) — illustrative of the work, not a Tobecat installation.
 import commercialRooftop from "@/assets/sections/commercial-rooftop.jpg";
+// Our own photo: the Tobecat, Gennex and SVC sales partnership.
+import partnershipPhoto from "@/assets/partners/tobecat-gennex-svc.jpg";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { SITE } = await getSiteLinks();
@@ -369,6 +371,39 @@ export default async function AboutPage() {
           </div>
         </section>
       )}
+
+      {/* ---------------- partnerships ---------------- */}
+      <section className="bg-mist/40 py-14 lg:py-20">
+        <div className="mx-auto grid max-w-[1240px] items-center gap-8 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:px-9">
+          <figure className="overflow-hidden rounded-3xl border border-hair bg-white shadow-[0_26px_54px_-30px_rgba(13,27,47,0.45)]">
+            <Image
+              src={partnershipPhoto}
+              alt={`Representatives of ${SITE.legalName}, Gennex and SVC beside an SVC all-in-one energy storage system and hybrid inverters`}
+              placeholder="blur"
+              sizes="(min-width: 1024px) 640px, 100vw"
+              className="h-auto w-full"
+            />
+            <figcaption className="px-5 py-3.5 text-[0.86rem] text-slate">
+              <b className="font-semibold text-ink">{SITE.shortName} × Gennex × SVC</b> — sealing our sales partnership.
+            </figcaption>
+          </figure>
+          <div>
+            <span className="kicker">Partnerships</span>
+            <h2 className="mt-3 font-heading text-[clamp(1.7rem,3.2vw,2.3rem)] font-extrabold leading-[1.12] tracking-tight text-ink">
+              Sales partnership with Gennex and SVC
+            </h2>
+            <p className="mt-4 text-[1rem] leading-relaxed text-slate">
+              {SITE.legalName} has entered a sales partnership with Gennex and SVC. Through the partnership we supply their energy
+              equipment — including SVC all-in-one energy storage systems — and back it with our design, installation and after-sales support.
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <SiteButton href="/quote" variant="red" trailingArrow>
+                Ask About SVC &amp; Gennex Systems
+              </SiteButton>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ---------------- brands ---------------- */}
       <section className="bg-white py-14 lg:py-20">
