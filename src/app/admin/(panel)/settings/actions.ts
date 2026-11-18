@@ -31,6 +31,8 @@ export async function saveSettings(_: SettingsState | undefined, fd: FormData): 
     social: SOCIAL_LABELS.map((label) => ({ label, href: v(`social_${label}`) })),
     brand: { wordmark: v("wordmark"), wordmarkSub: v("wordmarkSub"), logoUrl: v("logoUrl"), logoHeaderUrl: v("logoHeaderUrl"), logoFooterUrl: v("logoFooterUrl") },
     footerBlurb: v("footerBlurb"),
+    alertEmail: v("alertEmail"),
+    bank: { bankName: v("bankName"), accountName: v("accountName"), accountNumber: v("accountNumber") },
   };
   const { site, errors } = parseSiteSettings(raw);
   if (raw.brand.logoUrl && !(await isLibraryUrl(raw.brand.logoUrl))) errors.logoUrl = "Pick the logo from the media library.";

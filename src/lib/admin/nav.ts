@@ -34,6 +34,7 @@ export const ADMIN_NAV: { group: string; items: AdminNavItem[] }[] = [
     items: [
       { label: "Site settings", href: "/admin/settings", permission: "settings.manage", ready: true },
       { label: "Banners & slides", href: "/admin/banners", permission: "content.manage", ready: true },
+      { label: "Emails", href: "/admin/emails", permission: "settings.manage", ready: true },
       { label: "Pages", href: "/admin/pages", permission: "content.manage", ready: true },
       { label: "Media library", href: "/admin/media", permission: "media.manage", ready: true },
       { label: "Calculator settings", href: "/admin/calculator", permission: "calculator.manage", ready: true },

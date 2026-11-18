@@ -25,7 +25,8 @@ export interface CheckoutDefaults {
   state?: string | null;
 }
 
-export function CheckoutForm({ signedIn, defaults, onlinePayment }: { signedIn: boolean; defaults: CheckoutDefaults; onlinePayment: boolean }) {
+/** `bankTransfer`: the bank name, when bank transfer is set up in Site settings (account details are shown after ordering). */
+export function CheckoutForm({ signedIn, defaults, onlinePayment, bankTransfer }: { signedIn: boolean; defaults: CheckoutDefaults; onlinePayment: boolean; bankTransfer?: string | null }) {
   // Live catalogue (from the database), shared via <CatalogProvider>.
   const catalog = useCatalog();
   const kitCatalogue = useMemo(() => kitCatalogueFrom(catalog.products), [catalog]);
@@ -53,6 +54,8 @@ export function CheckoutForm({ signedIn, defaults, onlinePayment }: { signedIn: 
   const subtotal = summary.reduce((s, i) => s + i.total, 0);
   const unpriced = summary.some((i) => i.unpriced);
   const canPayOnline = onlinePayment && !unpriced;
+  // a bank transfer needs a final total, so it waits (like online payment) until every part is priced
+  const canPayByTransfer = Boolean(bankTransfer) && !unpriced;
   const cartJson = JSON.stringify(lines.map((l) => ({ slug: l.slug, quantity: l.quantity, ...(l.kit ? { kit: l.kit } : {}) })));
 
   if (!hydrated) return <div className="h-96 animate-pulse rounded-3xl bg-field" aria-label="Loading checkout" />;
@@ -150,8 +153,19 @@ export function CheckoutForm({ signedIn, defaults, onlinePayment }: { signedIn: 
                 </span>
               </label>
             )}
+            {canPayByTransfer && (
+              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border-[1.5px] border-hair p-4 has-[:checked]:border-blue has-[:checked]:bg-mist">
+                <input type="radio" name="payment_method" value="bank-transfer" defaultChecked={!canPayOnline} className="mt-1 accent-[var(--color-blue)]" />
+                <span>
+                  <span className="block font-semibold text-ink">Pay by bank transfer</span>
+                  <span className="block text-[0.82rem] text-slate">
+                    Transfer to our {bankTransfer} account — you&rsquo;ll see the account details and your payment reference as soon as you place the order.
+                  </span>
+                </span>
+              </label>
+            )}
             <label className="flex cursor-pointer items-start gap-3 rounded-2xl border-[1.5px] border-hair p-4 has-[:checked]:border-blue has-[:checked]:bg-mist">
-              <input type="radio" name="payment_method" value="pay-on-confirmation" defaultChecked={!canPayOnline} className="mt-1 accent-[var(--color-blue)]" />
+              <input type="radio" name="payment_method" value="pay-on-confirmation" defaultChecked={!canPayOnline && !canPayByTransfer} className="mt-1 accent-[var(--color-blue)]" />
               <span>
                 <span className="block font-semibold text-ink">Pay after we confirm your order</span>
                 <span className="block text-[0.82rem] text-slate">We confirm stock and delivery first, then send payment details.</span>

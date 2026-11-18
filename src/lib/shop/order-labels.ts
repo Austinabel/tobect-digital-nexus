@@ -20,4 +20,5 @@ export const PAYMENT_STATUS: Record<string, string> = {
 export const PAYMENT_METHOD: Record<string, string> = {
   paystack: "Online payment (Paystack)",
   "pay-on-confirmation": "Pay after confirmation",
+  "bank-transfer": "Bank transfer",
 };

@@ -46,6 +46,19 @@ export interface SiteSettings {
   };
   /** short company description in the footer */
   footerBlurb: string;
+  /** where new-order and new-quote alerts are emailed (empty = the contact email) */
+  alertEmail: string;
+  /**
+   * Bank account for "Pay by bank transfer" at checkout. The option is offered
+   * only when all three details are filled in.
+   */
+  bank: { bankName: string; accountName: string; accountNumber: string };
+}
+
+/** The bank account to show customers, or null when bank transfer isn't set up. */
+export function bankTransferDetails(site: SiteSettings): SiteSettings["bank"] | null {
+  const b = site.bank;
+  return b.bankName && b.accountName && /^\d{10}$/.test(b.accountNumber) ? b : null;
 }
 
 /** The details the site launched with — used for anything not yet saved in the admin. */
@@ -68,6 +81,8 @@ export const DEFAULT_SITE: SiteSettings = {
   // The owner's logo (public/brand). The logo word stays as the text fallback and for screen readers.
   brand: { wordmark: "TOBECAT", wordmarkSub: "TECHNOLOGIES NIG LTD", logoHeaderUrl: "/brand/logo-header.png", logoFooterUrl: "/brand/logo-full.png" },
   footerBlurb: "solar energy products, installation, CCTV and security systems for homes, businesses and industries across Nigeria.",
+  alertEmail: "",
+  bank: { bankName: "", accountName: "", accountNumber: "" },
 };
 
 /** Convert a Nigerian local number (0803…) to international digits (234803…). */
@@ -179,6 +194,14 @@ export function parseSiteSettings(raw: unknown, fallback: SiteSettings = DEFAULT
     if (!ok) errors[key] = "Pick the logo from the media library.";
     return ok ?? fallback.brand[key];
   };
+  const bankRaw = (r.bank && typeof r.bank === "object" ? r.bank : fallback.bank) as Record<string, unknown>;
+  const bank = { bankName: str(bankRaw.bankName, 60), accountName: str(bankRaw.accountName, 100), accountNumber: str(bankRaw.accountNumber, 20).replace(/\s/g, "") };
+  if (bank.accountNumber && !/^\d{10}$/.test(bank.accountNumber)) errors.accountNumber = "Nigerian account numbers have 10 digits.";
+  const filled = [bank.bankName, bank.accountName, bank.accountNumber].filter(Boolean).length;
+  if (filled > 0 && filled < 3) for (const k of ["bankName", "accountName", "accountNumber"] as const) if (!bank[k]) errors[k] = "Fill in all three bank details, or leave all empty.";
+  const alertEmail = str(r.alertEmail ?? fallback.alertEmail, 120);
+  if (alertEmail && !EMAIL_RE.test(alertEmail)) errors.alertEmail = "Enter a valid email address.";
+
   const logoHeaderUrl = logoImage("logoHeaderUrl");
   const logoFooterUrl = logoImage("logoFooterUrl");
 
@@ -208,6 +231,8 @@ export function parseSiteSettings(raw: unknown, fallback: SiteSettings = DEFAULT
       ...(logoFooterUrl ? { logoFooterUrl } : {}),
     },
     footerBlurb: "footerBlurb" in r ? str(r.footerBlurb, 300) : fallback.footerBlurb,
+    alertEmail: alertEmail && EMAIL_RE.test(alertEmail) ? alertEmail : "",
+    bank: errors.accountNumber || errors.bankName || errors.accountName ? fallback.bank : bank,
   };
   return { site, errors };
 }

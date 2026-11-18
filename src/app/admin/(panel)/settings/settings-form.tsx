@@ -82,6 +82,24 @@ export function SettingsForm({ site, library, canUpload }: { site: SiteSettings;
         </Field>
       </Section>
 
+      <Section
+        title="Bank transfer & order alerts"
+        intro="With all three bank details filled in, customers can choose “Pay by bank transfer” at checkout and see this account, with their order number as the payment reference. Leave them empty to switch bank transfer off."
+      >
+        <Field label="Bank name" error={e.bankName} hint="e.g. Zenith Bank">
+          <input name="bankName" defaultValue={site.bank.bankName} maxLength={60} className={inputClass} />
+        </Field>
+        <Field label="Account number" error={e.accountNumber} hint="10 digits">
+          <input name="accountNumber" defaultValue={site.bank.accountNumber} maxLength={20} inputMode="numeric" className={inputClass} />
+        </Field>
+        <Field label="Account name" error={e.accountName} className="sm:col-span-2" hint="Exactly as the bank shows it, e.g. Tobecat Technologies Nigeria Limited">
+          <input name="accountName" defaultValue={site.bank.accountName} maxLength={100} className={inputClass} />
+        </Field>
+        <Field label="Email for new order & quote alerts" error={e.alertEmail} className="sm:col-span-2" hint="Leave empty to use the contact email above.">
+          <input name="alertEmail" type="email" defaultValue={site.alertEmail} maxLength={120} className={inputClass} />
+        </Field>
+      </Section>
+
       <Section title="Address">
         <Field label="Head office street *" error={e.street} className="sm:col-span-2">
           <input name="street" defaultValue={site.address.street} maxLength={120} className={inputClass} />

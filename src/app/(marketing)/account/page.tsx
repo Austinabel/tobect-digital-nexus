@@ -10,6 +10,9 @@ import { ORDER_STATUS, PAYMENT_STATUS } from "@/lib/shop/order-labels";
 import { logout } from "./actions";
 import { getStaff } from "@/lib/admin/auth";
 import { deleteDesign } from "../solar-calculator/actions";
+import { BankTransferBox } from "@/components/shop/bank-transfer-box";
+import { bankTransferDetails } from "@/lib/site";
+import { getSite } from "@/lib/site-server";
 
 export const metadata: Metadata = { title: "My Account", robots: { index: false, follow: false } };
 
@@ -19,13 +22,14 @@ export default async function AccountPage(props: PageProps<"/account">) {
   const supabase = await supabaseServer();
   const { data } = await supabase.auth.getUser();
   if (!data.user) redirect("/account/login?next=/account");
+  const bank = bankTransferDetails(await getSite());
 
   // Both reads go through row-level security: customers only ever get their own rows.
   const [{ data: profile }, { data: orders }, { data: designs }] = await Promise.all([
     supabase.from("customer_profiles").select("full_name, phone, delivery_address, city, state").eq("id", data.user.id).maybeSingle(),
     supabase
       .from("orders")
-      .select("id, order_number, created_at, subtotal_ngn, status, payment_status, order_items(name, quantity)")
+      .select("id, order_number, created_at, subtotal_ngn, status, payment_status, payment_method, order_items(name, quantity)")
       .order("created_at", { ascending: false })
       .limit(50),
     supabase.from("saved_designs").select("id, name, share_code, summary, created_at").order("created_at", { ascending: false }).limit(50),
@@ -76,6 +80,11 @@ export default async function AccountPage(props: PageProps<"/account">) {
                         <span className="rounded-full bg-field px-2.5 py-1 text-[0.72rem] font-semibold text-slate">{PAYMENT_STATUS[o.payment_status] ?? o.payment_status}</span>
                         <span className="font-heading font-extrabold tabular-nums text-ink">{formatNaira(o.subtotal_ngn)}</span>
                       </div>
+                      {bank && o.payment_method === "bank-transfer" && o.payment_status === "unpaid" && !["cancelled", "returned"].includes(o.status) && (
+                        <div className="basis-full">
+                          <BankTransferBox bank={bank} orderNumber={o.order_number} amountNgn={Number(o.subtotal_ngn)} compact />
+                        </div>
+                      )}
                     </li>
                   );
                 })}

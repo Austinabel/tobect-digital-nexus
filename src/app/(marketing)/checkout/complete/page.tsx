@@ -8,6 +8,8 @@ import { formatNaira } from "@/lib/data/products";
 import { PAYMENT_METHOD, PAYMENT_STATUS } from "@/lib/shop/order-labels";
 import { getSiteLinks } from "@/lib/site-server";
 import { IconCheck, IconWhatsApp, IconInfo } from "@/components/icons";
+import { BankTransferBox } from "@/components/shop/bank-transfer-box";
+import { bankTransferDetails } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Order Received", robots: { index: false, follow: false } };
 
@@ -28,6 +30,7 @@ export default async function CompletePage(props: PageProps<"/checkout/complete"
   if (!order) notFound();
 
   const paid = order.payment_status === "paid";
+  const bank = order.payment_method === "bank-transfer" && !paid ? bankTransferDetails(SITE) : null;
   const items = order.order_items as { name: string; quantity: number; line_total_ngn: number; kit_parts: string[] | null }[];
 
   return (
@@ -56,6 +59,12 @@ export default async function CompletePage(props: PageProps<"/checkout/complete"
               </p>
             )}
 
+            {bank && (
+              <div className="mt-5">
+                <BankTransferBox bank={bank} orderNumber={order.order_number} amountNgn={Number(order.subtotal_ngn)} />
+              </div>
+            )}
+
             <ul className="mt-5 divide-y divide-hair text-[0.9rem]">
               {items.map((i, n) => (
                 <li key={n} className="py-3">
@@ -80,7 +89,11 @@ export default async function CompletePage(props: PageProps<"/checkout/complete"
             <div className="rounded-3xl bg-ink p-6 text-white">
               <h2 className="font-heading text-[1.05rem] font-bold">What happens next</h2>
               <ol className="mt-3 list-decimal space-y-2 pl-4 text-[0.88rem] text-white/85">
-                <li>We confirm stock and your delivery cost{paid ? "" : ", then send payment details"}.</li>
+                <li>
+                  {bank
+                    ? "Make the transfer — we'll confirm your order and mark it paid when the money arrives."
+                    : `We confirm stock and your delivery cost${paid ? "" : ", then send payment details"}.`}
+                </li>
                 <li>We arrange delivery to {order.city}, {order.state}.</li>
                 <li>Installation, if you asked for it, is scheduled with you.</li>
               </ol>

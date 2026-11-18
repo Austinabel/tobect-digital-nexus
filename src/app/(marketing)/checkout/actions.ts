@@ -9,6 +9,9 @@ import { parseRequestedLines, priceOrder } from "@/lib/shop/order-pricing";
 import type { KitCatalogueProduct } from "@/lib/shop/kits";
 import { NIGERIAN_STATES } from "@/lib/nigeria";
 import { initializePayment, onlinePaymentEnabled } from "@/lib/payments/paystack";
+import { getSite } from "@/lib/site-server";
+import { bankTransferDetails } from "@/lib/site";
+import { emailNewOrder } from "@/lib/email/notify";
 
 export interface CheckoutState {
   error?: string;
@@ -38,7 +41,9 @@ export async function placeOrder(_: CheckoutState | undefined, fd: FormData): Pr
     state: str(fd, "state", 40),
     notes: str(fd, "notes", 1000),
   };
-  let method: "paystack" | "pay-on-confirmation" = fd.get("payment_method") === "paystack" && onlinePaymentEnabled() ? "paystack" : "pay-on-confirmation";
+  const chosen = fd.get("payment_method");
+  let method: "paystack" | "bank-transfer" | "pay-on-confirmation" =
+    chosen === "paystack" && onlinePaymentEnabled() ? "paystack" : chosen === "bank-transfer" && bankTransferDetails(await getSite()) ? "bank-transfer" : "pay-on-confirmation";
 
   if (contact.full_name.length < 2) return { error: "Please enter your full name." };
   if (contact.phone.replace(/\D/g, "").length < 10) return { error: "Please enter a valid phone number." };
@@ -112,6 +117,26 @@ export async function placeOrder(_: CheckoutState | undefined, fd: FormData): Pr
   }
 
   const done = `/checkout/complete?order=${created.id}&token=${created.access_token}`;
+
+  // Confirmation to the customer (with bank details for a transfer) and an alert to the team — sent after the page answers.
+  emailNewOrder(
+    {
+      orderNumber: created.order_number,
+      name: contact.full_name,
+      phone: contact.phone,
+      email: contact.email || user?.email || null,
+      address: contact.delivery_address,
+      city: contact.city,
+      state: contact.state,
+      notes: contact.notes || null,
+      subtotalNgn: order.subtotalNgn,
+      hasUnpricedParts: order.hasUnpricedParts,
+      paymentMethod: method,
+      items: order.lines.map((l) => ({ name: l.name, quantity: l.quantity, lineTotalNgn: l.lineTotalNgn })),
+      link: `${(await getSite()).url}${done}`,
+    },
+    `/admin/orders/${created.id}`,
+  );
 
   if (method === "paystack") {
     const h = await headers();

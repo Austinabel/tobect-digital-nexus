@@ -1,5 +1,6 @@
 "use server";
 
+import { emailWelcome } from "@/lib/email/notify";
 import { redirect } from "next/navigation";
 import { safeNext, supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
 
@@ -48,6 +49,7 @@ export async function register(_: AuthState | undefined, fd: FormData): Promise<
     await admin.auth.admin.deleteUser(data.user.id);
     return { ...back, error: "We couldn't create your account. Please try again." };
   }
+  emailWelcome(fields.email, fields.full_name);
 
   const supabase = await supabaseServer();
   const { error: signInError } = await supabase.auth.signInWithPassword({ email: fields.email, password });

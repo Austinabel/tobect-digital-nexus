@@ -37,6 +37,8 @@
     "src/lib/content.ts",
     "src/lib/content.test.ts",
     "src/lib/site.ts",
+    "src/lib/email/templates.ts",
+    "src/lib/email/templates.test.ts",
     "src/lib/admin/reports.ts",
     "src/lib/admin/reports.test.ts",
     "src/lib/admin/product-dedupe.ts",

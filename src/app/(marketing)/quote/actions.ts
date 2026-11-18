@@ -2,6 +2,7 @@
 
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { getCatalog } from "@/lib/catalog-server";
+import { emailNewQuote } from "@/lib/email/notify";
 
 export interface QuotePayload {
   kind: "standard" | "bulk";
@@ -48,19 +49,15 @@ export async function saveQuoteRequest(p: QuotePayload): Promise<{ ok: boolean; 
   const { count } = await admin.from("quote_requests").select("id", { count: "exact", head: true }).eq("phone", phone).gte("created_at", since);
   if ((count ?? 0) >= 5) return { ok: false, error: "We've already received several requests from this number — our team will be in touch." };
 
+  const details = {
+    business_name: clip(p.businessName, 120) || null,
+    customer_type: clip(p.customerType, 60) || null,
+    services: (Array.isArray(p.services) ? p.services : []).map((s) => clip(s, 120)).filter(Boolean).slice(0, 10),
+    project_description: clip(p.message, 3000) || null,
+  };
   const { data: req, error } = await admin
     .from("quote_requests")
-    .insert({
-      kind,
-      name,
-      phone,
-      email: email || null,
-      delivery_location: location,
-      business_name: clip(p.businessName, 120) || null,
-      customer_type: clip(p.customerType, 60) || null,
-      services: (Array.isArray(p.services) ? p.services : []).map((s) => clip(s, 120)).filter(Boolean).slice(0, 10),
-      project_description: clip(p.message, 3000) || null,
-    })
+    .insert({ kind, name, phone, email: email || null, delivery_location: location, ...details })
     .select("id, reference")
     .single();
   if (error || !req) return { ok: false, error: "Couldn't save your request — WhatsApp still has it." };
@@ -70,5 +67,9 @@ export async function saveQuoteRequest(p: QuotePayload): Promise<{ ok: boolean; 
     const byName = new Map(products.map((x) => [x.name.toLowerCase(), x.slug]));
     await admin.from("quote_request_items").insert(items.map((i) => ({ request_id: req.id, description: i.description, quantity: i.quantity, product_slug: byName.get(i.description.toLowerCase()) ?? null })));
   }
+  emailNewQuote(
+    { reference: req.reference, kind, name, phone, email: email || null, location, businessName: details.business_name, customerType: details.customer_type, services: details.services, message: details.project_description, items },
+    `/admin/quotes/${req.id}`,
+  );
   return { ok: true, reference: req.reference };
 }
