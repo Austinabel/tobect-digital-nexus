@@ -6,6 +6,9 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { requirePermission } from "@/lib/admin/auth";
 import { logActivity } from "@/lib/admin/activity";
 import { canChangeStatus, canRecordPayment, stockEffect } from "@/lib/shop/order-status";
+import { emailOrderUpdate } from "@/lib/email/notify";
+import { emailEnabled } from "@/lib/email/send";
+import type { OrderUpdateEvent } from "@/lib/email/templates";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -18,6 +21,14 @@ async function loadOrder(id: string) {
   const { data } = await supabaseAdmin().from("orders").select("id, order_number, status, payment_status").eq("id", id).maybeSingle();
   if (!data) redirect("/admin/orders?notice=Order%20not%20found.");
   return data;
+}
+
+/** Emails the customer about the change (unless staff unticked "Email the customer"); returns a note for the admin. */
+async function tellCustomer(id: string, event: OrderUpdateEvent, fd: FormData): Promise<string> {
+  // forms with an "Email the customer" tick box send notify_box; unticked = don't email
+  if ((fd.has("notify_box") && !fd.get("notify")) || !emailEnabled()) return "";
+  const to = await emailOrderUpdate(id, event);
+  return to ? ` The customer has been emailed at ${to}.` : " (No email address on this order — let the customer know by phone or WhatsApp.)";
 }
 
 export async function changeOrderStatus(fd: FormData) {
@@ -56,7 +67,8 @@ export async function changeOrderStatus(fd: FormData) {
   await logActivity(actor, { action: "order.status", entityType: "order", entityId: id, summary: `${order.order_number}: ${order.status} → ${to}` });
   revalidatePath("/admin/orders");
   revalidatePath("/", "layout"); // stock levels show in the shop
-  back(id, `Order ${to}.${stockNote ? ` ${stockNote}` : ""}`);
+  const emailed = await tellCustomer(id, to as OrderUpdateEvent, fd);
+  back(id, `Order ${to}.${stockNote ? ` ${stockNote}` : ""}${emailed}`);
 }
 
 export async function recordPayment(fd: FormData) {
@@ -77,7 +89,8 @@ export async function recordPayment(fd: FormData) {
   await admin.from("order_events").insert({ order_id: id, actor_id: actor.userId, actor_email: actor.email, kind: "payment", from_value: order.payment_status, to_value: to, message: note });
   await logActivity(actor, { action: "order.payment", entityType: "order", entityId: id, summary: `${order.order_number}: payment ${order.payment_status} → ${to}` });
   revalidatePath("/admin/orders");
-  back(id, to === "paid" ? "Payment recorded." : "Refund recorded.");
+  const emailed = await tellCustomer(id, to as OrderUpdateEvent, fd);
+  back(id, `${to === "paid" ? "Payment recorded." : "Refund recorded."}${emailed}`);
 }
 
 export async function addOrderNote(fd: FormData) {

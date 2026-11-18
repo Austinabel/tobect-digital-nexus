@@ -66,7 +66,7 @@ export const DEFAULT_SITE: SiteSettings = {
   name: "Tobecat Technologies",
   shortName: "Tobecat",
   legalName: "Tobecat Technologies Nigeria Limited",
-  url: "https://tobecat.com",
+  url: "https://www.tobecat.com",
   tagline: "Powering the Future with Renewable Energy",
   description:
     "Tobecat Technologies Nigeria Limited supplies and installs solar panels, inverters, lithium batteries, solar generators, CCTV and security systems for homes and businesses across Nigeria.",

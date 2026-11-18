@@ -256,3 +256,62 @@ export function newQuoteAlert(site: SiteSettings, q: QuoteEmailData, adminLink: 
     text: `New quote request ${q.reference} from ${q.name} (${q.phone}), ${q.location}.\n${adminLink}`,
   };
 }
+
+// ---------------------------------------------------------------- order updates
+
+export type OrderUpdateEvent = "confirmed" | "processing" | "dispatched" | "delivered" | "cancelled" | "returned" | "paid" | "refunded";
+
+export interface OrderUpdateData {
+  event: OrderUpdateEvent;
+  orderNumber: string;
+  name: string;
+  city: string;
+  state: string;
+  subtotalNgn: number;
+  /** still waiting for payment (and not paid online) — the email then says how to pay */
+  awaitingPayment: boolean;
+  link: string;
+}
+
+const UPDATE_COPY: Record<OrderUpdateEvent, { subject: string; heading: string; line: (o: OrderUpdateData) => string }> = {
+  confirmed: { subject: "confirmed", heading: "Your order is confirmed", line: () => "Good news — we&rsquo;ve confirmed your order and reserved your items. We&rsquo;ll let you know as soon as it&rsquo;s on its way." },
+  processing: { subject: "is being prepared", heading: "We're preparing your order", line: () => "Your order is being prepared for delivery." },
+  dispatched: { subject: "is on its way", heading: "Your order is on its way", line: (o) => `Your order has left our warehouse and is on its way to <b>${esc(o.city)}, ${esc(o.state)}</b>. Please keep your phone close — the delivery team will call you.` },
+  delivered: { subject: "has been delivered", heading: "Your order has been delivered", line: () => "Your order has been delivered. Thank you for choosing us! If anything isn&rsquo;t right, or you&rsquo;d like help with installation, just reply to this email or message us on WhatsApp." },
+  cancelled: { subject: "has been cancelled", heading: "Your order has been cancelled", line: () => "Your order has been cancelled. If you didn&rsquo;t expect this or have any questions, please contact us — we&rsquo;re happy to help." },
+  returned: { subject: "return has been processed", heading: "Your return has been processed", line: () => "We&rsquo;ve processed the return of your order. If you have any questions, please contact us." },
+  paid: { subject: "payment received", heading: "Payment received — thank you!", line: (o) => `We&rsquo;ve received your payment of <b>${esc(naira(o.subtotalNgn))}</b>. Your order is now being processed.` },
+  refunded: { subject: "refund processed", heading: "Your refund has been processed", line: () => "We&rsquo;ve processed a refund for your order. Depending on your bank it can take a few working days to show. If you have any questions, please contact us." },
+};
+
+export function orderUpdateEmail(site: SiteSettings, o: OrderUpdateData, bank: SiteSettings["bank"] | null): Email {
+  const copy = UPDATE_COPY[o.event];
+  // how to pay: only while an order is going ahead and still unpaid
+  const payNow = o.awaitingPayment && bank && (o.event === "confirmed" || o.event === "processing");
+  const body = [
+    p(`Hi ${esc(firstName(o.name))},`),
+    p(copy.line(o)),
+    table([["Order", `<b>${esc(o.orderNumber)}</b>`], ["Total", esc(naira(o.subtotalNgn))]], { tint: true }),
+    payNow
+      ? h2("How to pay") +
+        p("Please pay by bank transfer to:") +
+        table(
+          [
+            ["Bank", esc(bank.bankName)],
+            ["Account number", `<b>${esc(bank.accountNumber)}</b>`],
+            ["Account name", esc(bank.accountName)],
+            ["Payment reference", `<b>${esc(o.orderNumber)}</b>`],
+          ],
+          { tint: true },
+        ) +
+        p(`Use <b>${esc(o.orderNumber)}</b> as the transfer narration so we can match your payment.`)
+      : "",
+    button(o.link, "View Your Order", BLUE),
+    p(`Thank you,<br><b>The ${esc(site.shortName)} team</b>`),
+  ].join("");
+  return {
+    subject: `Order ${o.orderNumber} ${copy.subject} — ${site.name}`,
+    html: layout(site, { preheader: `Order ${o.orderNumber}: ${copy.heading.toLowerCase()}.`, heading: copy.heading, body }),
+    text: `Hi ${firstName(o.name)},\n\n${copy.line(o).replace(/<[^>]+>/g, "").replace(/&rsquo;/g, "'")}\n\nOrder ${o.orderNumber} — ${naira(o.subtotalNgn)}${payNow ? `\nPay by bank transfer: ${bank.bankName}, ${bank.accountNumber}, ${bank.accountName}. Reference: ${o.orderNumber}.` : ""}\n\nView your order: ${o.link}\n\nThe ${site.shortName} team`,
+  };
+}

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { verifyPayment } from "@/lib/payments/paystack";
+import { emailOrderUpdate } from "@/lib/email/notify";
 
 /**
  * Paystack sends the customer back here after paying. The redirect proves
@@ -25,11 +26,14 @@ export async function GET(request: NextRequest) {
   try {
     const tx = await verifyPayment(reference);
     const paid = tx.status === "success" && tx.currency === "NGN" && tx.amount === Number(order.subtotal_ngn) * 100;
-    await admin
+    const { data: changed } = await admin
       .from("orders")
       .update(paid ? { payment_status: "paid", paid_at: tx.paid_at ?? new Date().toISOString() } : { payment_status: tx.status === "abandoned" ? "unpaid" : "failed" })
       .eq("id", order.id)
-      .neq("payment_status", "paid");
+      .neq("payment_status", "paid")
+      .select("id");
+    // "payment received" email — only by the request that actually marked it paid
+    if (paid && changed?.length) await emailOrderUpdate(order.id, "paid");
   } catch {
     // Verification couldn't run (network etc.): leave it "pending"; staff can re-check in Paystack.
   }

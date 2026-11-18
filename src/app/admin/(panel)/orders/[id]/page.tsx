@@ -9,6 +9,7 @@ import { ORDER_STATUS, PAYMENT_METHOD, PAYMENT_STATUS } from "@/lib/shop/order-l
 import { STATUS_ACTION_LABEL, allowedNextStatuses, canRecordPayment } from "@/lib/shop/order-status";
 import { badge, customerWhatsApp } from "@/lib/admin/contact";
 import { addOrderNote, changeOrderStatus, recordPayment } from "../actions";
+import { emailEnabled } from "@/lib/email/send";
 
 export const metadata = { title: "Order" };
 
@@ -32,6 +33,7 @@ export default async function OrderPage(props: PageProps<"/admin/orders/[id]">) 
   ]);
   if (!o) notFound();
   const next = allowedNextStatuses(o.status);
+  const emailOn = emailEnabled();
   const wa = customerWhatsApp(o.phone, `Hello ${o.full_name.split(" ")[0]}, this is Tobecat Technologies about your order ${o.order_number}.`);
 
   return (
@@ -153,6 +155,12 @@ export default async function OrderPage(props: PageProps<"/admin/orders/[id]">) 
                           <input type="hidden" name="id" value={o.id} />
                           <input type="hidden" name="to" value={to} />
                           <input name="reason" required maxLength={500} placeholder={`Reason (required)`} className={`${inputClass} h-9`} />
+                          {o.email && emailOn && (
+                            <label className="flex items-center gap-2 text-[0.78rem] text-slate">
+                              <input type="hidden" name="notify_box" value="1" />
+                              <input type="checkbox" name="notify" value="yes" defaultChecked className="accent-[var(--color-blue)]" /> Email the customer
+                            </label>
+                          )}
                           <button type="submit" className={`${ghostButtonClass} w-full hover:border-red hover:text-red`}>
                             {STATUS_ACTION_LABEL[to]}
                           </button>
@@ -168,6 +176,7 @@ export default async function OrderPage(props: PageProps<"/admin/orders/[id]">) 
                       ),
                     )}
                     {o.status === "new" && <p className="text-[0.74rem] text-slate">Confirming deducts any tracked stock for this order.</p>}
+                    {o.email && emailOn && <p className="text-[0.74rem] text-slate">The customer is emailed about each step ({o.email}).</p>}
                   </div>
                 ) : (
                   <p className="text-[0.86rem] text-slate">This order is {ORDER_STATUS[o.status]?.label.toLowerCase()} — no further steps.</p>
@@ -186,6 +195,12 @@ export default async function OrderPage(props: PageProps<"/admin/orders/[id]">) 
                       placeholder={canRecordPayment(o.payment_status, "paid") ? "How it was paid, e.g. Bank transfer ref 12345" : "Refund details: amount, method, reference"}
                       className={`${inputClass} h-9`}
                     />
+                    {o.email && emailOn && (
+                    <label className="flex items-center gap-2 text-[0.78rem] text-slate">
+                      <input type="hidden" name="notify_box" value="1" />
+                      <input type="checkbox" name="notify" value="yes" defaultChecked className="accent-[var(--color-blue)]" /> Email the customer
+                    </label>
+                    )}
                     <button type="submit" className={`${canRecordPayment(o.payment_status, "paid") ? buttonClass : ghostButtonClass} w-full`}>
                       {canRecordPayment(o.payment_status, "paid") ? `Record payment of ${formatNaira(Number(o.subtotal_ngn))}` : "Record refund"}
                     </button>

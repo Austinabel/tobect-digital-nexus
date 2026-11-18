@@ -45,3 +45,16 @@ test("quote alert lists products and keeps line breaks in the message", () => {
   assert.ok(e.html.includes("450W panel") && e.html.includes("× 20") && e.html.includes("line1<br>line2"));
   assert.match(e.subject, /bulk quote request Q-7/);
 });
+
+test("order updates: bank details only while a confirmed order is unpaid", async () => {
+  const { orderUpdateEmail } = await import("./templates");
+  const base = { orderNumber: "TBC-9", name: "Ada Obi", city: "Awka", state: "Anambra", subtotalNgn: 500_000, awaitingPayment: true, link: "https://x/o" };
+  const confirmed = orderUpdateEmail(DEFAULT_SITE, { ...base, event: "confirmed" }, bank);
+  assert.ok(confirmed.html.includes("How to pay") && confirmed.html.includes("0123456789"));
+  assert.match(confirmed.subject, /TBC-9 confirmed/);
+  const dispatched = orderUpdateEmail(DEFAULT_SITE, { ...base, event: "dispatched" }, bank);
+  assert.ok(!dispatched.html.includes("0123456789") && dispatched.html.includes("Awka, Anambra"));
+  const paid = orderUpdateEmail(DEFAULT_SITE, { ...base, event: "paid", awaitingPayment: false }, bank);
+  assert.ok(paid.html.includes("₦500,000") && !paid.html.includes("How to pay"));
+  assert.ok(!paid.text.includes("<b>"));
+});
