@@ -517,6 +517,13 @@ export const categoryGlyphs = {
       <path d="M3.5 8.5 8.5 3.5l3 3-5 5ZM13.5 16.5l3-3 4 4-3 3Z" />
     </svg>
   ),
+  /** cables & accessories: a coiled cable with a plug end */
+  cable: (
+    <svg {...base} strokeWidth={1.5}>
+      <path d="M4 20c0-4 3-5 6-5s6-1 6-5-2.5-6-6-6-6 2-6 5" />
+      <path d="M16 10h3M19 7.5v5M21 8.5v3" />
+    </svg>
+  ),
   /** small appliances: a plug */
   appliance: (
     <svg {...base} strokeWidth={1.5}>

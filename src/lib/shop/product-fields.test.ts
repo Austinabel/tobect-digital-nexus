@@ -16,7 +16,8 @@ test("categories get their product type from their address, or their parent's", 
   assert.equal(productTypeFor("solar-pumps").id, "pump");
   assert.equal(productTypeFor("solar-lights").id, "lighting");
   assert.equal(productTypeFor("deye-range", "inverters").id, "inverter", "a subcategory without a keyword uses its parent");
-  assert.equal(productTypeFor("accessories").id, "general");
+  assert.equal(productTypeFor("accessories").id, "accessory");
+  assert.equal(productTypeFor("miscellaneous").id, "general");
   assert.deepEqual(fieldsFor(""), []);
 });
 
@@ -57,4 +58,13 @@ test("a bad number names the field; typed key specs are kept as typed", () => {
   const typed = parseProductForm({ name: "Deye 8kW", category: "inverters", price: "1", images: "[]", attr_capacity: "8", specs: "8 kW, Hybrid" }, { categories: ["inverters"], isNew: true });
   assert.deepEqual(typed.value!.specs, ["8 kW", "Hybrid"]);
   assert.deepEqual(chipsFromAttributes(PRODUCT_TYPES.inverter.fields, { capacity: "8 kVA", inverterType: "Hybrid", phase: "Single phase" }), ["8 kVA", "Hybrid"]);
+});
+
+test("cable & accessory categories get the accessory fields; other categories are unchanged", () => {
+  for (const slug of ["cables-accessories", "cables", "surge-voltage-protectors", "changeover-switches", "breakers-isolators", "connectors-mounting"])
+    assert.equal(productTypeFor(slug, slug === "cables-accessories" ? null : "cables-accessories").id, "accessory", slug);
+  assert.equal(productTypeFor("cctv-security").id, "cctv");
+  assert.equal(productTypeFor("complete-solar-setups").id, "power-system");
+  assert.equal(productTypeFor("solar-panels").id, "solar-panel");
+  assert.equal(productTypeFor("small-appliances").id, "general");
 });

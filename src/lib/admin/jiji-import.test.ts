@@ -180,3 +180,11 @@ test("complete solar setups are told apart from single products and solar genera
   for (const t of ["SVC RPS 1.2kw Inverter + 4kwh Solar Generator", "Haisic 215kWh / 100kva All-in-One Commercial Industrial ESS Cabinet", "Felicity Solar 10kVA 48V Hybrid Inverter With 120A MPPT", "16kwh Lifepo4 Battery With 10 Yrs Warranty", "1000w Itel Solar Kit"])
     assert.equal(isCompleteSetup(t), false, t);
 });
+
+test("cable and protection adverts are read as accessories", async () => {
+  const { productTypeFromTitle } = await import("./jiji-import");
+  for (const t of ["6mm DC Solar Cable 100 Metres", "Sollatek Voltage Protector (AVS 30)", "63A Changeover Switch", "DC Surge Protector 1000V", "MC4 Connectors (10 pairs)"])
+    assert.equal(productTypeFromTitle(t, "power-equipments"), "accessory", t);
+  assert.equal(productTypeFromTitle("Felicity 5kva Inverter With Surge Protection", "power-equipments"), "inverter");
+  assert.equal(productTypeFromTitle("Solar Generator With Cables", "power-equipments"), "power-system");
+});

@@ -164,6 +164,20 @@ export const PRODUCT_TYPES: Record<string, ProductType> = {
       warranty,
     ],
   },
+  accessory: {
+    id: "accessory",
+    label: "Cable & accessory details",
+    fields: [
+      { key: "current", label: "Current rating (A)", kind: "number", unit: "A", quick: [16, 32, 63, 100, 125], filter: true, chip: 0 },
+      { key: "voltage", label: "Voltage", kind: "number", unit: "V", quick: [220, 500, 1000], filter: true, chip: 1 },
+      { key: "cableSize", label: "Cable size (mm²)", kind: "number", unit: "mm²", quick: [2.5, 4, 6, 10, 16, 25, 35], filter: true, chip: 2 },
+      { key: "length", label: "Length (m)", kind: "number", unit: "m", quick: [10, 50, 100] },
+      { key: "poles", label: "Poles", kind: "choice", options: ["1P", "2P", "3P", "4P"] },
+      { key: "use", label: "For", kind: "choice", options: ["DC (solar side)", "AC (house side)", "Battery"], filter: true },
+      condition,
+      warranty,
+    ],
+  },
   general: { id: "general", label: "Other details", fields: [condition, warranty] },
 };
 
@@ -178,6 +192,7 @@ const MATCHERS: [RegExp, string][] = [
   [/pump/, "pump"],
   [/\bfans?\b/, "fan"],
   [/light|lamp|flood|bulb/, "lighting"],
+  [/cable|accessor|surge|protector|protection|change-?over|breaker|isolator|connector|mounting|fuse/, "accessory"],
 ];
 
 function match(slug: string | undefined): ProductType | undefined {

@@ -164,6 +164,7 @@ export function parseJijiListing(html: string, url: string): JijiListing | null 
 
 /** Title keyword → product type. Checked in order; the first match wins. */
 const TITLE_TYPES: [RegExp, string][] = [
+  [/\bcables?\b|surge|\bprotectors?\b|\bavs\b|change ?over|\bbreakers?\b|isolator|\bmc4\b|\bconnectors?\b|mounting (kit|rail|bracket)|\bspd\b|\bfuses?\b/, "accessory"],
   [/\bgenerator\b|power ?station|power ?tank|power ?bank|all in one|\bess\b|\bkit\b|set ?up|solar system|\bcombo\b|\d\s*w output\b/, "power-system"],
   [/\bcctv\b|\bcamera|\bcamer\b|\bptz\b|\blens(es)?\b/, "cctv"],
   [/freezer|fridge|refrigerator|ice (block )?maker/, "freezer"],
