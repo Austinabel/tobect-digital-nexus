@@ -67,8 +67,19 @@ export const BATTERY_CHEMISTRY: Record<
   },
 };
 
-export const PANEL_WATT_OPTIONS = [450, 550, 600] as const;
-export type PanelWatt = (typeof PANEL_WATT_OPTIONS)[number];
+/** Common panel sizes offered in the calculators; any other size can be typed as a custom value. */
+export const PANEL_WATT_OPTIONS = [250, 300, 350, 420, 450, 500, 550, 590, 600, 620, 650, 700, 720] as const;
+/** Panel rating in watts — one of the options above or a custom size within PANEL_WATT_RANGE. */
+export type PanelWatt = number;
+export const PANEL_WATT_RANGE = { min: 50, max: 1000 } as const;
+
+/** A usable panel size: whole watts within the allowed range, or null. */
+export function cleanPanelWatt(w: unknown): PanelWatt | null {
+  const n = typeof w === "string" ? Number(w) : w;
+  if (typeof n !== "number" || !Number.isFinite(n)) return null;
+  const r = Math.round(n);
+  return r >= PANEL_WATT_RANGE.min && r <= PANEL_WATT_RANGE.max ? r : null;
+}
 
 /* ------------------------------------------------------------------ */
 /* Appliances & presets                                                */

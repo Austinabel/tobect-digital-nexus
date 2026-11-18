@@ -12,7 +12,6 @@ import {
   APPLICATION_TYPES,
   BACKUP_HOUR_OPTIONS,
   BATTERY_CHEMISTRY,
-  PANEL_WATT_OPTIONS,
   SIMULTANEITY_OPTIONS,
   defaultInput,
   formatKwh,
@@ -24,11 +23,10 @@ import {
   type BatteryChemistry,
   type CalculatorInput,
   type LoadLine,
-  type PanelWatt,
 } from "@/lib/calculator";
 import {
   REGIONS,
-  TYPICAL_PANELS,
+  typicalPanel,
   compatibleModules,
   computeDesign,
   defaultDesignOptions,
@@ -42,6 +40,7 @@ import { attrNumber, generatorSavings, priceDesign, type CatalogueEntry } from "
 import { decodeDesign, encodeDesign } from "@/lib/design-share";
 import { saveDesign } from "@/app/(marketing)/solar-calculator/actions";
 import { LoadRow, fieldClass, numberValue } from "@/components/marketing/solar-calculator";
+import { PanelSizeField } from "@/components/calculator/panel-size-field";
 import { IconArrowRight, IconCart, IconCheck, IconChevronDown, IconInfo, IconPlus, IconQuote, IconWhatsApp } from "@/components/icons";
 
 /* ---------------- catalogue (real shop data, from the database) ---------------- */
@@ -487,14 +486,12 @@ export function AdvancedCalculator({ initialType = "home", shared, signedIn }: {
             </div>
             <p className="mt-1.5 text-[0.76rem] text-slate">Typical annual average for {region?.label}. The north gets more sun than the coast, so it needs fewer panels.</p>
             <div className="mt-4">
-              <Segmented
-                label="Panel size"
-                value={String(input.panelWatt)}
-                options={PANEL_WATT_OPTIONS.map((w) => ({ value: String(w), label: `${w} W` }))}
-                onChange={(w) => {
-                  const watt = Number(w) as PanelWatt;
+              <PanelSizeField
+                className="sm:max-w-[260px]"
+                value={input.panelWatt}
+                onChange={(watt) => {
                   setInput((s) => ({ ...s, panelWatt: watt }));
-                  opt({ panel: { ...TYPICAL_PANELS[watt] } });
+                  opt({ panel: typicalPanel(watt) });
                 }}
               />
             </div>

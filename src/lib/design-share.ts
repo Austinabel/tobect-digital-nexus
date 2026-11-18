@@ -7,7 +7,7 @@
 import {
   APPLICATION_TYPES,
   BATTERY_CHEMISTRY,
-  PANEL_WATT_OPTIONS,
+  cleanPanelWatt,
   defaultInput,
   type CalculatorInput,
   type LoadLine,
@@ -62,7 +62,7 @@ export function decodeDesign(raw: string | undefined | null): SharedDesign | nul
           };
         })
       : base.loads;
-    const panelWatt: PanelWatt = (PANEL_WATT_OPTIONS as readonly number[]).includes(i?.panelWatt) ? i.panelWatt : base.panelWatt;
+    const panelWatt: PanelWatt = cleanPanelWatt(i?.panelWatt) ?? base.panelWatt;
     const input: CalculatorInput = {
       ...base,
       loads,

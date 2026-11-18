@@ -3,13 +3,13 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { PanelSizeField } from "@/components/calculator/panel-size-field";
 import { useSiteLinks } from "@/components/site-provider";
 import { useAppliances } from "@/components/calculator-provider";
 import {
   APPLICATION_TYPES,
   BACKUP_HOUR_OPTIONS,
   BATTERY_CHEMISTRY,
-  PANEL_WATT_OPTIONS,
   PEAK_SUN_HOURS,
   SIMULTANEITY_OPTIONS,
   computeSystemEstimate,
@@ -25,7 +25,6 @@ import {
   type BatteryChemistry,
   type CalculatorInput,
   type LoadLine,
-  type PanelWatt,
 } from "@/lib/calculator";
 import { IconCalculator, IconArrowRight, IconWhatsApp, IconMinus, IconPlus, IconTrash, IconInfo, IconChevronDown } from "@/components/icons";
 
@@ -315,19 +314,14 @@ export function SolarCalculator({ initialType = "home", className }: { initialTy
             <option value="custom">Other / custom appliance</option>
           </select>
         </label>
-        <div className="mt-3 grid grid-cols-2 items-end gap-3">
+        <div className="mt-3 grid grid-cols-2 items-start gap-3">
           <Select
             label="Running together"
             value={input.simultaneity}
             options={simultaneityOptions}
             onChange={(v) => update({ simultaneity: v })}
           />
-          <Select<PanelWatt>
-            label="Panel size"
-            value={input.panelWatt}
-            options={PANEL_WATT_OPTIONS.map((w) => ({ value: w, label: `${w} W panels` }))}
-            onChange={(v) => update({ panelWatt: v })}
-          />
+          <PanelSizeField value={input.panelWatt} optionSuffix=" panels" onChange={(w) => update({ panelWatt: w })} />
         </div>
         <button
           type="button"

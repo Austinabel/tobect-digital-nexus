@@ -16,6 +16,7 @@ import {
   BATTERY_CHEMISTRY,
   POWER_FACTOR,
   PV_SYSTEM_DERATE,
+  PANEL_WATT_OPTIONS,
   computeSystemEstimate,
   type BatteryChemistry,
   type CalculatorInput,
@@ -132,12 +133,36 @@ export interface PanelSpec {
   widthMm: number;
 }
 
-/** Typical datasheet values for common module classes — replace with the actual panel's datasheet. */
-export const TYPICAL_PANELS: Record<PanelWatt, PanelSpec> = {
+/**
+ * Typical module classes by rating (STC voltages and size). Currents follow
+ * from the rating. These are only starting points — the advanced section
+ * lets the customer type the real datasheet values.
+ */
+const PANEL_CLASSES: { upTo: number; vmp: number; voc: number; lengthMm: number; widthMm: number }[] = [
+  { upTo: 330, vmp: 31.5, voc: 38.5, lengthMm: 1650, widthMm: 992 }, // 60-cell
+  { upTo: 480, vmp: 41.5, voc: 49.5, lengthMm: 2094, widthMm: 1038 }, // 72-cell / 144 half-cut
+  { upTo: 580, vmp: 41.9, voc: 49.9, lengthMm: 2278, widthMm: 1134 }, // 182 mm, 144 half-cut
+  { upTo: 640, vmp: 44.6, voc: 53.2, lengthMm: 2382, widthMm: 1134 }, // N-type 182 mm, 156 half-cut
+  { upTo: Infinity, vmp: 40.2, voc: 48.3, lengthMm: 2384, widthMm: 1303 }, // 210 mm, 132 half-cut
+];
+
+/** Exact typical values kept for the sizes earlier designs were made with. */
+const KNOWN_PANELS: Record<number, PanelSpec> = {
   450: { watt: 450, vmp: 41.5, voc: 49.5, imp: 10.85, isc: 11.5, lengthMm: 2094, widthMm: 1038 },
   550: { watt: 550, vmp: 41.9, voc: 49.9, imp: 13.13, isc: 13.9, lengthMm: 2278, widthMm: 1134 },
   600: { watt: 600, vmp: 34.9, voc: 41.7, imp: 17.2, isc: 18.3, lengthMm: 2172, widthMm: 1303 },
 };
+
+/** Typical datasheet values for a panel of the given rating — replace with the actual panel's datasheet. */
+export function typicalPanel(watt: PanelWatt): PanelSpec {
+  if (KNOWN_PANELS[watt]) return { ...KNOWN_PANELS[watt] };
+  const c = PANEL_CLASSES.find((x) => watt <= x.upTo)!;
+  const imp = Math.round((watt / c.vmp) * 100) / 100;
+  return { watt, vmp: c.vmp, voc: c.voc, imp, isc: Math.round(imp * 1.06 * 100) / 100, lengthMm: c.lengthMm, widthMm: c.widthMm };
+}
+
+/** Typical values for every size offered in the calculators. */
+export const TYPICAL_PANELS: Record<number, PanelSpec> = Object.fromEntries(PANEL_WATT_OPTIONS.map((w) => [w, typicalPanel(w)]));
 
 /* ------------------------------------------------------------------ */
 /* Inputs                                                              */
@@ -172,7 +197,7 @@ export function defaultDesignOptions(panelWatt: PanelWatt = 550): DesignOptions 
     regionId: "south-west",
     peakSunHours: REGIONS.find((r) => r.id === "south-west")!.psh,
     batteryModuleId: "li-48-100",
-    panel: { ...TYPICAL_PANELS[panelWatt] },
+    panel: typicalPanel(panelWatt),
     inverterMaxPvV: 500,
     mpptMinV: 120,
     pvRunM: 15,

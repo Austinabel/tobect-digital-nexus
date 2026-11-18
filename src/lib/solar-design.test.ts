@@ -119,3 +119,19 @@ test("summary text lists the bill of materials", () => {
   assert.match(text, /mm²/);
   assert.match(text, /Battery bank/);
 });
+
+test("every offered panel size has typical datasheet values; custom sizes are accepted within range", async () => {
+  const { PANEL_WATT_OPTIONS, cleanPanelWatt } = await import("./calculator");
+  const { typicalPanel } = await import("./solar-design");
+  assert.deepEqual([...PANEL_WATT_OPTIONS], [250, 300, 350, 420, 450, 500, 550, 590, 600, 620, 650, 700, 720]);
+  for (const w of [...PANEL_WATT_OPTIONS, 410, 1000]) {
+    const p = typicalPanel(w);
+    assert.equal(p.watt, w);
+    assert.ok(Math.abs(p.vmp * p.imp - w) / w < 0.03, `${w} W: Vmp × Imp should be close to the rating`);
+    assert.ok(p.voc > p.vmp && p.isc > p.imp);
+  }
+  assert.deepEqual(TYPICAL_PANELS[550], typicalPanel(550));
+  assert.equal(cleanPanelWatt("410"), 410);
+  assert.equal(cleanPanelWatt(20), null);
+  assert.equal(cleanPanelWatt("lots"), null);
+});
