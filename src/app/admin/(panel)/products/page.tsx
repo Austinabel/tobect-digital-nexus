@@ -6,6 +6,7 @@ import { can, getStaff } from "@/lib/admin/auth";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { formatNaira } from "@/lib/data/products";
 import { deleteProductForever, restoreProduct, trashAllSamples } from "./actions";
+import { BULK_FORM_ID, BulkBar } from "./bulk-bar";
 
 export const metadata = { title: "Products" };
 
@@ -59,6 +60,7 @@ export default async function ProductsAdminPage(props: PageProps<"/admin/product
   ]);
   const rows = (data ?? []) as unknown as Row[];
   const catName = new Map((cats ?? []).map((c) => [c.slug, c.name]));
+  const selectable = status !== "trash";
   const tabHref = (key: string) => `/admin/products${key ? `?status=${key}` : ""}`;
 
   return (
@@ -127,10 +129,17 @@ export default async function ProductsAdminPage(props: PageProps<"/admin/product
 
       <AdminCard className="p-0">
         {rows.length ? (
-          <div className="overflow-x-auto">
+          <>
+            {selectable && <BulkBar status={status} total={rows.length} />}
+            <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-left text-[0.88rem]">
               <thead className="border-b border-hair text-[0.72rem] uppercase tracking-[0.08em] text-slate">
                 <tr>
+                  {selectable && (
+                    <th className="w-10 py-3 pl-4">
+                      <span className="sr-only">Select</span>
+                    </th>
+                  )}
                   <th className="px-4 py-3 font-semibold">Product</th>
                   <th className="px-4 py-3 font-semibold">Category</th>
                   <th className="px-4 py-3 text-right font-semibold">Price</th>
@@ -144,6 +153,11 @@ export default async function ProductsAdminPage(props: PageProps<"/admin/product
                   const img = [...r.product_images].sort((a, b) => a.sort_order - b.sort_order)[0]?.media_assets?.public_url;
                   return (
                     <tr key={r.slug} className="hover:bg-field/60">
+                      {selectable && (
+                        <td className="py-2.5 pl-4">
+                          <input type="checkbox" name="slug" value={r.slug} form={BULK_FORM_ID} aria-label={`Select ${r.name}`} className="size-4 accent-[var(--color-blue)]" />
+                        </td>
+                      )}
                       <td className="px-4 py-2.5">
                         <Link href={`/admin/products/${r.slug}`} className="flex items-center gap-3">
                           <span className="relative size-11 shrink-0 overflow-hidden rounded-lg border border-hair bg-field">
@@ -195,7 +209,8 @@ export default async function ProductsAdminPage(props: PageProps<"/admin/product
                 })}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         ) : (
           <p className="p-5 text-slate">{status === "trash" ? "The trash is empty." : q || cat ? "No products match these filters." : "No products yet — add your first one."}</p>
         )}

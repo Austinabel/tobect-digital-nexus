@@ -142,3 +142,36 @@ export async function trashAllSamples(fd: FormData) {
   refreshSite();
   backToList({ notice: `${n} sample product${n === 1 ? "" : "s"} moved to the trash. You can restore them from the Trash tab.` });
 }
+
+const BULK_LABEL = { publish: "published", draft: "moved to drafts", trash: "moved to the trash" } as const;
+
+/**
+ * Publish, unpublish or trash the ticked products in one go. Products with no
+ * price are never published (the shop would show ₦0) — they're named in the notice.
+ */
+export async function bulkUpdateProducts(fd: FormData) {
+  const actor = await requirePermission("products.manage");
+  const action = String(fd.get("bulk") ?? "") as keyof typeof BULK_LABEL;
+  const back = { ...(fd.get("status") ? { status: String(fd.get("status")) } : {}) };
+  if (!(action in BULK_LABEL)) backToList({ ...back, notice: "Choose what to do with the selected products." });
+  const slugs = [...new Set(fd.getAll("slug").map(String).filter(Boolean))].slice(0, 500);
+  if (!slugs.length) backToList({ ...back, notice: "Tick at least one product first." });
+
+  const admin = supabaseAdmin();
+  const { data: found } = await admin.from("products").select("slug, name, price_ngn").in("slug", slugs).is("deleted_at", null);
+  let targets = found ?? [];
+  const noPrice = action === "publish" ? targets.filter((p) => !(Number(p.price_ngn) > 0)) : [];
+  if (noPrice.length) targets = targets.filter((p) => Number(p.price_ngn) > 0);
+
+  const change = action === "trash" ? { deleted_at: new Date().toISOString() } : { published: action === "publish" };
+  let done = 0;
+  if (targets.length) {
+    const { data, error } = await admin.from("products").update({ ...change, updated_by: actor.userId }).in("slug", targets.map((p) => p.slug)).select("slug");
+    if (error) backToList({ ...back, notice: `Couldn't update the products: ${error.message}` });
+    done = data?.length ?? 0;
+  }
+  if (done) await logActivity(actor, { action: `product.bulk_${action}`, entityType: "product", summary: `${done} product${done === 1 ? "" : "s"} ${BULK_LABEL[action]}` });
+  refreshSite();
+  const skipped = noPrice.length ? ` ${noPrice.length} not published because ${noPrice.length === 1 ? "it has" : "they have"} no price: ${noPrice.slice(0, 5).map((p) => p.name).join(", ")}${noPrice.length > 5 ? "…" : ""}.` : "";
+  backToList({ ...back, notice: `${done} product${done === 1 ? "" : "s"} ${BULK_LABEL[action]}.${action === "trash" && done ? " You can restore them from the Trash tab." : ""}${skipped}` });
+}
